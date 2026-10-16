@@ -4,16 +4,18 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { buildWorld, RING_RADIUS } from './world.js';
 import { createCar } from './car.js';
 import { createInput } from './input.js';
+import { styleSportsCar } from './carStyle.js';
 
 const STEP = 1 / 60;
 
 export async function startGame({ canvas, quality, isTouch, ui, projects, contact }) {
-  // Car model: Kenney Car Kit taxi (CC0). The box car is the fallback.
+  // Car model: Kenney Car Kit sports car (CC0), repainted yellow with black stripes.
+  // The box car is the fallback.
   const modelPromise = new GLTFLoader()
-    .loadAsync('/models/taxi/taxi.glb')
-    .then((gltf) => gltf.scene)
+    .loadAsync('/models/sports/sedan-sports.glb')
+    .then((gltf) => styleSportsCar(gltf.scene))
     .catch((err) => {
-      console.warn('Taxi model failed to load, using the box car.', err);
+      console.warn('Car model failed to load, using the box car.', err);
       return null;
     });
   await RAPIER.init();

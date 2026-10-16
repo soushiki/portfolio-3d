@@ -15,13 +15,14 @@ const HALF = { x: 0.85, y: 0.45, z: 1.55 };
 const moveTowards = (value, target, step) =>
   value < target ? Math.min(value + step, target) : Math.max(value - step, target);
 
-// Kenney's taxi is 2.75 long; this scale fills the 3.1-long collider.
-const MODEL_SCALE = 1.15;
+// Car models are scaled so their length fills the collider.
+const CAR_LENGTH = HALF.z * 2;
+const MODEL_WHEEL_RADIUS = 0.3; // Kenney wheels, before scaling
 
-// Uses the taxi model when it loaded; otherwise falls back to the box car.
+// Uses the loaded car model when there is one; otherwise falls back to the box car.
 export function createCar({ scene, physics, RAPIER, quality, spawn, model }) {
   const group = new THREE.Group();
-  const { chassis, wheels } = model ? buildModelCar(group, model, quality) : buildBoxCar(group, quality);
+  const { chassis, wheels, wheelRadius } = model ? buildModelCar(group, model, quality) : buildBoxCar(group, quality);
   scene.add(group);
 
   const rb = physics.createRigidBody(
@@ -39,7 +40,6 @@ export function createCar({ scene, physics, RAPIER, quality, spawn, model }) {
   let speed = 0;
   let steer = 0;
   let wheelRoll = 0;
-  const wheelRadius = model ? 0.3 * MODEL_SCALE : 0.38;
   const forward = new THREE.Vector3();
 
   const yawOf = (r) => 2 * Math.atan2(r.y, r.w);
@@ -112,13 +112,20 @@ export function createCar({ scene, physics, RAPIER, quality, spawn, model }) {
 
 // Wraps each wheel node in a pivot so it can steer (pivot Y) and roll (wheel X).
 function buildModelCar(group, model, quality) {
-  model.scale.setScalar(MODEL_SCALE);
+  const size = new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3());
+  const scale = CAR_LENGTH / size.z;
+  model.scale.setScalar(scale);
   model.position.y = -HALF.y; // the model's origin sits on the ground
   model.traverse((o) => {
     if (o.isMesh) o.castShadow = quality.shadows;
   });
   group.add(model);
-  const chassis = model.getObjectByName('body');
+  // Body and any extras (spoiler) lean together; wheels stay planted.
+  const chassis = new THREE.Group();
+  for (const part of [...model.children]) {
+    if (!part.name.startsWith('wheel')) chassis.add(part);
+  }
+  model.add(chassis);
   const wheels = [];
   for (const name of ['wheel-front-left', 'wheel-front-right', 'wheel-back-left', 'wheel-back-right']) {
     const wheel = model.getObjectByName(name);
@@ -129,7 +136,7 @@ function buildModelCar(group, model, quality) {
     pivot.add(wheel);
     wheels.push({ pivot, spin: wheel, front: name.includes('front') });
   }
-  return { chassis, wheels };
+  return { chassis, wheels, wheelRadius: MODEL_WHEEL_RADIUS * scale };
 }
 
 function buildBoxCar(group, quality) {
@@ -181,5 +188,5 @@ function buildBoxCar(group, quality) {
     group.add(pivot);
     wheels.push({ pivot, spin, front });
   }
-  return { chassis, wheels };
+  return { chassis, wheels, wheelRadius: 0.38 };
 }
