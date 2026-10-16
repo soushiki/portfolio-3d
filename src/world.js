@@ -1,22 +1,23 @@
 import * as THREE from 'three';
 import { makeSignTexture } from './signs.js';
+import { grassTexture, asphaltTexture, pavingTexture } from './textures.js';
 
 export const RING_RADIUS = 34;
 const WORLD_RADIUS = 88;
 const PAD_RADIUS = 3.2;
 const PLAZA_RADIUS = 11;
 
+const HOUSE_SCALE = 7; // Kenney suburban houses are ~1.3 units wide
+
 const COLORS = {
-  ground: '#E2D3CC',
-  road: '#4A4E69',
-  plaza: '#C9ADA7',
-  dash: '#F2E9E4',
-  trunk: '#22223B',
-  leaves: ['#4A4E69', '#9A8C98', '#6B6880'],
+  dash: '#F4F1EA',
+  curb: '#D9D4CC',
+  trunk: '#5A4636',
+  leaves: ['#4E7D3A', '#6A9A45', '#3F6B35'],
   rock: '#9A8C98',
   crate: '#C9ADA7',
   crateAlt: '#9A8C98',
-  cone: '#22223B',
+  cone: '#E8743B',
   post: '#22223B',
   pad: '#F2E9E4',
   accents: ['#22223B', '#4A4E69', '#9A8C98', '#C9ADA7'],
@@ -37,7 +38,7 @@ function yawQuat(yaw) {
   return { x: 0, y: Math.sin(yaw / 2), z: 0, w: Math.cos(yaw / 2) };
 }
 
-export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects, contact }) {
+export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects, contact, houses = [] }) {
   const rand = mulberry32(7);
   const dynamics = [];
   const zones = [];
@@ -64,7 +65,10 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
 
   // Ground + invisible boundary wall
   const ground = shadow(
-    new THREE.Mesh(new THREE.CylinderGeometry(WORLD_RADIUS, WORLD_RADIUS - 2, 4, 72), material(COLORS.ground)),
+    new THREE.Mesh(
+      new THREE.CylinderGeometry(WORLD_RADIUS, WORLD_RADIUS - 2, 4, 72),
+      material('#ffffff', { map: grassTexture(renderer) }),
+    ),
     false,
   );
   ground.position.y = -2;
@@ -79,18 +83,28 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
     addFixed(RAPIER.ColliderDesc.cuboid(half, 4, 0.5), Math.sin(a) * r, 3, Math.cos(a) * r, a);
   }
 
-  // Roads: plaza, ring road, spokes and dashed centre line
-  const roadMat = material(COLORS.road, { polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
+  // Roads: plaza, ring road with sidewalks, spokes and dashed centre line
+  const offset = (n) => ({ polygonOffset: true, polygonOffsetFactor: n, polygonOffsetUnits: n });
+  const roadMat = material('#ffffff', { map: asphaltTexture(renderer, [18, 18]), ...offset(-1) });
   const ring = shadow(new THREE.Mesh(new THREE.RingGeometry(RING_RADIUS - 3, RING_RADIUS + 3, 128), roadMat), false);
   ring.rotation.x = -Math.PI / 2;
   ring.position.y = 0.02;
   scene.add(ring);
 
+  const walkMat = material('#ffffff', { map: pavingTexture(renderer, [26, 26]), ...offset(-1) });
+  for (const [inner, outer] of [[RING_RADIUS - 4.4, RING_RADIUS - 3], [RING_RADIUS + 3, RING_RADIUS + 4.4]]) {
+    const walk = shadow(new THREE.Mesh(new THREE.RingGeometry(inner, outer, 128), walkMat), false);
+    walk.rotation.x = -Math.PI / 2;
+    walk.position.y = 0.05;
+    scene.add(walk);
+  }
+
   const spokeAngles = [];
   for (let i = 0; i < projects.length; i += 2) spokeAngles.push((i / projects.length) * Math.PI * 2);
   for (const a of spokeAngles) {
     const len = RING_RADIUS - PLAZA_RADIUS;
-    const spoke = shadow(new THREE.Mesh(new THREE.PlaneGeometry(5, len), roadMat), false);
+    const spokeMat = material('#ffffff', { map: asphaltTexture(renderer, [1.2, 5.5]), ...offset(-1) });
+    const spoke = shadow(new THREE.Mesh(new THREE.PlaneGeometry(5, len), spokeMat), false);
     spoke.rotation.set(-Math.PI / 2, 0, a);
     const mid = PLAZA_RADIUS + len / 2;
     spoke.position.set(Math.sin(a) * mid, 0.02, Math.cos(a) * mid);
@@ -100,7 +114,7 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
   const plaza = shadow(
     new THREE.Mesh(
       new THREE.CircleGeometry(PLAZA_RADIUS, 64),
-      material(COLORS.plaza, { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
+      material('#ffffff', { map: pavingTexture(renderer, [5.5, 5.5]), ...offset(-2) }),
     ),
     false,
   );
@@ -268,7 +282,39 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
   blockers.push({ x: 0, z: 20, r: 4 });
   for (let i = 0; i < (quality.low ? 4 : 6); i++) addCone(5 + (i % 2) * 1.2, -4 + i * 2.2);
 
-  // Trees and rocks, kept off roads, pads and signs
+  // Suburban houses in two rows around the ring road, fronts facing the centre
+  const houseSize = new Map();
+  const sizeOf = (proto) => {
+    if (!houseSize.has(proto)) houseSize.set(proto, new THREE.Box3().setFromObject(proto).getSize(new THREE.Vector3()));
+    return houseSize.get(proto);
+  };
+  const addHouse = (proto, x, z, yaw) => {
+    const size = sizeOf(proto).clone().multiplyScalar(HOUSE_SCALE);
+    const house = proto.clone();
+    house.scale.setScalar(HOUSE_SCALE);
+    house.position.set(x, 0, z);
+    house.rotation.y = yaw;
+    house.traverse((o) => {
+      if (o.isMesh) shadow(o);
+    });
+    scene.add(house);
+    addFixed(RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2), x, size.y / 2, z, yaw);
+    blockers.push({ x, z, r: Math.hypot(size.x, size.z) / 2 + 1 });
+  };
+  if (houses.length) {
+    const rows = quality.low ? [{ r: 54, n: 14 }] : [{ r: 54, n: 16 }, { r: 72, n: 20 }];
+    rows.forEach(({ r, n }, row) => {
+      for (let i = 0; i < n; i++) {
+        const a = ((i + 0.5 + row * 0.5) / n) * Math.PI * 2;
+        const rr = r + (rand() - 0.5) * 3;
+        const x = Math.sin(a) * rr;
+        const z = Math.cos(a) * rr;
+        addHouse(houses[(i * 7 + row * 3) % houses.length], x, z, Math.atan2(-x, -z));
+      }
+    });
+  }
+
+  // Trees and rocks, kept off roads, pads, signs and houses
   const nearSpoke = (x, z, margin) =>
     spokeAngles.some((a) => {
       const sx = Math.sin(a);
@@ -280,7 +326,7 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
   const freeSpot = (x, z, margin) => {
     const r = Math.hypot(x, z);
     if (r < PLAZA_RADIUS + margin) return false;
-    if (Math.abs(r - RING_RADIUS) < 3 + margin + 1) return false;
+    if (Math.abs(r - RING_RADIUS) < 4.4 + margin + 1) return false;
     if (nearSpoke(x, z, 2.5 + margin)) return false;
     return !blockers.some((b) => Math.hypot(x - b.x, z - b.z) < b.r + margin);
   };

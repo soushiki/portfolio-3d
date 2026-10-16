@@ -7,17 +7,26 @@ import { createInput } from './input.js';
 import { styleSportsCar } from './carStyle.js';
 
 const STEP = 1 / 60;
+const HOUSE_TYPES = ['a', 'b', 'c', 'd', 'e', 'g', 'j', 'l', 'p', 't'];
 
 export async function startGame({ canvas, quality, isTouch, ui, projects, contact }) {
   // Car model: Kenney Car Kit sports car (CC0), repainted yellow with black stripes.
   // The box car is the fallback.
-  const modelPromise = new GLTFLoader()
+  const loader = new GLTFLoader();
+  const modelPromise = loader
     .loadAsync('/models/sports/sedan-sports.glb')
     .then((gltf) => styleSportsCar(gltf.scene))
     .catch((err) => {
       console.warn('Car model failed to load, using the box car.', err);
       return null;
     });
+  // Houses: Kenney City Kit Suburban (CC0). Without them the world still works.
+  const housesPromise = Promise.all(
+    HOUSE_TYPES.map((t) => loader.loadAsync(`/models/suburban/building-type-${t}.glb`).then((g) => g.scene)),
+  ).catch((err) => {
+    console.warn('House models failed to load.', err);
+    return [];
+  });
   await RAPIER.init();
   ui.progress(0.6, 'Building the world…');
 
@@ -28,13 +37,13 @@ export async function startGame({ canvas, quality, isTouch, ui, projects, contac
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
-  const sky = new THREE.Color('#F2E9E4');
+  const sky = new THREE.Color('#CFE2EC');
   scene.background = sky;
   scene.fog = new THREE.Fog(sky, 50, 120);
 
   const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.5, 260);
 
-  scene.add(new THREE.HemisphereLight('#ffffff', '#C9ADA7', 1.7));
+  scene.add(new THREE.HemisphereLight('#ffffff', '#8FAF73', 1.6));
   const sun = new THREE.DirectionalLight('#fff4ec', 2.2);
   sun.castShadow = quality.shadows;
   if (quality.shadows) {
@@ -53,7 +62,7 @@ export async function startGame({ canvas, quality, isTouch, ui, projects, contac
   const physics = new RAPIER.World({ x: 0, y: -25, z: 0 });
   physics.timestep = STEP;
 
-  const world = buildWorld({ scene, physics, RAPIER, renderer, quality, projects, contact });
+  const world = buildWorld({ scene, physics, RAPIER, renderer, quality, projects, contact, houses: await housesPromise });
   const car = createCar({ scene, physics, RAPIER, quality, spawn: world.spawn, model: await modelPromise });
   const input = createInput({ touchRoot: document.getElementById('touch'), onReset: () => car.reset() });
 
