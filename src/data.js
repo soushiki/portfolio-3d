@@ -78,7 +78,7 @@ export const PROJECTS = [
     id: 'gacha',
     title: 'Whisker Gacha',
     description:
-      'Capsule-machine gacha game where you pull for 15 cats with powers, with rarity tiers, pity, animated reveals and a collection saved in the browser.',
+      'Capsule-machine gacha game with 21 cats with powers: soft and hard pity, a 50/50 rate-up system, a treat jar and daily challenges, and an animated Mythic reveal.',
     tags: ['JavaScript', 'CSS animation', 'SVG'],
     live: `${SIMPLE_PORTFOLIO}/public/html/cat-gacha.html`,
     code: 'https://github.com/soushiki/portfolio/blob/main/public/html/cat-gacha.html',
