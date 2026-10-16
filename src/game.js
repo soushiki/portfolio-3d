@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import RAPIER from '@dimforge/rapier3d-compat';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { buildWorld, RING_RADIUS } from './world.js';
 import { createCar } from './car.js';
 import { createInput } from './input.js';
@@ -7,6 +8,14 @@ import { createInput } from './input.js';
 const STEP = 1 / 60;
 
 export async function startGame({ canvas, quality, isTouch, ui, projects, contact }) {
+  // Car model: Kenney Car Kit taxi (CC0). The box car is the fallback.
+  const modelPromise = new GLTFLoader()
+    .loadAsync('/models/taxi/taxi.glb')
+    .then((gltf) => gltf.scene)
+    .catch((err) => {
+      console.warn('Taxi model failed to load, using the box car.', err);
+      return null;
+    });
   await RAPIER.init();
   ui.progress(0.6, 'Building the world…');
 
@@ -43,7 +52,7 @@ export async function startGame({ canvas, quality, isTouch, ui, projects, contac
   physics.timestep = STEP;
 
   const world = buildWorld({ scene, physics, RAPIER, renderer, quality, projects, contact });
-  const car = createCar({ scene, physics, RAPIER, quality, spawn: world.spawn });
+  const car = createCar({ scene, physics, RAPIER, quality, spawn: world.spawn, model: await modelPromise });
   const input = createInput({ touchRoot: document.getElementById('touch'), onReset: () => car.reset() });
 
   // Chase camera: trails behind the car's heading with some lag.

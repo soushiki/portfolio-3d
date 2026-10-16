@@ -15,8 +15,124 @@ const HALF = { x: 0.85, y: 0.45, z: 1.55 };
 const moveTowards = (value, target, step) =>
   value < target ? Math.min(value + step, target) : Math.max(value - step, target);
 
-export function createCar({ scene, physics, RAPIER, quality, spawn }) {
+// Kenney's taxi is 2.75 long; this scale fills the 3.1-long collider.
+const MODEL_SCALE = 1.15;
+
+// Uses the taxi model when it loaded; otherwise falls back to the box car.
+export function createCar({ scene, physics, RAPIER, quality, spawn, model }) {
   const group = new THREE.Group();
+  const { chassis, wheels } = model ? buildModelCar(group, model, quality) : buildBoxCar(group, quality);
+  scene.add(group);
+
+  const rb = physics.createRigidBody(
+    RAPIER.RigidBodyDesc.dynamic()
+      .setTranslation(spawn.x, HALF.y + 0.05, spawn.z)
+      .enabledRotations(false, true, false)
+      .setCcdEnabled(true)
+      .setCanSleep(false),
+  );
+  physics.createCollider(
+    RAPIER.ColliderDesc.cuboid(HALF.x, HALF.y, HALF.z).setDensity(2.2).setFriction(0.1).setRestitution(0.05),
+    rb,
+  );
+
+  let speed = 0;
+  let steer = 0;
+  let wheelRoll = 0;
+  const wheelRadius = model ? 0.3 * MODEL_SCALE : 0.38;
+  const forward = new THREE.Vector3();
+
+  const yawOf = (r) => 2 * Math.atan2(r.y, r.w);
+
+  return {
+    group,
+    body: rb,
+    get speed() {
+      return speed;
+    },
+    get yaw() {
+      return yawOf(rb.rotation());
+    },
+
+    step(input, dt) {
+      const yaw = yawOf(rb.rotation());
+      const fx = Math.sin(yaw);
+      const fz = Math.cos(yaw);
+      const v = rb.linvel();
+      // Read the real forward speed back, so walls and crates slow us down.
+      speed = v.x * fx + v.z * fz;
+      const latX = v.x - fx * speed;
+      const latZ = v.z - fz * speed;
+
+      const throttle = input.forward - input.back;
+      let target = throttle > 0 ? MAX_SPEED * throttle : throttle < 0 ? -MAX_REVERSE : 0;
+      let rate = throttle === 0 ? COAST : Math.sign(target) !== Math.sign(speed) && Math.abs(speed) > 0.5 ? BRAKE : ACCEL;
+      if (input.brake) {
+        target = 0;
+        rate = BRAKE;
+      }
+      speed = moveTowards(speed, target, rate * dt);
+
+      const grip = Math.pow(GRIP, dt);
+      rb.setLinvel({ x: fx * speed + latX * grip, y: v.y, z: fz * speed + latZ * grip }, true);
+
+      steer = moveTowards(steer, input.right - input.left, dt * 6);
+      const turnFactor = Math.max(-1, Math.min(1, speed / 5));
+      rb.setAngvel({ x: 0, y: -steer * TURN_RATE * turnFactor, z: 0 }, true);
+    },
+
+    // Copy physics to the meshes and animate wheels and body lean.
+    sync(dt) {
+      const p = rb.translation();
+      const r = rb.rotation();
+      group.position.set(p.x, p.y, p.z);
+      group.quaternion.set(r.x, r.y, r.z, r.w);
+      wheelRoll += (speed * dt) / wheelRadius;
+      for (const w of wheels) {
+        w.spin.rotation.x = wheelRoll;
+        if (w.front) w.pivot.rotation.y = -steer * 0.45;
+      }
+      const lean = THREE.MathUtils.clamp(steer * speed * 0.006, -0.08, 0.08);
+      chassis.rotation.z = THREE.MathUtils.lerp(chassis.rotation.z, lean, 0.15);
+      forward.set(Math.sin(yawOf(r)), 0, Math.cos(yawOf(r)));
+    },
+
+    forward,
+
+    reset(x = spawn.x, z = spawn.z, yaw = spawn.yaw) {
+      rb.setTranslation({ x, y: HALF.y + 0.3, z }, true);
+      rb.setRotation({ x: 0, y: Math.sin(yaw / 2), z: 0, w: Math.cos(yaw / 2) }, true);
+      rb.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      rb.setAngvel({ x: 0, y: 0, z: 0 }, true);
+      speed = 0;
+      steer = 0;
+    },
+  };
+}
+
+// Wraps each wheel node in a pivot so it can steer (pivot Y) and roll (wheel X).
+function buildModelCar(group, model, quality) {
+  model.scale.setScalar(MODEL_SCALE);
+  model.position.y = -HALF.y; // the model's origin sits on the ground
+  model.traverse((o) => {
+    if (o.isMesh) o.castShadow = quality.shadows;
+  });
+  group.add(model);
+  const chassis = model.getObjectByName('body');
+  const wheels = [];
+  for (const name of ['wheel-front-left', 'wheel-front-right', 'wheel-back-left', 'wheel-back-right']) {
+    const wheel = model.getObjectByName(name);
+    const pivot = new THREE.Group();
+    pivot.position.copy(wheel.position);
+    wheel.parent.add(pivot);
+    wheel.position.set(0, 0, 0);
+    pivot.add(wheel);
+    wheels.push({ pivot, spin: wheel, front: name.includes('front') });
+  }
+  return { chassis, wheels };
+}
+
+function buildBoxCar(group, quality) {
   const mat = (color, extra) =>
     quality.low
       ? new THREE.MeshLambertMaterial({ color, flatShading: true, ...extra })
@@ -65,89 +181,5 @@ export function createCar({ scene, physics, RAPIER, quality, spawn }) {
     group.add(pivot);
     wheels.push({ pivot, spin, front });
   }
-  scene.add(group);
-
-  const rb = physics.createRigidBody(
-    RAPIER.RigidBodyDesc.dynamic()
-      .setTranslation(spawn.x, HALF.y + 0.05, spawn.z)
-      .enabledRotations(false, true, false)
-      .setCcdEnabled(true)
-      .setCanSleep(false),
-  );
-  physics.createCollider(
-    RAPIER.ColliderDesc.cuboid(HALF.x, HALF.y, HALF.z).setDensity(2.2).setFriction(0.1).setRestitution(0.05),
-    rb,
-  );
-
-  let speed = 0;
-  let steer = 0;
-  let wheelRoll = 0;
-  const forward = new THREE.Vector3();
-
-  const yawOf = (r) => 2 * Math.atan2(r.y, r.w);
-
-  return {
-    group,
-    body: rb,
-    get speed() {
-      return speed;
-    },
-    get yaw() {
-      return yawOf(rb.rotation());
-    },
-
-    step(input, dt) {
-      const yaw = yawOf(rb.rotation());
-      const fx = Math.sin(yaw);
-      const fz = Math.cos(yaw);
-      const v = rb.linvel();
-      // Read the real forward speed back, so walls and crates slow us down.
-      speed = v.x * fx + v.z * fz;
-      const latX = v.x - fx * speed;
-      const latZ = v.z - fz * speed;
-
-      const throttle = input.forward - input.back;
-      let target = throttle > 0 ? MAX_SPEED * throttle : throttle < 0 ? -MAX_REVERSE : 0;
-      let rate = throttle === 0 ? COAST : Math.sign(target) !== Math.sign(speed) && Math.abs(speed) > 0.5 ? BRAKE : ACCEL;
-      if (input.brake) {
-        target = 0;
-        rate = BRAKE;
-      }
-      speed = moveTowards(speed, target, rate * dt);
-
-      const grip = Math.pow(GRIP, dt);
-      rb.setLinvel({ x: fx * speed + latX * grip, y: v.y, z: fz * speed + latZ * grip }, true);
-
-      steer = moveTowards(steer, input.right - input.left, dt * 6);
-      const turnFactor = Math.max(-1, Math.min(1, speed / 5));
-      rb.setAngvel({ x: 0, y: -steer * TURN_RATE * turnFactor, z: 0 }, true);
-    },
-
-    // Copy physics to the meshes and animate wheels and body lean.
-    sync(dt) {
-      const p = rb.translation();
-      const r = rb.rotation();
-      group.position.set(p.x, p.y, p.z);
-      group.quaternion.set(r.x, r.y, r.z, r.w);
-      wheelRoll += (speed * dt) / 0.38;
-      for (const w of wheels) {
-        w.spin.rotation.x = wheelRoll;
-        if (w.front) w.pivot.rotation.y = -steer * 0.45;
-      }
-      const lean = THREE.MathUtils.clamp(steer * speed * 0.006, -0.08, 0.08);
-      chassis.rotation.z = THREE.MathUtils.lerp(chassis.rotation.z, lean, 0.15);
-      forward.set(Math.sin(yawOf(r)), 0, Math.cos(yawOf(r)));
-    },
-
-    forward,
-
-    reset(x = spawn.x, z = spawn.z, yaw = spawn.yaw) {
-      rb.setTranslation({ x, y: HALF.y + 0.3, z }, true);
-      rb.setRotation({ x: 0, y: Math.sin(yaw / 2), z: 0, w: Math.cos(yaw / 2) }, true);
-      rb.setLinvel({ x: 0, y: 0, z: 0 }, true);
-      rb.setAngvel({ x: 0, y: 0, z: 0 }, true);
-      speed = 0;
-      steer = 0;
-    },
-  };
+  return { chassis, wheels };
 }
