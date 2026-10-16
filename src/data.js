@@ -75,6 +75,15 @@ export const PROJECTS = [
     code: 'https://github.com/soushiki/todo-list',
   },
   {
+    id: 'gacha',
+    title: 'Whisker Gacha',
+    description:
+      'Capsule-machine gacha game where you pull for 15 cats with powers, with rarity tiers, pity, animated reveals and a collection saved in the browser.',
+    tags: ['JavaScript', 'CSS animation', 'SVG'],
+    live: `${SIMPLE_PORTFOLIO}/public/html/cat-gacha.html`,
+    code: 'https://github.com/soushiki/portfolio/blob/main/public/html/cat-gacha.html',
+  },
+  {
     id: 'reddit',
     title: 'Reddit Plus',
     description: 'Reddit client built on the Reddit API, with state managed in Redux.',
