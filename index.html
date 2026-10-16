@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#22223B" />
+    <meta name="description" content="Drive a small car around a low-poly world to discover Sebastian Herrera's projects." />
+    <title>Sebastian Herrera · 3D Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Mozilla+Headline:wght@200..700&family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <canvas id="scene" aria-label="3D world: drive the car to discover projects"></canvas>
+
+    <!-- Loading screen -->
+    <div id="loader" class="loader">
+      <div class="loader-inner">
+        <p class="eyebrow">Sebastian Herrera</p>
+        <h1>Portfolio, the driving edition</h1>
+        <div class="bar" aria-hidden="true"><span id="loader-bar"></span></div>
+        <p id="loader-status" class="loader-status" role="status">Loading the world…</p>
+        <button id="start-btn" class="btn btn-primary" type="button" hidden>Start driving</button>
+        <p class="loader-hint">
+          <span class="hint-keys">WASD / arrows to drive · Space to brake · R to reset</span>
+          <span class="hint-touch">Use the on-screen buttons to drive</span>
+        </p>
+        <a class="skip-link" href="https://sebherr.netlify.app">Skip to the simple portfolio →</a>
+      </div>
+    </div>
+
+    <!-- HUD -->
+    <header id="hud" class="hud" hidden>
+      <span class="hud-name">Sebastian Herrera</span>
+      <nav class="hud-actions">
+        <button id="list-btn" class="btn btn-small" type="button" aria-haspopup="dialog">All projects</button>
+        <a class="btn btn-small" href="https://sebherr.netlify.app">Simple portfolio</a>
+      </nav>
+    </header>
+    <p id="zone-hint" class="zone-hint" hidden>Drive onto a glowing pad to open a project</p>
+
+    <!-- Project card -->
+    <aside id="card" class="card" role="dialog" aria-modal="false" aria-labelledby="card-title" hidden>
+      <button id="card-close" class="card-close" type="button" aria-label="Close">×</button>
+      <h2 id="card-title"></h2>
+      <p id="card-desc"></p>
+      <ul id="card-tags" class="tags"></ul>
+      <div id="card-links" class="card-links"></div>
+    </aside>
+
+    <!-- Touch controls -->
+    <div id="touch" class="touch" hidden>
+      <div class="touch-group">
+        <button class="touch-btn" data-key="left" type="button" aria-label="Steer left">◀</button>
+        <button class="touch-btn" data-key="right" type="button" aria-label="Steer right">▶</button>
+      </div>
+      <div class="touch-group">
+        <button class="touch-btn" data-key="back" type="button" aria-label="Reverse">▼</button>
+        <button class="touch-btn touch-gas" data-key="forward" type="button" aria-label="Accelerate">▲</button>
+      </div>
+    </div>
+
+    <!-- Project list: used as the "All projects" dialog and as the no-WebGL fallback -->
+    <section id="list" class="list" aria-labelledby="list-title" hidden>
+      <div class="list-inner">
+        <button id="list-close" class="card-close" type="button" aria-label="Close">×</button>
+        <p class="eyebrow">Sebastian Herrera</p>
+        <h2 id="list-title">Projects</h2>
+        <p id="list-note" class="list-note"></p>
+        <ul id="list-items" class="list-items"></ul>
+        <p class="list-contact">
+          <a href="https://www.linkedin.com/in/sebastian-herrera-claro-23a0af/" target="_blank" rel="noopener">LinkedIn</a>
+          ·
+          <a href="https://github.com/soushiki" target="_blank" rel="noopener">GitHub</a>
+          ·
+          <a href="https://sebherr.netlify.app">Simple portfolio</a>
+        </p>
+      </div>
+    </section>
+
+    <noscript>
+      <div class="noscript">
+        <p>This 3D portfolio needs JavaScript.</p>
+        <p><a href="https://sebherr.netlify.app">Open the simple portfolio</a> · <a href="https://github.com/soushiki">GitHub</a></p>
+      </div>
+    </noscript>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

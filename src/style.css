@@ -1,0 +1,575 @@
+:root {
+  --navy: #22223b;
+  --slate: #4a4e69;
+  --mauve: #9a8c98;
+  --rose: #c9ada7;
+  --cream: #f2e9e4;
+  --font: 'Outfit', system-ui, sans-serif;
+  --display: 'Mozilla Headline', 'Outfit', system-ui, sans-serif;
+  --radius: 16px;
+  --gutter: 24px;
+  --touch-size: 72px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--cream);
+  color: var(--navy);
+  font-family: var(--font);
+  -webkit-tap-highlight-color: transparent;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+a {
+  color: inherit;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 22px;
+  border: 2px solid var(--navy);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--navy);
+  font: 600 1rem var(--font);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  background: var(--navy);
+  color: var(--cream);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--navy);
+  color: var(--cream);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background: var(--slate);
+  border-color: var(--slate);
+}
+
+.btn-small {
+  padding: 7px 14px;
+  font-size: 0.875rem;
+  background: rgba(242, 233, 228, 0.85);
+  backdrop-filter: blur(6px);
+}
+
+/* Loader */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  background: var(--cream);
+  transition: opacity 0.6s ease;
+}
+
+.loader.is-done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader-inner {
+  width: min(460px, 100%);
+  text-align: center;
+}
+
+.loader h1 {
+  margin: 0 0 28px;
+  font: 600 clamp(1.8rem, 5vw, 2.6rem) / 1.1 var(--display);
+}
+
+.bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--rose);
+  overflow: hidden;
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--navy);
+  transition: width 0.3s ease;
+}
+
+.loader-status {
+  margin: 12px 0 20px;
+  color: var(--slate);
+}
+
+.loader-hint {
+  margin: 20px 0 0;
+  font-size: 0.9rem;
+  color: var(--slate);
+}
+
+.hint-touch {
+  display: none;
+}
+
+.is-touch .hint-touch {
+  display: inline;
+}
+
+.is-touch .hint-keys {
+  display: none;
+}
+
+.skip-link {
+  display: inline-block;
+  margin-top: 18px;
+  font-weight: 600;
+}
+
+/* HUD */
+.hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(16px + env(safe-area-inset-top)) var(--gutter) 16px;
+  pointer-events: none;
+}
+
+.hud > * {
+  pointer-events: auto;
+}
+
+.hud-name {
+  font: 600 1.1rem var(--display);
+}
+
+.hud-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.zone-hint {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 10;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(34, 34, 59, 0.8);
+  color: var(--cream);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Project card */
+.card {
+  position: fixed;
+  right: var(--gutter);
+  bottom: var(--gutter);
+  z-index: 20;
+  width: min(400px, calc(100% - 2 * var(--gutter)));
+  max-height: calc(100% - 2 * var(--gutter) - 60px);
+  overflow: auto;
+  padding: 26px 24px 22px;
+  border-radius: var(--radius);
+  background: var(--cream);
+  box-shadow: 0 18px 50px rgba(34, 34, 59, 0.28);
+  animation: card-in 0.28s ease;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+
+.card h2 {
+  margin: 0 32px 10px 0;
+  font: 600 1.6rem / 1.15 var(--display);
+}
+
+.card p {
+  margin: 0 0 14px;
+  line-height: 1.5;
+  color: var(--slate);
+}
+
+.card-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--navy);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.card-close:hover,
+.card-close:focus-visible {
+  background: var(--rose);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.tags li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--rose);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Touch controls */
+.touch {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 var(--gutter) calc(var(--gutter) + env(safe-area-inset-bottom));
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.touch-group {
+  display: flex;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.touch-btn {
+  width: var(--touch-size);
+  height: var(--touch-size);
+  border: 0;
+  border-radius: 50%;
+  background: rgba(34, 34, 59, 0.55);
+  color: var(--cream);
+  font-size: 1.5rem;
+  touch-action: none;
+  backdrop-filter: blur(4px);
+}
+
+.touch-btn.is-down {
+  background: rgba(34, 34, 59, 0.9);
+  transform: scale(0.94);
+}
+
+.touch-gas {
+  background: rgba(74, 78, 105, 0.7);
+}
+
+/* Project list (dialog + no-WebGL fallback) */
+.list {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow: auto;
+  padding: var(--gutter);
+  background: rgba(242, 233, 228, 0.97);
+}
+
+.list-inner {
+  position: relative;
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+.list h2 {
+  margin: 0 0 8px;
+  font: 600 2.2rem var(--display);
+}
+
+.list-note {
+  margin: 0 0 20px;
+  color: var(--slate);
+}
+
+.list-note:empty {
+  display: none;
+}
+
+.list-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.list-items > li {
+  padding: 18px;
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(34, 34, 59, 0.08);
+}
+
+.list-items h3 {
+  margin: 0 0 6px;
+  font: 600 1.15rem var(--display);
+}
+
+.list-items p {
+  margin: 0 0 12px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--slate);
+}
+
+.list-items .tags {
+  margin-bottom: 12px;
+}
+
+.list-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.list-links a {
+  font-weight: 600;
+}
+
+.list-contact {
+  text-align: center;
+  font-weight: 600;
+}
+
+.list-goto {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--slate);
+  font: 600 0.9rem var(--font);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.is-fallback .list-close,
+.is-fallback #list-close,
+.is-fallback .list-goto {
+  display: none;
+}
+
+.noscript {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-content: center;
+  padding: var(--gutter);
+  background: var(--cream);
+  text-align: center;
+}
+
+/* Tablet: width up to 1024px, or short landscape screens */
+@media (max-width: 1024px), (max-height: 700px) {
+  :root {
+    --gutter: 18px;
+    --touch-size: 64px;
+  }
+
+  .card {
+    width: min(360px, calc(100% - 2 * var(--gutter)));
+    padding: 22px 20px 18px;
+  }
+
+  .card h2 {
+    font-size: 1.4rem;
+  }
+}
+
+/* Touch devices: move the card above the driving buttons */
+@media (pointer: coarse) {
+  .card {
+    left: 50%;
+    right: auto;
+    top: calc(70px + env(safe-area-inset-top));
+    bottom: auto;
+    transform: translateX(-50%);
+    animation: none;
+    max-height: calc(100% - 70px - var(--touch-size) - 3 * var(--gutter));
+  }
+
+  .zone-hint {
+    bottom: calc(var(--touch-size) + 2 * var(--gutter) + 6px);
+  }
+}
+
+/* Phone portrait */
+@media (max-width: 600px) {
+  :root {
+    --gutter: 16px;
+  }
+
+  .hud-name {
+    font-size: 0.95rem;
+  }
+
+  .hud-actions .btn-small {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .list-items {
+    grid-template-columns: 1fr;
+  }
+
+  .list h2 {
+    font-size: 1.8rem;
+  }
+
+  .card h2 {
+    font-size: 1.25rem;
+  }
+
+  .card p {
+    font-size: 0.92rem;
+  }
+
+  .zone-hint {
+    font-size: 0.8rem;
+  }
+}
+
+/* Very narrow phones */
+@media (max-width: 380px) {
+  :root {
+    --touch-size: 58px;
+  }
+
+  .hud-name {
+    display: none;
+  }
+
+  .hud {
+    justify-content: flex-end;
+  }
+}
+
+/* Phone landscape: short viewport, so shrink everything vertically */
+@media (max-height: 500px) {
+  :root {
+    --gutter: 12px;
+    --touch-size: 56px;
+  }
+
+  .hud {
+    padding-top: calc(8px + env(safe-area-inset-top));
+    padding-bottom: 8px;
+  }
+
+  .card {
+    top: calc(52px + env(safe-area-inset-top));
+    max-height: calc(100% - 64px);
+    width: min(380px, calc(100% - 2 * var(--touch-size) - 6 * var(--gutter)));
+    padding: 16px 16px 12px;
+  }
+
+  .card p {
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+  }
+
+  .tags {
+    margin-bottom: 10px;
+  }
+
+  .card-links .btn {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+
+  .loader h1 {
+    margin-bottom: 14px;
+    font-size: 1.6rem;
+  }
+
+  .loader-hint,
+  .skip-link {
+    margin-top: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .loader {
+    animation: none;
+    transition: none;
+  }
+}
