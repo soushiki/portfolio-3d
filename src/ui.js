@@ -21,11 +21,12 @@ function tagList(tags) {
   return ul;
 }
 
-// Live/Code for projects; contact zones bring their own link list.
+// Live/Case study/Code for projects; contact zones bring their own link list.
 export function linksFor(item) {
   if (item.links) return item.links;
   const links = [];
   if (item.live) links.push({ label: 'Live', href: item.live });
+  if (item.caseStudy) links.push({ label: 'Case study', href: item.caseStudy });
   if (item.code) links.push({ label: 'Code', href: item.code });
   return links;
 }

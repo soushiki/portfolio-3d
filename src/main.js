@@ -1,7 +1,7 @@
-import { PROJECTS, CONTACT_ZONE } from './data.js';
+import { PROJECTS, CONTACT_ZONE, DATA_SCIENCE, DATA_SCIENCE_HUB } from './data.js';
 import { createUI } from './ui.js';
 
-const ui = createUI({ projects: PROJECTS });
+const ui = createUI({ projects: [...PROJECTS, DATA_SCIENCE_HUB, ...DATA_SCIENCE] });
 
 const isTouch = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
 document.body.classList.toggle('is-touch', isTouch);
@@ -64,6 +64,7 @@ async function boot() {
       ui,
       projects: PROJECTS,
       contact: CONTACT_ZONE,
+      dataScience: { hub: DATA_SCIENCE_HUB, projects: DATA_SCIENCE },
     });
     if (import.meta.env.DEV) window.__game = game;
   } catch (err) {

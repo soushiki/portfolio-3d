@@ -9,7 +9,7 @@ import { styleSportsCar } from './carStyle.js';
 const STEP = 1 / 60;
 const HOUSE_TYPES = ['a', 'b', 'c', 'd', 'e', 'g', 'j', 'l', 'p', 't'];
 
-export async function startGame({ canvas, quality, isTouch, ui, projects, contact }) {
+export async function startGame({ canvas, quality, isTouch, ui, projects, contact, dataScience }) {
   // Car model: Kenney Car Kit sports car (CC0), repainted yellow with black stripes.
   // The box car is the fallback.
   const loader = new GLTFLoader();
@@ -62,7 +62,9 @@ export async function startGame({ canvas, quality, isTouch, ui, projects, contac
   const physics = new RAPIER.World({ x: 0, y: -25, z: 0 });
   physics.timestep = STEP;
 
-  const world = buildWorld({ scene, physics, RAPIER, renderer, quality, projects, contact, houses: await housesPromise });
+  const world = buildWorld({
+    scene, physics, RAPIER, renderer, quality, projects, contact, dataScience, houses: await housesPromise,
+  });
   const car = createCar({ scene, physics, RAPIER, quality, spawn: world.spawn, model: await modelPromise });
   const input = createInput({ touchRoot: document.getElementById('touch'), onReset: () => car.reset() });
 
@@ -111,10 +113,15 @@ export async function startGame({ canvas, quality, isTouch, ui, projects, contac
     const zone = allZones.find((z) => z.data.id === id);
     if (!zone) return;
     // Park a few metres before the pad, facing it, so a tap on the gas drives in.
-    const len = Math.hypot(zone.x, zone.z) || 1;
+    // Pads face their own island's centre; a pad on the centre is approached from the west.
+    let dx = zone.x - zone.cx;
+    let dz = zone.z - zone.cz;
+    const len = Math.hypot(dx, dz);
+    if (len < 1) [dx, dz] = [1, 0];
+    else [dx, dz] = [dx / len, dz / len];
     const back = 7;
-    const x = zone.x - (zone.x / len) * back;
-    const z = zone.z - (zone.z / len) * back;
+    const x = zone.x - dx * back;
+    const z = zone.z - dz * back;
     const yaw = Math.atan2(zone.x - x, zone.z - z);
     car.reset(x, z, yaw);
     camYaw = yaw;

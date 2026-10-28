@@ -14,6 +14,7 @@ export const PROJECTS = [
       'Anonymizes Word documents before you paste them into an AI, then restores the real names in the answer. Everything runs in the browser, so nothing leaves your computer.',
     tags: ['React', 'Vite', 'Vitest', '.docx'],
     live: 'https://minoscreto.netlify.app/',
+    caseStudy: `${SIMPLE_PORTFOLIO}/public/html/minoscreto.html`,
     code: 'https://github.com/soushiki/minoscreto',
   },
   {
@@ -29,17 +30,18 @@ export const PROJECTS = [
     id: 'ingresos',
     title: 'Ingresos App',
     description:
-      "Reads photos and PDFs of receipts and POS cash-closing reports with OCR and a local vision model, then builds the day's accounting ledger and exports it to Excel.",
+      "Bookkeeping template for restaurants: reads photos and PDFs of receipts and POS cash-closing reports with OCR and a local vision model, then builds the day's accounting ledger and exports it to Excel.",
     tags: ['Python', 'OCR', 'Ollama', 'Excel'],
+    caseStudy: `${SIMPLE_PORTFOLIO}/public/html/ingresos.html`,
     code: 'https://github.com/soushiki/ingresos-app',
   },
   {
-    id: 'stockroom',
-    title: 'Stockroom',
+    id: 'formato',
+    title: 'Formato Médico',
     description:
-      'Full-stack accounting and inventory prototype, with a Spring Boot REST API, an Angular frontend and Docker Compose for local setup.',
-    tags: ['Java', 'Spring Boot', 'Angular', 'Docker'],
-    code: 'https://github.com/soushiki/stockroom',
+      "Fills a physician's lab orders, prescriptions and certificates as PDFs that match the printed form, with an offline ICD-10 search. One React codebase for web and Android.",
+    tags: ['React', 'jsPDF', 'Capacitor', 'Android'],
+    caseStudy: `${SIMPLE_PORTFOLIO}/public/html/formato-medico.html`,
   },
   {
     id: 'davinci',
@@ -96,6 +98,52 @@ export const PROJECTS = [
     description: 'Search Spotify and build playlists using the Spotify Web API.',
     tags: ['React', 'Spotify API', 'OAuth'],
     code: 'https://github.com/soushiki/Jammming',
+  },
+];
+
+// Data science island: a hub pad on its plaza plus one pad per project.
+const DATA_SCIENCE_SITE = 'https://soushiki.github.io/data-science';
+
+export const DATA_SCIENCE_HUB = {
+  id: 'ds-hub',
+  title: 'Data Science Portfolio',
+  description:
+    'End-to-end data science on real public data: live API pipelines, honest out-of-time evaluation and interactive dashboards. Drive around the island to see each project.',
+  tags: ['Data science', 'Python', 'scikit-learn'],
+  links: [
+    { label: 'Portfolio', href: `${DATA_SCIENCE_SITE}/` },
+    { label: 'Data science CV', href: `${DATA_SCIENCE_SITE}/cv/` },
+    { label: 'Code', href: 'https://github.com/soushiki/data-science' },
+  ],
+};
+
+export const DATA_SCIENCE = [
+  {
+    id: 'ds-email',
+    title: 'Email Uplift Test',
+    description:
+      'A/B test readout and uplift modeling on a 64,000-customer randomized experiment, ending in a decision: send everyone the men\'s email ($131 per 1,000, 95% CI $46–$216), and don\'t deploy the targeting model.',
+    tags: ['A/B testing', 'Uplift', 'Statistics'],
+    live: `${DATA_SCIENCE_SITE}/email-uplift/`,
+    code: 'https://github.com/soushiki/data-science/tree/main/projects/email-uplift',
+  },
+  {
+    id: 'ds-grid',
+    title: 'GB Demand Forecast',
+    description:
+      "Day-ahead electricity demand forecast for Great Britain (4.2% MAPE), compared with the grid operator's official forecasts. It lost on the daily peak, but a 50/50 blend beat the operator by 6.7%.",
+    tags: ['Time series', 'Forecasting', 'Weather data'],
+    live: `${DATA_SCIENCE_SITE}/gb-electricity-demand/`,
+    code: 'https://github.com/soushiki/data-science/tree/main/projects/gb-electricity-demand',
+  },
+  {
+    id: 'ds-311',
+    title: 'NYC 311 Delays',
+    description:
+      'Predicts which NYC service requests will be resolved slower than similar ones, from ~400K records on a live city API. It reframes a misleading 0.95-AUC target into a model with 2.2× lift.',
+    tags: ['Classification', 'pandas', 'API data'],
+    live: `${DATA_SCIENCE_SITE}/nyc-311-delays/`,
+    code: 'https://github.com/soushiki/data-science/tree/main/projects/nyc-311-delays',
   },
 ];
 
