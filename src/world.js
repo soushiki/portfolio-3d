@@ -12,6 +12,8 @@ const HOUSE_SCALE = 7; // Kenney suburban houses are ~1.3 units wide
 // Data science island, east of the main island and joined to it by a bridge along z = 0.
 const ISLET = { x: 136, z: 0, radius: 30, ring: 16, plaza: 7 };
 const BRIDGE = { from: 86, to: ISLET.x - ISLET.radius + 2, halfWidth: 3.4 };
+// "← Data Science" sign beside the causeway, just past the ring road. Houses keep clear of it.
+const CAUSEWAY_SIGN = { x: RING_RADIUS + 7, z: 6, clearance: 9 };
 
 const COLORS = {
   dash: '#F4F1EA',
@@ -345,6 +347,7 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
         const x = Math.sin(a) * rr;
         const z = Math.cos(a) * rr;
         if (dataScience && inCauseway(x, z, 9)) continue;
+        if (dataScience && Math.hypot(x - CAUSEWAY_SIGN.x, z - CAUSEWAY_SIGN.z) < CAUSEWAY_SIGN.clearance) continue;
         addHouse(houses[(i * 7 + row * 3) % houses.length], x, z, Math.atan2(-x, -z));
       }
     });
@@ -369,8 +372,8 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
     );
     // Parallel to the causeway on the driver's right, facing the road: its left points to the bridge
     addSign({
-      x: RING_RADIUS + 14,
-      z: 6.5,
+      x: CAUSEWAY_SIGN.x,
+      z: CAUSEWAY_SIGN.z,
       yaw: Math.PI,
       texture: makeSignTexture({ title: '← Data Science', subtitle: 'Cross the bridge', accent: COLORS.dsAccents[0] }, renderer),
     });
