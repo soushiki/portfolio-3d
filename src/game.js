@@ -1,3 +1,4 @@
+import { t } from './i18n.js';
 import * as THREE from 'three';
 import RAPIER from '@dimforge/rapier3d-compat';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -28,7 +29,7 @@ export async function startGame({ canvas, quality, isTouch, ui, projects, contac
     return [];
   });
   await RAPIER.init();
-  ui.progress(0.6, 'Building the world…');
+  ui.progress(0.6, t('buildingWorld'));
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: quality.antialias, powerPreference: 'high-performance' });
   renderer.setPixelRatio(quality.pixelRatio);

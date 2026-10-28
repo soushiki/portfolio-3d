@@ -1,5 +1,8 @@
 import { PROJECTS, CONTACT_ZONE, DATA_SCIENCE, DATA_SCIENCE_HUB } from './data.js';
 import { createUI } from './ui.js';
+import { t, applyStaticText } from './i18n.js';
+
+applyStaticText();
 
 const ui = createUI({ projects: [...PROJECTS, DATA_SCIENCE_HUB, ...DATA_SCIENCE] });
 
@@ -49,13 +52,13 @@ async function loadFonts() {
 
 async function boot() {
   if (!hasWebGL()) {
-    ui.showFallback("Your browser can't run the 3D world (WebGL is unavailable), so here are all the projects.");
+    ui.showFallback(t('noWebgl'));
     return;
   }
   try {
-    ui.progress(0.1, 'Loading fonts…');
+    ui.progress(0.1, t('loadingFonts'));
     await loadFonts();
-    ui.progress(0.3, 'Loading the engine…');
+    ui.progress(0.3, t('loadingEngine'));
     const { startGame } = await import('./game.js');
     const game = await startGame({
       canvas: document.getElementById('scene'),
@@ -69,7 +72,7 @@ async function boot() {
     if (import.meta.env.DEV) window.__game = game;
   } catch (err) {
     console.error(err);
-    ui.showFallback('Something went wrong while starting the 3D world, so here are all the projects.');
+    ui.showFallback(t('startFailed'));
   }
 }
 

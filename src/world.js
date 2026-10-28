@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { makeSignTexture } from './signs.js';
+import { t } from './i18n.js';
 import { makeLandmark } from './landmarks.js';
 import { grassTexture, asphaltTexture, pavingTexture } from './textures.js';
 
@@ -325,7 +326,7 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
     x: -12.5,
     z: -3,
     yaw: Math.PI / 2,
-    texture: makeSignTexture({ title: 'Say hi', subtitle: 'LinkedIn · GitHub', tags: ['Open to work'] }, renderer),
+    texture: makeSignTexture({ title: t('signContactTitle'), subtitle: t('signContactSub'), tags: [t('signContactTag')] }, renderer),
   });
 
   // Welcome board
@@ -336,7 +337,7 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
     width: 6,
     height: 3,
     texture: makeSignTexture(
-      { title: "Hi, I'm Sebastian Herrera", subtitle: 'Drive onto the glowing pads to see my projects.' },
+      { title: t('signHiTitle'), subtitle: t('signHiSub') },
       renderer,
     ),
   });
@@ -406,7 +407,7 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
       x: CAUSEWAY_SIGN.x,
       z: CAUSEWAY_SIGN.z,
       yaw: Math.PI,
-      texture: makeSignTexture({ title: '← Data Science', subtitle: 'Cross the bridge', accent: COLORS.dsAccents[0] }, renderer),
+      texture: makeSignTexture({ title: t('signBridgeTitle'), subtitle: t('signBridgeSub'), accent: COLORS.dsAccents[0] }, renderer),
     });
 
     // Bridge: wooden deck, asphalt top, rails with posts
@@ -473,7 +474,7 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
       width: 6,
       height: 3,
       texture: makeSignTexture(
-        { title: 'Data Science', subtitle: 'Forecasting · A/B testing · ML', accent: COLORS.dsAccents[0] },
+        { title: t('signIslandTitle'), subtitle: t('signIslandSub'), accent: COLORS.dsAccents[0] },
         renderer,
       ),
     });

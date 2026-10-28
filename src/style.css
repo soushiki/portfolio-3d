@@ -97,6 +97,46 @@ a {
   backdrop-filter: blur(6px);
 }
 
+/* Language toggle */
+.lang-toggle {
+  display: inline-flex;
+  border: 2px solid var(--navy);
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(242, 233, 228, 0.85);
+  backdrop-filter: blur(6px);
+}
+
+.lang-toggle button {
+  padding: 5px 11px;
+  border: 0;
+  background: transparent;
+  color: var(--navy);
+  font: 600 0.8rem var(--font);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.lang-toggle button[aria-pressed='true'] {
+  background: var(--navy);
+  color: var(--cream);
+}
+
+.lang-toggle button:focus-visible {
+  outline: 2px solid var(--slate);
+  outline-offset: -4px;
+}
+
+.lang-toggle-loader {
+  display: flex;
+  width: max-content;
+  margin: 16px auto 0;
+}
+
+.hud-actions {
+  align-items: center;
+}
+
 /* Loader */
 .loader {
   position: fixed;

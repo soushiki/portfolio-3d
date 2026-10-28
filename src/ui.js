@@ -1,3 +1,5 @@
+import { t } from './i18n.js';
+
 const $ = (id) => document.getElementById(id);
 
 function link(label, href, primary) {
@@ -25,9 +27,9 @@ function tagList(tags) {
 export function linksFor(item) {
   if (item.links) return item.links;
   const links = [];
-  if (item.live) links.push({ label: 'Live', href: item.live });
-  if (item.caseStudy) links.push({ label: 'Case study', href: item.caseStudy });
-  if (item.code) links.push({ label: 'Code', href: item.code });
+  if (item.live) links.push({ label: t('live'), href: item.live });
+  if (item.caseStudy) links.push({ label: t('caseStudy'), href: item.caseStudy });
+  if (item.code) links.push({ label: t('code'), href: item.code });
   return links;
 }
 
@@ -79,7 +81,7 @@ export function createUI({ projects }) {
     const go = document.createElement('button');
     go.type = 'button';
     go.className = 'list-goto';
-    go.textContent = 'Drive there';
+    go.textContent = t('driveThere');
     go.addEventListener('click', () => {
       list.hidden = true;
       onGoTo?.(p.id);
@@ -96,7 +98,7 @@ export function createUI({ projects }) {
     },
 
     ready(onStart) {
-      this.progress(1, 'Ready.');
+      this.progress(1, t('ready'));
       const btn = $('start-btn');
       btn.hidden = false;
       btn.focus();
