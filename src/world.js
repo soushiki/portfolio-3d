@@ -367,11 +367,12 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
       material('#ffffff', { map: asphaltTexture(renderer, [causeLen / 5, 1.2]), ...offset(-1) }),
       RING_RADIUS + 3 + causeLen / 2, 0.02, 0,
     );
+    // Parallel to the causeway on the driver's right, facing the road: its left points to the bridge
     addSign({
       x: RING_RADIUS + 14,
-      z: 7.5,
-      yaw: -Math.PI / 2,
-      texture: makeSignTexture({ title: 'Data Science →', subtitle: 'Cross the bridge', accent: COLORS.dsAccents[0] }, renderer),
+      z: 6.5,
+      yaw: Math.PI,
+      texture: makeSignTexture({ title: '← Data Science', subtitle: 'Cross the bridge', accent: COLORS.dsAccents[0] }, renderer),
     });
 
     // Bridge: wooden deck, asphalt top, rails with posts
