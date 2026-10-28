@@ -9,6 +9,7 @@ export const CONTACT = {
 export const PROJECTS = [
   {
     id: 'minoscreto',
+    landmark: 'vault',
     title: 'Minoscreto',
     description:
       'Anonymizes Word documents before you paste them into an AI, then restores the real names in the answer. Everything runs in the browser, so nothing leaves your computer.',
@@ -19,6 +20,7 @@ export const PROJECTS = [
   },
   {
     id: 'brasa',
+    landmark: 'restaurant',
     title: 'Brasa Food & Drinks',
     description:
       'Landing page prototype for a Cartagena restaurant: smash burgers, wood-fired pizza and ribs, with menu, locations and ordering sections.',
@@ -28,6 +30,7 @@ export const PROJECTS = [
   },
   {
     id: 'ingresos',
+    landmark: 'bank',
     title: 'Ingresos App',
     description:
       "Bookkeeping template for restaurants: reads photos and PDFs of receipts and POS cash-closing reports with OCR and a local vision model, then builds the day's accounting ledger and exports it to Excel.",
@@ -37,6 +40,7 @@ export const PROJECTS = [
   },
   {
     id: 'formato',
+    landmark: 'hospital',
     title: 'Formato Médico',
     description:
       "Fills a physician's lab orders, prescriptions and certificates as PDFs that match the printed form, with an offline ICD-10 search. One React codebase for web and Android.",
@@ -45,6 +49,7 @@ export const PROJECTS = [
   },
   {
     id: 'davinci',
+    landmark: 'bookStack',
     title: 'Da Vinci Diary',
     description: 'Markdown notes app with login and a Firebase database.',
     tags: ['React', 'Next.js', 'Firebase'],
@@ -53,6 +58,7 @@ export const PROJECTS = [
   },
   {
     id: 'apod',
+    landmark: 'observatory',
     title: 'NASA APOD',
     description:
       "Shows NASA's Astronomy Picture of the Day from the APOD API, with responses cached in local storage.",
@@ -62,6 +68,7 @@ export const PROJECTS = [
   },
   {
     id: 'gym',
+    landmark: 'gym',
     title: 'Gym Routine Generator',
     description: 'Generates a random workout based on your goals. Routine data courtesy of @smoljames.',
     tags: ['React', 'Tailwind CSS'],
@@ -70,6 +77,7 @@ export const PROJECTS = [
   },
   {
     id: 'todo',
+    landmark: 'clipboard',
     title: 'Todo App',
     description: 'CRUD todo list built with React hooks.',
     tags: ['React', 'Vite'],
@@ -78,6 +86,7 @@ export const PROJECTS = [
   },
   {
     id: 'gacha',
+    landmark: 'gachaMachine',
     title: 'Whisker Gacha',
     description:
       'Capsule-machine gacha game with 21 cats with powers: soft and hard pity, a 50/50 rate-up system, a treat jar and daily challenges, and an animated Mythic reveal.',
@@ -87,6 +96,7 @@ export const PROJECTS = [
   },
   {
     id: 'reddit',
+    landmark: 'forumHall',
     title: 'Reddit Plus',
     description: 'Reddit client built on the Reddit API, with state managed in Redux.',
     tags: ['React', 'Redux', 'REST API'],
@@ -94,6 +104,7 @@ export const PROJECTS = [
   },
   {
     id: 'jammming',
+    landmark: 'speakers',
     title: 'Jammming',
     description: 'Search Spotify and build playlists using the Spotify Web API.',
     tags: ['React', 'Spotify API', 'OAuth'],

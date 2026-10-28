@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { makeSignTexture } from './signs.js';
+import { makeLandmark } from './landmarks.js';
 import { grassTexture, asphaltTexture, pavingTexture } from './textures.js';
 
 export const RING_RADIUS = 34;
@@ -266,6 +267,34 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
     blockers.push({ x, z, r: base + 1.5 });
   };
 
+  // Themed landmark behind a project's sign, front facing the road. Houses keep clear of it.
+  const landmarks = [];
+  const LANDMARK_R = RING_RADIUS + 14;
+  const placeLandmark = (kind, angle) => {
+    const lm = makeLandmark(kind, material);
+    if (!lm) return;
+    const r = Math.hypot(lm.w, lm.d) / 2;
+    // Nudge away from the causeway so the road to the bridge stays clear
+    let a = angle;
+    const away = a < Math.PI / 2 ? -1 : 1;
+    for (let k = 0; k < 12 && dataScience && inCauseway(Math.sin(a) * LANDMARK_R, Math.cos(a) * LANDMARK_R, 3.5 + r); k++) {
+      a += away * 0.05;
+    }
+    const x = Math.sin(a) * LANDMARK_R;
+    const z = Math.cos(a) * LANDMARK_R;
+    const yaw = Math.atan2(-Math.sin(a), -Math.cos(a));
+    lm.group.name = `landmark:${kind}`;
+    lm.group.position.set(x, 0, z);
+    lm.group.rotation.y = yaw;
+    lm.group.traverse((o) => {
+      if (o.isMesh) shadow(o, !o.material.transparent);
+    });
+    scene.add(lm.group);
+    addFixed(RAPIER.ColliderDesc.cuboid(lm.w / 2, lm.h / 2, lm.d / 2), x, lm.h / 2, z, yaw);
+    blockers.push({ x, z, r: r + 1.5 });
+    landmarks.push({ x, z, r, update: lm.update });
+  };
+
   // Projects around the ring road
   projects.forEach((project, i) => {
     const a = (i / projects.length) * Math.PI * 2;
@@ -287,6 +316,8 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
     const tz = -Math.sin(a);
     const pr = RING_RADIUS + 5;
     addPyramid(dx * pr + tx * 6, dz * pr + tz * 6, a, quality.low ? 2 : 3);
+
+    if (project.landmark) placeLandmark(project.landmark, a);
   });
 
   // Contact zone on the plaza, left of the spawn point (out of the camera's way)
@@ -348,6 +379,7 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
         const z = Math.cos(a) * rr;
         if (dataScience && inCauseway(x, z, 9)) continue;
         if (dataScience && Math.hypot(x - CAUSEWAY_SIGN.x, z - CAUSEWAY_SIGN.z) < CAUSEWAY_SIGN.clearance) continue;
+        if (landmarks.some((l) => Math.hypot(x - l.x, z - l.z) < l.r + 8.5)) continue;
         addHouse(houses[(i * 7 + row * 3) % houses.length], x, z, Math.atan2(-x, -z));
       }
     });
@@ -556,6 +588,7 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
     spawn: { x: 0, z: 0, yaw: 0 },
     update(t, activeId) {
       for (const zone of zones) zone.update(t, zone.data.id === activeId);
+      for (const l of landmarks) l.update?.(t);
     },
   };
 }
