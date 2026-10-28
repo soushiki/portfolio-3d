@@ -270,18 +270,17 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
   // Themed landmark behind a project's sign, front facing the road. Houses keep clear of it.
   const landmarks = [];
   const LANDMARK_R = RING_RADIUS + 14;
-  const placeLandmark = (kind, angle) => {
+  const placeLandmark = (kind, angle, { cx = 0, cz = 0, radius = LANDMARK_R } = {}) => {
     const lm = makeLandmark(kind, material);
     if (!lm) return;
     const r = Math.hypot(lm.w, lm.d) / 2;
-    // Nudge away from the causeway so the road to the bridge stays clear
+    // On the main island, nudge away from the causeway so the road to the bridge stays clear
     let a = angle;
     const away = a < Math.PI / 2 ? -1 : 1;
-    for (let k = 0; k < 12 && dataScience && inCauseway(Math.sin(a) * LANDMARK_R, Math.cos(a) * LANDMARK_R, 3.5 + r); k++) {
-      a += away * 0.05;
-    }
-    const x = Math.sin(a) * LANDMARK_R;
-    const z = Math.cos(a) * LANDMARK_R;
+    const onCauseway = () => cx === 0 && cz === 0 && inCauseway(Math.sin(a) * radius, Math.cos(a) * radius, 3.5 + r);
+    for (let k = 0; k < 12 && dataScience && onCauseway(); k++) a += away * 0.05;
+    const x = cx + Math.sin(a) * radius;
+    const z = cz + Math.cos(a) * radius;
     const yaw = Math.atan2(-Math.sin(a), -Math.cos(a));
     lm.group.name = `landmark:${kind}`;
     lm.group.position.set(x, 0, z);
@@ -493,6 +492,8 @@ export function buildWorld({ scene, physics, RAPIER, renderer, quality, projects
         yaw: Math.atan2(-dx, -dz),
         texture: makeSignTexture({ title: project.title, tags: project.tags, accent }, renderer),
       });
+      // Between the sign (ring + 6.5) and the shore wall (radius - 1)
+      if (project.landmark) placeLandmark(project.landmark, a, { cx: ISLET.x, cz: ISLET.z, radius: ISLET.ring + 10.3 });
     });
   }
 

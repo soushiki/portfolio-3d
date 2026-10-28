@@ -313,8 +313,112 @@ function speakers(M) {
   };
 }
 
+// Data science island: slimmer pieces that fit between a sign and the island's edge.
+
+function mailbox(M) {
+  const g = new THREE.Group();
+  const blue = M('#3E6A8A');
+  g.add(at(box(0.5, 2.4, 0.5, M('#5A4636')), 0, 1.2, 0));
+  g.add(at(box(4.4, 1.8, 2.4, blue), 0, 3.3, 0));
+  const lid = cyl(1.2, 1.2, 4.4, blue, 16);
+  lid.rotation.z = Math.PI / 2;
+  g.add(at(lid, 0, 4.2, 0));
+  g.add(at(box(0.15, 1.6, 1.8, M('#2F5C73')), 2.25, 3.6, 0)); // door
+  const flag = new THREE.Group();
+  flag.position.set(-2.3, 3.6, 0.9);
+  flag.add(at(box(0.12, 2.0, 0.12, M('#D64545')), 0, 0.8, 0), at(box(0.12, 0.7, 0.9, M('#D64545')), 0, 1.5, 0.45));
+  g.add(flag);
+  // Floating envelope: a white card with a folded flap
+  const env = new THREE.Group();
+  env.position.set(0, 7.4, 0);
+  const paper = M('#FBF7F5');
+  env.add(box(3, 2, 0.15, paper));
+  for (const s of [-1, 1]) {
+    const fold = box(1.9, 0.1, 0.18, M('#D9D4CC'));
+    fold.rotation.z = s * 0.58;
+    env.add(at(fold, s * 0.72, 0.42, 0.02));
+  }
+  g.add(env);
+  return {
+    group: g, w: 5.2, d: 2.8, h: 8.6,
+    update: (t) => {
+      env.position.y = 7.4 + Math.sin(t * 1.5) * 0.3;
+      env.rotation.y = Math.sin(t * 0.8) * 0.7;
+    },
+  };
+}
+
+function windTurbine(M) {
+  const g = new THREE.Group();
+  const white = M('#F4F1EA');
+  g.add(at(cyl(0.3, 0.55, 9, white, 12), -0.8, 4.5, 0));
+  g.add(at(box(0.9, 0.8, 1.6, white), -0.8, 9.2, 0.2));
+  const rotor = new THREE.Group();
+  rotor.position.set(-0.8, 9.2, 1.1);
+  rotor.add(new THREE.Mesh(new THREE.SphereGeometry(0.35, 10, 8), white));
+  for (let i = 0; i < 3; i++) {
+    const arm = new THREE.Group();
+    arm.rotation.z = (i * Math.PI * 2) / 3;
+    arm.add(at(box(0.45, 3.6, 0.12, white), 0, 1.9, 0));
+    rotor.add(arm);
+  }
+  g.add(rotor);
+  // A tilted solar panel on a frame
+  const panel = new THREE.Group();
+  panel.position.set(1.8, 1.1, 0.3);
+  panel.rotation.x = -0.55;
+  panel.add(box(2.4, 0.12, 1.8, M('#2F5C73')));
+  for (const x of [-0.6, 0, 0.6]) panel.add(at(box(0.04, 0.14, 1.8, M('#9AA3AF')), x, 0, 0));
+  g.add(panel, at(box(0.15, 1.1, 0.15, M('#9AA3AF')), 1.8, 0.55, 0.3));
+  return {
+    group: g, w: 5, d: 3.2, h: 11,
+    update: (t) => {
+      rotor.rotation.z = -t * 1.4;
+    },
+  };
+}
+
+function streetClock(M) {
+  const g = new THREE.Group();
+  const post = M('#2F6F5E');
+  g.add(at(cyl(0.6, 0.75, 0.5, post, 12), 0, 0.25, 0));
+  g.add(at(cyl(0.22, 0.28, 5.6, post, 10), 0, 3.05, 0));
+  const face = cyl(1.3, 1.3, 0.5, post, 24);
+  face.rotation.x = Math.PI / 2;
+  g.add(at(face, 0, 6.6, 0));
+  const dial = cyl(1.1, 1.1, 0.08, M('#FBF7F5'), 24);
+  dial.rotation.x = Math.PI / 2;
+  g.add(at(dial, 0, 6.6, 0.27));
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    g.add(at(box(0.1, i % 3 ? 0.14 : 0.26, 0.04, M('#22223B')), Math.sin(a) * 0.9, 6.6 + Math.cos(a) * 0.9, 0.33));
+  }
+  const hand = (len, width) => {
+    const pivot = new THREE.Group();
+    pivot.position.set(0, 6.6, 0.36);
+    pivot.add(at(box(width, len, 0.04, M('#22223B')), 0, len / 2, 0));
+    g.add(pivot);
+    return pivot;
+  };
+  const minute = hand(0.85, 0.08);
+  const hour = hand(0.55, 0.12);
+  // Traffic cones stacked beside the clock
+  const orange = M('#E8743B');
+  for (const [x, z, y] of [[1.6, 0.4, 0], [2.4, -0.2, 0], [2.0, 0.1, 0.55]]) {
+    g.add(at(new THREE.Mesh(new THREE.ConeGeometry(0.4, 1.0, 10), orange), x, 0.5 + y, z));
+  }
+  return {
+    group: g, w: 5.4, d: 2.8, h: 8,
+    update: (t) => {
+      minute.rotation.z = -t * 1.2; // running late: the clock spins fast
+      hour.rotation.z = -t * 0.1;
+    },
+  };
+}
+
 const BUILDERS = {
   hospital, observatory, gym, restaurant, bank, vault, bookStack, clipboard, gachaMachine, forumHall, speakers,
+  mailbox, windTurbine, streetClock,
 };
 
 // `material(color, extra)` comes from the world so landmarks share its shading and quality settings.

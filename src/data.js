@@ -131,6 +131,7 @@ export const DATA_SCIENCE_HUB = {
 export const DATA_SCIENCE = [
   {
     id: 'ds-email',
+    landmark: 'mailbox',
     title: 'Email Uplift Test',
     description:
       'A/B test readout and uplift modeling on a 64,000-customer randomized experiment, ending in a decision: send everyone the men\'s email ($131 per 1,000, 95% CI $46–$216), and don\'t deploy the targeting model.',
@@ -140,6 +141,7 @@ export const DATA_SCIENCE = [
   },
   {
     id: 'ds-grid',
+    landmark: 'windTurbine',
     title: 'GB Demand Forecast',
     description:
       "Day-ahead electricity demand forecast for Great Britain (4.2% MAPE), compared with the grid operator's official forecasts. It lost on the daily peak, but a 50/50 blend beat the operator by 6.7%.",
@@ -149,6 +151,7 @@ export const DATA_SCIENCE = [
   },
   {
     id: 'ds-311',
+    landmark: 'streetClock',
     title: 'NYC 311 Delays',
     description:
       'Predicts which NYC service requests will be resolved slower than similar ones, from ~400K records on a live city API. It reframes a misleading 0.95-AUC target into a model with 2.2× lift.',
