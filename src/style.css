@@ -9,6 +9,7 @@
   --radius: 16px;
   --gutter: 24px;
   --touch-size: 72px;
+  --joy-size: 140px;
 }
 
 *,
@@ -93,8 +94,15 @@ a {
 .btn-small {
   padding: 7px 14px;
   font-size: 0.875rem;
+  white-space: nowrap; /* one line, centred: never wraps into a lopsided two-line pill */
+  text-align: center;
   background: rgba(242, 233, 228, 0.85);
   backdrop-filter: blur(6px);
+}
+
+/* Long labels on wide screens, short ones on phones */
+.lbl-short {
+  display: none;
 }
 
 /* Language toggle */
@@ -243,12 +251,15 @@ a {
   z-index: 10;
   transform: translateX(-50%);
   margin: 0;
+  width: max-content;
+  max-width: calc(100% - 2 * var(--gutter));
   padding: 8px 16px;
-  border-radius: 999px;
+  border-radius: 18px;
   background: rgba(34, 34, 59, 0.8);
   color: var(--cream);
   font-size: 0.9rem;
-  white-space: nowrap;
+  line-height: 1.35;
+  text-align: center;
   pointer-events: none;
 }
 
@@ -329,46 +340,79 @@ a {
   gap: 10px;
 }
 
-/* Touch controls */
+/* Touch controls: one analog joystick, bottom left (the bottom right is left free for host badges) */
 .touch {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: calc(var(--gutter) + env(safe-area-inset-left));
+  bottom: calc(var(--gutter) + env(safe-area-inset-bottom));
   z-index: 15;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 var(--gutter) calc(var(--gutter) + env(safe-area-inset-bottom));
-  pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
 }
 
-.touch-group {
-  display: flex;
-  gap: 12px;
-  pointer-events: auto;
-}
-
-.touch-btn {
-  width: var(--touch-size);
-  height: var(--touch-size);
-  border: 0;
+.joystick {
+  position: relative;
+  width: var(--joy-size);
+  height: var(--joy-size);
   border-radius: 50%;
-  background: rgba(34, 34, 59, 0.55);
-  color: var(--cream);
-  font-size: 1.5rem;
-  touch-action: none;
+  background: rgba(34, 34, 59, 0.38);
+  border: 2px solid rgba(242, 233, 228, 0.55);
   backdrop-filter: blur(4px);
+  touch-action: none;
 }
 
-.touch-btn.is-down {
-  background: rgba(34, 34, 59, 0.9);
-  transform: scale(0.94);
+.joystick.is-down {
+  background: rgba(34, 34, 59, 0.5);
 }
 
-.touch-gas {
-  background: rgba(74, 78, 105, 0.7);
+.joy-knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 42%;
+  height: 42%;
+  border-radius: 50%;
+  background: rgba(242, 233, 228, 0.92);
+  box-shadow: 0 4px 14px rgba(34, 34, 59, 0.35);
+  transform: translate(-50%, -50%);
+  transition: transform 0.12s ease-out;
+  pointer-events: none;
+}
+
+.joystick.is-down .joy-knob {
+  transition: none; /* follow the thumb exactly while dragging */
+}
+
+.joy-arrow {
+  position: absolute;
+  color: rgba(242, 233, 228, 0.8);
+  font-size: 0.75rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.joy-up {
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.joy-down {
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.joy-left {
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.joy-right {
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 /* Project list (dialog + no-WebGL fallback) */
@@ -494,7 +538,7 @@ a {
   }
 }
 
-/* Touch devices: move the card above the driving buttons */
+/* Touch devices: card and hint go to the top, clear of the joystick */
 @media (pointer: coarse) {
   .card {
     left: 50%;
@@ -503,11 +547,12 @@ a {
     bottom: auto;
     transform: translateX(-50%);
     animation: none;
-    max-height: calc(100% - 70px - var(--touch-size) - 3 * var(--gutter));
+    max-height: calc(100% - 70px - var(--joy-size) - 3 * var(--gutter));
   }
 
   .zone-hint {
-    bottom: calc(var(--touch-size) + 2 * var(--gutter) + 6px);
+    top: calc(70px + env(safe-area-inset-top));
+    bottom: auto;
   }
 }
 
@@ -545,20 +590,36 @@ a {
   .zone-hint {
     font-size: 0.8rem;
   }
+
+  :root {
+    --joy-size: 124px;
+  }
+
+  .lbl-long {
+    display: none;
+  }
+
+  .lbl-short {
+    display: inline;
+  }
+}
+
+/* Narrow phones: no room for the name, so the buttons sit centred on their own */
+@media (max-width: 480px) {
+  .hud-name {
+    display: none;
+  }
+
+  .hud {
+    justify-content: center;
+  }
 }
 
 /* Very narrow phones */
 @media (max-width: 380px) {
   :root {
     --touch-size: 58px;
-  }
-
-  .hud-name {
-    display: none;
-  }
-
-  .hud {
-    justify-content: flex-end;
+    --joy-size: 112px;
   }
 }
 
@@ -567,6 +628,7 @@ a {
   :root {
     --gutter: 12px;
     --touch-size: 56px;
+    --joy-size: 108px;
   }
 
   .hud {
@@ -577,7 +639,7 @@ a {
   .card {
     top: calc(52px + env(safe-area-inset-top));
     max-height: calc(100% - 64px);
-    width: min(380px, calc(100% - 2 * var(--touch-size) - 6 * var(--gutter)));
+    width: min(380px, calc(100% - 2 * var(--joy-size) - 4 * var(--gutter)));
     padding: 16px 16px 12px;
   }
 
