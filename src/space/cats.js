@@ -90,9 +90,16 @@ export const CATS = [
     idle: 'loaf', react: ['freeze', 'greet', 'headBump'], found: 'bellyUp',
   },
   {
-    id: 'pelusa', name: 'Pelusa', fur: '#FBF7EE', belly: '#FBF7EE', socks: '#FBF7EE', eyes: '#A9C25A', nose: '#E8A0AE',
-    patches: [['head', -0.1, 0.25, 0.1, 0.25, '#6E7384', 0.75], ['head', 0.32, 0.1, 0.16, 0.08, '#6E7384', 1], ['body', -0.2, 0.32, 0, 0.2, '#6E7384', 0.6]],
-    tail: '#6E7384', fluffy: 1.12, idle: 'loaf', react: ['freeze', 'greet', 'slowBlink'], found: 'sit',
+    // Fluffy white with a grey stripe from the forehead over the head and spine to a grey tail
+    // (reunion.jpg, right); white muzzle and belly. Yellow eyes (Sebastian, 2026-11-11).
+    id: 'pelusa', name: 'Pelusa', fur: '#FBF7EE', belly: '#FBF7EE', socks: '#FBF7EE', eyes: '#E2C23A', nose: '#E8A0AE',
+    tail: '#6E7384', ear: '#6E7384', fluffy: 1.12,
+    paint: {
+      // Wide enough to read from the side camera, which sees the spine edge-on.
+      body: [{ kind: 'ridge', at: [0, -0.06, 0], size: 0.25, color: '#6E7384' }],
+      head: [{ kind: 'ridge', at: [0, -0.06, 0], size: 0.27, color: '#6E7384' }, { kind: 'blob', at: [0.3, -0.06, 0], size: 0.17, color: '#FBF7EE' }],
+    },
+    idle: 'loaf', react: ['freeze', 'greet', 'slowBlink'], found: 'sit',
   },
   {
     id: 'rosie', name: 'Rosie', fur: '#5C5450', belly: '#7A706A', socks: '#5C5450', eyes: '#C9B14A', nose: '#8A6A60',
@@ -217,7 +224,7 @@ function addTufts({ spec, torso, head, tails, ears }) {
   const fur = spec.fur;
   const bib = spec.belly;
   // Back and head-top tufts take the colour of a painted cap/saddle when there is one.
-  const topOf = (list) => list?.find((p) => p.kind === 'half' && p.at[1] > 0)?.color;
+  const topOf = (list) => list?.find((p) => (p.kind === 'half' && p.at[1] > 0) || p.kind === 'ridge')?.color;
   const backHex = topOf(spec.paint?.body) ?? fur;
   const headTopHex = topOf(spec.paint?.head) ?? fur;
   const s = 0.24 * big;
@@ -328,10 +335,14 @@ export function makeSecretCat(spec) {
     ...(spec.patches ?? []).filter((p) => p[0] === 'head').map(([, x, y, z, r, c]) => ({ kind: 'blob', at: [x, y * 0.9, z], size: r * 1.05, color: c })),
   ];
   head.add(bindPaint(sphere(0.33 * fluffy, headPaint.length ? M(spec.fur, headPaint) : fur, 18, 12)));
-  head.add(put(sphere(0.17, belly, 12, 8), 0.2, -0.1, 0, 0.8, 0.65, 1.2)); // muzzle
-  if (spec.chin) head.add(noLine(put(sphere(0.07, M(spec.chin), 8, 6), 0.27, -0.18, 0)));
-  if (spec.blaze) head.add(noLine(put(sphere(0.07, belly, 8, 6), 0.27, 0.06, 0, 0.5, 1.8, 0.8))); // white stripe up the nose
-  head.add(noLine(put(sphere(0.045, M(spec.nose), 8, 6), 0.33, -0.03, 0)));
+  // Face parts sit on the head's surface: scale them with fluffy heads so they never sink into the fur.
+  const face = new THREE.Group();
+  face.scale.setScalar(fluffy);
+  head.add(face);
+  face.add(put(sphere(0.17, belly, 12, 8), 0.2, -0.1, 0, 0.8, 0.65, 1.2)); // muzzle
+  if (spec.chin) face.add(noLine(put(sphere(0.07, M(spec.chin), 8, 6), 0.27, -0.18, 0)));
+  if (spec.blaze) face.add(noLine(put(sphere(0.07, belly, 8, 6), 0.27, 0.06, 0, 0.5, 1.8, 0.8))); // white stripe up the nose
+  face.add(noLine(put(sphere(0.045, M(spec.nose), 8, 6), 0.33, -0.03, 0)));
   const eyes = [];
   const ears = [];
   for (const z of [-0.12, 0.12]) {
@@ -343,10 +354,10 @@ export function makeSecretCat(spec) {
     eye.add(iris);
     eye.add(noLine(put(sphere(0.06, M('#16122E'), 8, 6), 0.03, 0, 0, 0.5, 1, 0.35))); // vertical slit
     eye.add(noLine(put(sphere(0.018, M('#FFFFFF'), 6, 4), 0.05, 0.035, 0)));
-    head.add(eye);
+    face.add(eye);
     eyes.push(eye);
     const ear = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.24, 4), z > 0 ? earMat(spec, 'L') : earMat(spec, 'R'));
-    head.add(put(ear, 0.0, 0.28, z * 1.45));
+    face.add(put(ear, 0.0, 0.28, z * 1.45));
     ear.rotation.x = z > 0 ? 0.3 : -0.3;
     ear.userData.baseX = ear.rotation.x;
     ears.push(ear);
@@ -364,6 +375,7 @@ export function makeSecretCat(spec) {
 
 // Ear colour: patched cats get the patch colour on the side the patch covers.
 function earMat(spec, side) {
+  if (spec.ear) return M(spec.ear);
   if (spec.paint?.head?.some((p) => p.kind === 'half' && p.at[1] > 0 && p.color === '#24202E')) return M('#24202E');
   const headPatch = (spec.patches ?? []).find((p) => p[0] === 'head' && (side === 'L' ? p[3] >= 0 : p[3] <= 0) && p[4] > 0.13);
   return M(headPatch ? headPatch[5] : spec.fur);

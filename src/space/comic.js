@@ -79,7 +79,8 @@ const comicFragment = /* glsl */ `
       float dist;
       if (a.w < 0.5) dist = length(vPaint - a.xyz) - uPaintB[i].x;
       else if (a.w < 1.5) dist = uPaintB[i].x - dot(vPaint, a.xyz);
-      else dist = abs(vPaint.y - a.y) - uPaintB[i].x;
+      else if (a.w < 2.5) dist = abs(vPaint.y - a.y) - uPaintB[i].x;
+      else dist = max(abs(vPaint.z - a.z) - uPaintB[i].x, a.y - vPaint.y); // ridge: strip along the top
       // Ragged fur edge: two cheap waves in surface position.
       float rag = (sin(vPaint.x * 53.0 + vPaint.z * 31.0) + sin(vPaint.y * 47.0 - vPaint.z * 29.0)) * 0.012;
       float m = 1.0 - smoothstep(-0.012, 0.012, dist + rag);
@@ -175,9 +176,10 @@ export function comicMaterial(color, extra = {}) {
 }
 
 // A coat with painted markings: one material per mesh (not cached). paint: [{ kind: 'blob' | 'half' |
-// 'band', at: [x, y, z] (centre, or the normal for 'half'), size, color }], in the coordinates of the
+// 'band' | 'ridge', at: [x, y, z] (centre, the normal for 'half', or for 'ridge' y = lowest edge and
+// z = centre line), size (radius / offset / half-width), color }], in the coordinates of the
 // mesh's parent group (set uPaintMat to the mesh's own matrix once it is placed: bindPaint()).
-const KINDS = { blob: 0, half: 1, band: 2 };
+const KINDS = { blob: 0, half: 1, band: 2, ridge: 3 };
 function paintedMaterial(color, extra) {
   const base = comicMaterial(color, { ...extra, paint: null });
   const m = base.clone();
