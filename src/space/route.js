@@ -101,5 +101,8 @@ export const LIST_ONLY = ['brasa', 'davinci', 'apod', 'gym', 'todo', 'reddit', '
 // so it never hides the landmark.
 for (const p of ROUTE) for (const s of p.stops) s.stand = s.angle + ((2.6 / p.radius) * 180) / Math.PI;
 
+// Back star pad on the left shoulder of every planet except the first, clear of the arrival point.
+for (const p of ROUTE) p.back = p.index > 0 ? p.stops[0].stand + 40 : null;
+
 // Flat list of every stop, in tour order (used by Next / Back and the planet strip).
 export const STOPS = ROUTE.flatMap((planet) => planet.stops.map((s) => ({ ...s, planet })));

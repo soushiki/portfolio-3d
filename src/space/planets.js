@@ -142,6 +142,14 @@ export function buildPlanets({ scene, route, low }) {
       root.add(pad.group);
     }
 
+    let backPad = null;
+    if (p.back != null) {
+      backPad = launchPad();
+      standOnRim(backPad.group, p, p.back, 0.05);
+      addOutlines(backPad.group, 1.1);
+      root.add(backPad.group);
+    }
+
     // Banner with the planet number and name, above the top of the planet.
     const banner = bannerSprite(p.stops[0].item.title, { color: p.color, number: p.number });
     const tallest = Math.max(...p.stops.map((st) => (Math.abs(st.angle - 90) < 20 ? st.height ?? 0 : 0)), 3);
@@ -162,7 +170,7 @@ export function buildPlanets({ scene, route, low }) {
     }
 
     scene.add(root);
-    planets.push({ ...p, root, body, pad, banner, hidden });
+    planets.push({ ...p, root, body, pad, backPad, banner, hidden });
   }
   return {
     planets,

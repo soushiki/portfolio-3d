@@ -250,8 +250,14 @@ export function createUI({ featured, earlier, planets }) {
       $('back-btn').disabled = !back;
     },
 
-    showLaunchHint(show) {
-      $('launch-hint').hidden = !show || !card.hidden;
+    // dir: 1 = star to the next planet, -1 = star to the previous one, 0 = none.
+    showLaunchHint(dir) {
+      const el = $('launch-hint');
+      el.hidden = !dir || !card.hidden;
+      if (dir && el.dataset.dir !== String(dir)) {
+        el.dataset.dir = String(dir);
+        el.textContent = t(dir > 0 ? 'launchHint' : 'launchHintBack');
+      }
     },
 
     foundCat(n, total) {

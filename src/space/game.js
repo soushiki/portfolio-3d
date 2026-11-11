@@ -17,6 +17,8 @@ const GRAVITY = 22;
 const STOP_RANGE = 7; // degrees: inside this the stop's card opens
 const LEAVE_RANGE = 11;
 const HIDDEN_RANGE = 8;
+const PAD_RANGE = 6; // degrees around a star pad
+const CHARGE_TIME = 0.6; // seconds of holding Space / Jump on a pad before the hop
 
 export async function startGame({ canvas, quality, isTouch, ui, reducedMotion }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: quality.antialias, powerPreference: 'high-performance' });
@@ -63,13 +65,14 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     dismissed: null,
     shake: 0,
     found: 0,
+    charge: null, // { dir, t } while Space / Jump is held on a star pad
+    cut: null, // reduced motion: { t, toPlanet, walkTo } short hop before the panel cut
   };
 
   const input = createInput({
     touchRoot: document.getElementById('touch'),
     onNext: () => next(1),
     onBack: () => next(-1),
-    onJump: () => jump(),
     onPlanet: (i) => travelTo(STOPS.findIndex((s) => s.planet.index === i)),
   });
 
@@ -87,8 +90,10 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     return best;
   };
 
+  const busy = () => state.mode === 'flight' || state.mode === 'cut';
+
   function next(dir) {
-    if (state.mode === 'flight') return;
+    if (busy()) return;
     const cur = currentStopIndex();
     const atStop = state.activeStop != null && STOPS[cur] === state.activeStop;
     let target = dir > 0 ? cur + 1 : atStop ? cur - 1 : cur;
@@ -98,24 +103,39 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
 
   function travelTo(index) {
     const stop = STOPS[index];
-    if (!stop || state.mode === 'flight') return;
+    if (!stop || busy()) return;
     if (stop.planet.index === state.planet) {
       state.mode = 'auto';
       state.autoTarget = stop.stand;
     } else {
-      launch(stop.planet.index, stop.stand + 22, stop.stand);
+      // Land on the side facing where the hero came from, then walk to the stop.
+      const back = stop.planet.index < state.planet;
+      launch(stop.planet.index, stop.stand + (back ? -18 : 22), stop.stand);
+    }
+  }
+
+  // The star pad under the hero: +1 hops to the next planet, -1 to the previous one.
+  function padUnderHero() {
+    if (state.height > 0.01) return 0;
+    const p = planetOf();
+    if (p.launch != null && Math.abs(angDiff(state.angle, p.launch)) < PAD_RANGE) return 1;
+    if (p.back != null && Math.abs(angDiff(state.angle, p.back)) < PAD_RANGE) return -1;
+    return 0;
+  }
+
+  function hopFromPad(dir) {
+    if (dir > 0) {
+      const s = STOPS.find((x) => x.planet.index === state.planet + 1);
+      if (s) launch(s.planet.index, s.stand + 22, s.stand);
+    } else {
+      const prev = STOPS.filter((x) => x.planet.index === state.planet - 1);
+      const s = prev[prev.length - 1];
+      if (s) launch(s.planet.index, s.stand - 18, s.stand);
     }
   }
 
   function jump() {
-    if (state.mode === 'flight') return;
-    const p = planetOf();
-    // On the launch pad, a jump is the hop to the next planet.
-    if (p.launch != null && Math.abs(angDiff(state.angle, p.launch)) < 6 && state.height === 0) {
-      const nextStop = STOPS.find((s) => s.planet.index === state.planet + 1);
-      if (nextStop) launch(state.planet + 1, nextStop.stand + 22, nextStop.stand);
-      return;
-    }
+    if (busy()) return;
     if (state.height > 0.01) return;
     state.vy = JUMP_SPEED;
     hero.anim.squash = -0.5;
@@ -129,13 +149,12 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     const from = rimPoint(planetOf(), state.angle, state.height, new THREE.Vector3());
     const to = rimPoint(planets[toPlanet], landAngle, 0, new THREE.Vector3());
     if (reducedMotion) {
-      // No arc: a comic panel cut straight to the next planet.
-      ui.panelCut();
-      state.planet = toPlanet;
-      state.angle = walkTo;
-      state.height = 0;
-      state.mode = 'walk';
-      ui.setPlanet(toPlanet);
+      // No arc and no camera travel: a small hop in place, then a comic panel cut.
+      state.vy = JUMP_SPEED * 0.7;
+      hero.anim.squash = -0.4;
+      hero.anim.air = 1;
+      state.cut = { t: 0, toPlanet, walkTo };
+      state.mode = 'cut';
       return;
     }
     const dist = from.distanceTo(to);
@@ -175,7 +194,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
   // Stops: open the card on arrival, close it on leaving, respect a manual close.
   ui.onCardClosed(() => (state.dismissed = state.activeStop));
   const updateStops = () => {
-    if (state.mode === 'flight') return;
+    if (busy()) return;
     const p = planetOf();
     let stop = state.activeStop;
     if (stop && (stop.planet.index !== state.planet || Math.abs(angDiff(state.angle, stop.stand)) > LEAVE_RANGE)) {
@@ -285,8 +304,48 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
       if (f.t >= 1) land();
       return;
     }
+    if (state.mode === 'cut') {
+      const c = state.cut;
+      c.t += dt;
+      state.vy -= GRAVITY * dt;
+      state.height = Math.max(0, state.height + state.vy * dt);
+      if (c.t >= 0.35) {
+        ui.panelCut();
+        state.planet = c.toPlanet;
+        state.angle = c.walkTo;
+        state.height = 0;
+        state.vy = 0;
+        state.cut = null;
+        state.mode = 'walk';
+        state.facing = 1;
+        hero.anim.air = 0;
+        hero.anim.squash = 0.4;
+        ui.setPlanet(c.toPlanet);
+      }
+      return;
+    }
     const p = planetOf();
-    let dir = input.state.right - input.state.left; // +1 = clockwise
+    // Space / Jump: on a star pad it starts a charge, elsewhere it is a plain jump.
+    if (input.consumeJump()) {
+      const padDir = padUnderHero();
+      if (padDir) state.charge = { dir: padDir, t: 0 };
+      else jump();
+    }
+    if (state.charge) {
+      if (!input.state.jumpHeld || padUnderHero() !== state.charge.dir) {
+        state.charge = null; // let go early or walked off: cancel
+      } else {
+        state.charge.t = Math.min(1, state.charge.t + dt / CHARGE_TIME);
+        hero.anim.squash = Math.max(hero.anim.squash, 0.45 * state.charge.t);
+        if (state.charge.t >= 1) {
+          const d = state.charge.dir;
+          state.charge = null;
+          hopFromPad(d);
+          return;
+        }
+      }
+    }
+    let dir = state.charge ? 0 : input.state.right - input.state.left; // +1 = clockwise
     if (dir !== 0) state.mode = 'walk';
     if (state.mode === 'auto') {
       const d = angDiff(state.angle, state.autoTarget);
@@ -297,7 +356,6 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
         dir = 0;
       } else dir = Math.sign(d);
     }
-    if (input.consumeJump()) jump();
     const degPerSec = (WALK_SPEED / p.radius) / DEG;
     state.angle -= dir * degPerSec * dt;
     state.angle = ((state.angle % 360) + 360) % 360;
@@ -314,13 +372,16 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
         hero.anim.squash = 0.45;
       }
     }
-    // The launch pad star pulses when the hero is close.
-    if (p.pad) {
-      const near = Math.abs(angDiff(state.angle, p.launch)) < 6;
-      const s = near ? 1.15 + Math.sin(performance.now() / 120) * 0.08 : 1;
-      p.pad.star.scale.setScalar(s);
-      ui.showLaunchHint(near);
-    } else ui.showLaunchHint(false);
+    // Star pads pulse when the hero is close and grow while charging.
+    const padDir = padUnderHero();
+    for (const [pad, d] of [[p.pad, 1], [p.backPad, -1]]) {
+      if (!pad) continue;
+      const near = padDir === d;
+      const charge = state.charge && state.charge.dir === d ? state.charge.t : 0;
+      const pulse = near && !reducedMotion ? Math.sin(performance.now() / 120) * 0.08 : 0;
+      pad.star.scale.setScalar(near ? 1.15 + pulse + charge * 0.5 : 1);
+    }
+    ui.showLaunchHint(padDir);
   };
 
   const resize = () => {
