@@ -44,13 +44,17 @@ const comicFragment = /* glsl */ `
   uniform float uPixelRatio;
   uniform float uOpacity;
   uniform float uFlash;
+  uniform float uSoft;
+  uniform vec3 uRim;
+  uniform float uRimAmt;
   varying vec3 vN;
   varying vec3 vView;
   void main() {
     vec3 n = normalize(vN);
     if (!gl_FrontFacing) n = -n;
     float d = dot(n, uLight);
-    float lit = step(0.08, d);
+    // uSoft widens the band edge into a short ramp (fur); 0 keeps the hard comic step.
+    float lit = smoothstep(0.08 - uSoft, 0.08 + uSoft + 0.0001, d);
     vec3 col = mix(uShadow, uColor, lit);
     // Highlight band
     col = mix(col, mix(uColor, vec3(1.0), 0.35), step(0.86, d));
@@ -64,6 +68,8 @@ const comicFragment = /* glsl */ `
     // Ink rim on the dark side edge, so silhouettes stay crisp against space.
     float rim = 1.0 - abs(dot(n, normalize(vView)));
     col = mix(col, uInk, smoothstep(0.82, 0.95, rim) * (1.0 - lit) * 0.6);
+    // Rim light tinted to the coat on the lit side: reads as a soft, fluffy edge.
+    col = mix(col, uRim, smoothstep(0.55, 0.9, rim) * lit * uRimAmt);
     col = mix(col, vec3(1.0), uFlash);
     gl_FragColor = vec4(col, uOpacity);
     #include <colorspace_fragment>
@@ -73,11 +79,15 @@ const comicFragment = /* glsl */ `
 const outlineVertex = /* glsl */ `
   uniform float uOutline;
   uniform float uScale;
+  uniform float uBias;
   void main() {
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
     vec3 n = normalize(normalMatrix * normal);
     // Push along the view-space normal, scaled by depth so the line width stays steady on screen.
     mv.xyz += n * uOutline * uScale * max(-mv.z, 1.0);
+    // Push the hull away from the camera: where it crosses another part of the same model it
+    // falls behind that part's surface, so only the outer silhouette keeps its line.
+    mv.z -= uBias;
     gl_Position = projectionMatrix * mv;
   }
 `;
@@ -95,7 +105,7 @@ const materialCache = new Map();
 // Comic material for one flat colour. `extra` mirrors the few MeshStandard options the
 // landmark builders pass: transparent/opacity, emissive (treated as "no shadow band").
 export function comicMaterial(color, extra = {}) {
-  const key = `${color}|${extra.transparent ? extra.opacity : ''}|${extra.emissive ? 'e' : ''}|${extra.side ?? ''}`;
+  const key = `${color}|${extra.transparent ? extra.opacity : ''}|${extra.emissive ? 'e' : ''}|${extra.side ?? ''}|${extra.soft ?? ''}|${extra.rim ?? ''}`;
   if (materialCache.has(key)) return materialCache.get(key);
   const base = new THREE.Color(color);
   const shadow = extra.emissive ? base.clone().multiplyScalar(0.92) : base.clone().multiply(SHADOW_TINT);
@@ -105,6 +115,9 @@ export function comicMaterial(color, extra = {}) {
       uShadow: { value: shadow },
       uOpacity: { value: extra.transparent ? extra.opacity ?? 0.4 : 1 },
       uFlash: { value: 0 },
+      uSoft: { value: extra.soft ?? 0 },
+      uRim: { value: new THREE.Color(extra.rim ?? '#FFFFFF') },
+      uRimAmt: { value: extra.rim ? 0.55 : 0 },
       uInk: shared.uInk,
       uLight: shared.uLight,
       uDot: shared.uDot,
@@ -122,13 +135,13 @@ export function comicMaterial(color, extra = {}) {
 }
 
 const outlineMaterials = new Map();
-function outlineMaterial(scale) {
-  const k = scale.toFixed(2);
+function outlineMaterial(scale, bias = 0) {
+  const k = `${scale.toFixed(2)}|${bias.toFixed(2)}`;
   if (!outlineMaterials.has(k)) {
     outlineMaterials.set(
       k,
       new THREE.ShaderMaterial({
-        uniforms: { uInk: shared.uInk, uOutline: shared.uOutline, uScale: { value: scale } },
+        uniforms: { uInk: shared.uInk, uOutline: shared.uOutline, uScale: { value: scale }, uBias: { value: bias } },
         vertexShader: outlineVertex,
         fragmentShader: outlineFragment,
         side: THREE.BackSide,
@@ -153,13 +166,16 @@ function hullGeometry(geo) {
 
 // Adds an ink outline mesh to every opaque mesh under `root`.
 // `scale` thickens (1.6) or thins (0.6) the line for hero vs background pieces.
-export function addOutlines(root, scale = 1) {
+// Options: `bias` pushes hulls back so inner crossings vanish (multi-part characters);
+// meshes with userData.outline === 0 get no hull, and userData.outline = k scales its width.
+export function addOutlines(root, scale = 1, { bias = 0 } = {}) {
   const meshes = [];
   root.traverse((o) => {
-    if (o.isMesh && !o.userData.isOutline && !o.material.userData?.noOutline) meshes.push(o);
+    if (o.isMesh && !o.userData.isOutline && !o.material.userData?.noOutline && o.userData.outline !== 0) meshes.push(o);
   });
   for (const mesh of meshes) {
-    const hull = new THREE.Mesh(hullGeometry(mesh.geometry), outlineMaterial(scale));
+    const k = mesh.userData.outline ?? 1;
+    const hull = new THREE.Mesh(hullGeometry(mesh.geometry), outlineMaterial(scale * k, bias));
     hull.userData.isOutline = true;
     hull.renderOrder = -1;
     mesh.add(hull);

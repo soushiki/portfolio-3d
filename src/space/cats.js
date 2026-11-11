@@ -1,5 +1,13 @@
 import * as THREE from 'three';
-import { comicMaterial as M, addOutlines } from './comic.js';
+import { comicMaterial, addOutlines } from './comic.js';
+
+// Fur materials: a short soft ramp and a rim light a little lighter than the coat.
+const M = (color) => comicMaterial(color, { soft: 0.14, rim: rimOf(color) });
+function rimOf(hex) {
+  const c = new THREE.Color(hex);
+  return '#' + c.lerp(new THREE.Color('#FFF6E5'), 0.55).getHexString();
+}
+const noLine = (mesh) => ((mesh.userData.outline = 0), mesh);
 
 // The 13 secret cats, modelled on Sebastian's own cats (likeness from coat, markings, eyes and size;
 // shapes stay simple and comic). His photos give only the looks; the motion follows real cat body
@@ -93,6 +101,94 @@ const TAILS = {
   hang: [[0, 0], [-0.3, 0.1], [-0.55, 0.05], [-0.75, -0.1]],
 };
 
+// --- Fur tufts ---------------------------------------------------------------------------------
+// Small alpha-tested cards with a jagged, clumped tuft drawn in white and tinted per coat,
+// placed on each part's side-view edge so the spikes break the silhouette.
+let tuftTexture = null;
+function getTuftTexture() {
+  if (tuftTexture) return tuftTexture;
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const g = c.getContext('2d');
+  g.beginPath();
+  // A fan of 5 spikes rising from a rounded base.
+  const spikes = [[8, 30], [18, 6], [26, 26], [34, 2], [40, 24], [50, 8], [56, 30]];
+  g.moveTo(4, 60);
+  g.quadraticCurveTo(2, 40, spikes[0][0], spikes[0][1]);
+  for (let i = 1; i < spikes.length; i++) g.lineTo(spikes[i][0], spikes[i][1]);
+  g.quadraticCurveTo(62, 40, 60, 60);
+  g.closePath();
+  g.fillStyle = '#FFFFFF';
+  g.fill();
+  g.lineWidth = 4;
+  g.strokeStyle = '#16122E';
+  g.stroke();
+  tuftTexture = new THREE.CanvasTexture(c);
+  tuftTexture.colorSpace = THREE.SRGBColorSpace;
+  return tuftTexture;
+}
+const tuftMats = new Map();
+function tuftMat(hex) {
+  if (!tuftMats.has(hex)) {
+    const m = new THREE.MeshBasicMaterial({ map: getTuftTexture(), color: hex, alphaTest: 0.5, side: THREE.DoubleSide });
+    m.userData.noOutline = true;
+    tuftMats.set(hex, m);
+  }
+  return tuftMats.get(hex);
+}
+const tuftGeo = new THREE.PlaneGeometry(1, 1).translate(0, 0.35, 0); // base near the bottom edge
+
+// One tuft on the edge of a round part seen from the side: centre (cx, cy), radius r,
+// at `deg` degrees around it, spikes pointing outward. Cards sit in the part's z = 0 plane,
+// so the inner half hides inside the body and the spikes break the silhouette.
+function edgeTuft(parent, hex, cx, cy, r, deg, size, z = 0) {
+  const a = (deg * Math.PI) / 180;
+  const m = new THREE.Mesh(tuftGeo, tuftMat(hex));
+  m.position.set(cx + Math.cos(a) * r * 0.9, cy + Math.sin(a) * r * 0.9, z);
+  m.rotation.z = a - Math.PI / 2;
+  m.scale.set(size, size, 1);
+  m.userData.outline = 0;
+  parent.add(m);
+  return m;
+}
+
+// 20-40 tufts on the silhouette: cheek ruffs, chest bib, back and rump, ear tips, tail tip.
+// Long-haired cats (fluffy > 1.05) get more and bigger tufts; the low preset gets half.
+function addTufts({ spec, torso, head, tails, ears }) {
+  const long = (spec.fluffy ?? 1) > 1.05;
+  const keep = spec.low ? 2 : 1; // keep every n-th tuft
+  const big = long ? 1.3 : 1;
+  const fur = spec.fur;
+  const bib = spec.belly;
+  const s = 0.24 * big;
+  const headR = 0.33 * (spec.fluffy ?? 1);
+  const bodyW = (spec.chunky ? 1.15 : spec.slim ? 0.88 : 1) * (spec.fluffy ?? 1);
+  let i = 0;
+  const add = (...args) => (i++ % keep === 0 ? edgeTuft(...args) : null);
+  // Cheek ruff: lower back of the head, plus the jowl under the chin.
+  const cheek = long ? [195, 212, 229, 246, 263, 282] : [205, 228, 252, 276];
+  for (const d of cheek) add(head, d > 240 ? bib : fur, 0, 0, headR, d, s);
+  // Back of the head.
+  for (const d of long ? [150, 168] : [160]) add(head, fur, 0, 0, headR, d, s * 0.8);
+  // Chest bib (front-bottom of the chest sphere).
+  const chest = long ? [250, 268, 286, 304, 322] : [262, 290, 318];
+  for (const d of chest) add(torso, bib, 0.55, -0.06, 0.22 * bodyW, d, s * 0.95);
+  // Back ridge and rump (top and back of the trunk).
+  const back = long ? [70, 90, 110, 130, 150, 170] : [80, 105, 135, 160];
+  for (const [k, d] of back.entries()) add(torso, fur, 0.18 + (k % 2) * 0.08, 0, 0.27 * bodyW + 0.02, d, s * 0.8);
+  // Ear tips.
+  for (const ear of ears) add(ear, fur, 0, 0.06, 0.07, 90, s * 0.45);
+  // Tail tip on every tail shape, pointing along the tail.
+  const tipHex = spec.tail ?? fur;
+  for (const g of Object.values(tails)) {
+    const path = g.children[0].geometry.parameters.path;
+    const end = path.getPoint(1);
+    const tan = path.getTangent(1);
+    const deg = (Math.atan2(tan.y, tan.x) * 180) / Math.PI;
+    for (let k = 0; k < (long ? 3 : 2); k++) add(g, tipHex, end.x, end.y, 0.02, deg + (k - 0.5) * 40, s * 0.7, end.z);
+  }
+}
+
 export function makeSecretCat(spec) {
   const fur = M(spec.fur);
   const belly = M(spec.belly);
@@ -112,22 +208,22 @@ export function makeSecretCat(spec) {
   const trunk = capsule(0.27 * bodyW, 0.42, fur);
   trunk.rotation.z = Math.PI / 2;
   torso.add(put(trunk, 0.32, 0, 0, 1, 1, bodyW > 1 ? 1.1 : 1));
-  torso.add(put(sphere(0.24 * bodyW, belly), 0.55, -0.06, 0, 0.8, 0.9, 0.95)); // chest
+  torso.add(noLine(put(sphere(0.24 * bodyW, belly), 0.55, -0.06, 0, 0.8, 0.9, 0.95))); // chest
   if (spec.stripes) {
     for (const x of [0.12, 0.3, 0.48]) {
       const band = new THREE.Mesh(new THREE.TorusGeometry(0.27 * bodyW + 0.005, 0.03, 5, 16, Math.PI * 1.1), M(spec.stripes));
       band.rotation.y = Math.PI / 2;
       band.rotation.x = -Math.PI * 0.05;
-      torso.add(put(band, x, 0, 0));
+      torso.add(noLine(put(band, x, 0, 0)));
     }
   }
   for (const [part, x, y, z, r, c, sy] of spec.patches ?? []) {
     if (part !== 'body') continue;
-    torso.add(put(sphere(r, M(c), 10, 8), 0.32 + x, y * bodyW * 0.9, z * bodyW, 1.2, sy, 1));
+    torso.add(noLine(put(sphere(r, M(c), 10, 8), 0.32 + x, y * bodyW * 0.9, z * bodyW, 1.2, sy, 1)));
   }
 
   // Haunches: hidden inside the trunk in most poses, they round out the rump when sitting.
-  for (const z of [-0.13, 0.13]) torso.add(put(sphere(0.19 * bodyW, fur, 10, 8), 0.1, -0.06, z));
+  for (const z of [-0.13, 0.13]) torso.add(noLine(put(sphere(0.19 * bodyW, fur, 10, 8), 0.1, -0.06, z)));
 
   // Legs: shoulder/hip pivots inside the torso so they follow it.
   const leg = (x, z, front) => {
@@ -165,20 +261,23 @@ export function makeSecretCat(spec) {
   head.add(sphere(0.33 * fluffy, fur, 18, 12));
   for (const [part, x, y, z, r, c, sy] of spec.patches ?? []) {
     if (part !== 'head') continue;
-    head.add(put(sphere(r, M(c), 10, 8), x, y * 0.9, z, 1, sy, 1));
+    head.add(noLine(put(sphere(r, M(c), 10, 8), x, y * 0.9, z, 1, sy, 1)));
   }
   head.add(put(sphere(0.17, belly, 12, 8), 0.2, -0.1, 0, 0.8, 0.65, 1.2)); // muzzle
-  if (spec.chin) head.add(put(sphere(0.07, M(spec.chin), 8, 6), 0.27, -0.18, 0));
-  if (spec.blaze) head.add(put(sphere(0.07, belly, 8, 6), 0.27, 0.06, 0, 0.5, 1.8, 0.8)); // white stripe up the nose
-  head.add(put(sphere(0.045, M(spec.nose), 8, 6), 0.33, -0.03, 0));
+  if (spec.chin) head.add(noLine(put(sphere(0.07, M(spec.chin), 8, 6), 0.27, -0.18, 0)));
+  if (spec.blaze) head.add(noLine(put(sphere(0.07, belly, 8, 6), 0.27, 0.06, 0, 0.5, 1.8, 0.8))); // white stripe up the nose
+  head.add(noLine(put(sphere(0.045, M(spec.nose), 8, 6), 0.33, -0.03, 0)));
   const eyes = [];
   const ears = [];
   for (const z of [-0.12, 0.12]) {
     const eye = new THREE.Group();
     eye.position.set(0.25, 0.06, z);
-    eye.add(put(sphere(0.085, M(spec.eyes), 10, 8), 0, 0, 0, 0.55, 1, 1));
-    eye.add(put(sphere(0.06, M('#16122E'), 8, 6), 0.03, 0, 0, 0.5, 1, 0.35)); // vertical slit
-    eye.add(put(sphere(0.018, M('#FFFFFF'), 6, 4), 0.05, 0.035, 0));
+    // Eyes are a hand-picked feature line: a thin hull around the iris only.
+    const iris = put(sphere(0.085, M(spec.eyes), 10, 8), 0, 0, 0, 0.55, 1, 1);
+    iris.userData.outline = 0.5;
+    eye.add(iris);
+    eye.add(noLine(put(sphere(0.06, M('#16122E'), 8, 6), 0.03, 0, 0, 0.5, 1, 0.35))); // vertical slit
+    eye.add(noLine(put(sphere(0.018, M('#FFFFFF'), 6, 4), 0.05, 0.035, 0)));
     head.add(eye);
     eyes.push(eye);
     const ear = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.24, 4), z > 0 ? earMat(spec, 'L') : earMat(spec, 'R'));
@@ -188,7 +287,10 @@ export function makeSecretCat(spec) {
     ears.push(ear);
   }
 
-  addOutlines(root, 1.1);
+  addTufts({ spec, torso, head, tails, ears, fur, belly, tailMat, low: spec.low });
+
+  // Silhouette-only ink: hulls pushed back so crossings between parts disappear.
+  addOutlines(root, 1.1, { bias: 0.22 });
 
   const cat = { spec, root, rig, torso, legs, tails, head, eyes, ears, pose: null, anim: null, time: 0, found: false, place: null };
   setPose(cat, spec.idle);
