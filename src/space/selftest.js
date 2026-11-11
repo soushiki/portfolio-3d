@@ -1,8 +1,7 @@
 // ?selftest=hop: checks that a hop between neighbouring planets is a visible flight on the
-// current device settings. Outside reduced motion it fails when the hero spends under 0.4 s in
-// flight, jumps more than a quarter of the screen in one frame (a teleport or cut), stays under
-// 14 px tall, or barely moves. Add &assert=flight to demand a flight even under reduced motion
-// (proves the test catches the cut). Steps the game at
+// current device settings, in full and in reduced motion alike. It fails when the hero spends
+// under 0.4 s in flight, jumps more than a quarter of the screen in one frame (a teleport or cut),
+// stays under 14 px tall, or barely moves. Steps the game at
 // 15 fps to imitate a slow phone. Result: an on-page banner, the console, and window.__selftest.
 // Use with ?quality=low and a phone-sized viewport to reproduce mobile conditions.
 import * as THREE from 'three';
@@ -40,7 +39,8 @@ export function runHopTest(game, { reducedMotion }) {
     minPx = Math.min(minPx, heroHeightPx());
     maxTravel = Math.max(maxTravel, now.distanceTo(start));
   }
-  const demandFlight = !reducedMotion || new URLSearchParams(location.search).get('assert') === 'flight';
+  // Every branch (full arc and calm glide) must show the trip with in-between frames.
+  const demandFlight = true;
   const jumpLimit = 0.25 * Math.min(innerWidth, innerHeight);
 
   const failures = [];

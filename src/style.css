@@ -839,3 +839,14 @@ a {
     place-items: start center;
   }
 }
+
+/* The HUD Motion button stays on one line on phones. */
+[data-short] {
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .hud-actions .btn-small {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+}
