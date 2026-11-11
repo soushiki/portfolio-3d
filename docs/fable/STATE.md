@@ -25,6 +25,8 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 
 - 2026-11-11, phone "teleport" report: reproduced mobile conditions (375 × 812, touch, `?quality=low`, 15 fps stepping). The hop runs: 1.73 s in flight, at most 29 px per frame, hero about 22 px tall. Low preset, dt clamping, the Next button path and the camera were ruled out. Most likely cause on his phone: the browser reports `prefers-reduced-motion: reduce` (Android "Remove animations" or a battery saver), which correctly swaps the hop for a cut. Not confirmed on his device yet: ask him to open the live site with `?debug=1` after the next deploy. Added: an "Animations: full / reduced" toggle (cover and list dialog, saved as `p3d-motion`) that overrides the OS setting; a trailing camera during hops (hero travel on a phone 120 → 163 px); `?selftest=hop` (passes the flight, fails the cut with `&motion=reduce&assert=flight`).
 
+- 2026-11-11, fur and outlines: silhouette-only hulls with a depth push (no inner lines on cats or hero), soft ramp + coat rim light, jagged tuft cards on the silhouette. Checked on the lineup in a visible Chrome tab. Hop selftest still passes (1.73 s). Cost: 830 cat meshes in total incl. hulls on the low preset (168 tufts); desktop low preset 83 fps. Not yet measured on a real phone.
+
 ## Tried and failed (and why)
 
 - **Testing in the hidden browser pane with real time:** `requestAnimationFrame` barely runs while the pane is hidden, so waits showed stale frames. Fixed for testing with the dev-only `__game.advance(seconds)`, which steps the simulation and renders. Screenshots can still show the frame before the last render; take a second screenshot.
@@ -39,9 +41,12 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 
 - **Phone checks that only read `state.mode`:** they said "flight" while the user saw a teleport. Visual checks must measure on screen (hero pixel size, per-frame jump); `?selftest=hop` does that now.
 
+- **Tufts as camera-facing sprites:** they sat inside the head and showed as white "teeth" on the cheeks. Replaced with flat cards on each part's side-view edge, spikes outward.
+
 ## Not tried yet / next
 
 0. Cat reactions follow Sebastian's clarification (looks from photos only, dynamic caught → greeting → end pose; zoomies and dazed wobble for chaotic cats). Next: study the GIF references in a visible Chrome tab and tune the `STEPS` durations; add the trill sound with PLAN task 3.
+0b. Profile the cats on a real phone (`?debug=1` shows fps). If under 50 fps: merge each cat's static meshes and tufts into one geometry per part, or drop tufts on cats off screen.
 1. PLAN.md tasks 3–14 for Haiku/Sonnet (start with 3 or 6). Tasks 1–2 done 2026-11-10 by Haiku (old driving files, Rapier and Kenney models removed; README rewritten), checked by Fable: build passes, full tour runs with no console errors.
 2. Fable F1–F5: hero polish (blink, wave, crouch, dust), data planet layout on a real phone, hop polish, real-device performance on a mid-range Android, update the review page.
 3. Not checked yet: keyboard-only pass through the whole tour in a visible tab, screen reader announcements, real touch input on a phone, frame rate on a phone, the hero close-up image for the review page (the pane was too small).

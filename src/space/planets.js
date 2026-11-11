@@ -158,7 +158,7 @@ export function buildPlanets({ scene, route, low }) {
     // Secret cats on the underside: easter eggs, never on the route.
     const hidden = [];
     for (const { id, angle } of p.cats ?? []) {
-      const cat = makeSecretCat(CATS.find((c) => c.id === id));
+      const cat = makeSecretCat({ ...CATS.find((c) => c.id === id), low }); // low preset: half the fur tufts
       cat.root.rotation.y = -0.5; // three-quarter view toward the camera
       cat.root.scale.setScalar(1.1);
       const holder = new THREE.Group();

@@ -111,7 +111,7 @@ export function makeCat({ coat = 'tuxedo', gear = true, outline = 1.4 } = {}) {
     body.add(flame);
   }
 
-  addOutlines(root, outline);
+  addOutlines(root, outline, { bias: 0.25 });
 
   // Animation state, driven by game.js each frame.
   const anim = { walk: 0, phase: 0, squash: 0, air: 0 };
