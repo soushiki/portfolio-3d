@@ -181,32 +181,26 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     state.activeStop = null;
     const from = rimPoint(planetOf(), state.angle, state.height, new THREE.Vector3());
     const to = rimPoint(planets[toPlanet], landAngle, 0, new THREE.Vector3());
-    if (reducedMotion) {
-      // No arc and no camera travel: a small hop in place, then a comic panel cut.
-      state.vy = JUMP_SPEED * 0.7;
-      hero.anim.squash = -0.4;
-      hero.anim.air = 1;
-      state.cut = { t: 0, toPlanet, walkTo };
-      state.mode = 'cut';
-      stats.hopStart = performance.now();
-      stats.lastHopKind = 'cut (reduced motion)';
-      return;
-    }
     const dist = from.distanceTo(to);
     const mid = from.clone().add(to).multiplyScalar(0.5);
-    mid.y += Math.max(6, dist * 0.35);
+    // Reduced motion still shows the trip, calmly: a lower arc over 0.9 s, no flip, no speed lines,
+    // no landing shake, and a camera that frames both planets instead of chasing the hero.
+    // Only the small hero moves; the view itself stays nearly still (vestibular-safe).
+    const calm = reducedMotion;
+    mid.y += calm ? Math.max(4, dist * 0.2) : Math.max(6, dist * 0.35);
     state.flight = {
-      from, to, mid, t: 0, duration: Math.min(1.7, 0.75 + dist / 45),
-      toPlanet, landAngle, walkTo, spin: toPlanet > state.planet ? -1 : 1,
+      from, to, mid, t: 0, duration: calm ? 0.9 : Math.min(1.7, 0.75 + dist / 45), calm,
+      toPlanet, landAngle, walkTo, spin: calm ? 0 : toPlanet > state.planet ? -1 : 1,
       startTilt: (state.angle - 90) * DEG, endTilt: (landAngle - 90) * DEG,
+      frame: from.clone().lerp(to, 0.5),
     };
     state.mode = 'flight';
     stats.hopStart = performance.now();
-    stats.lastHopKind = 'arc';
+    stats.lastHopKind = calm ? 'calm glide (motion is reduced)' : 'full arc';
     state.facing = toPlanet > state.planet ? 1 : -1;
-    hero.anim.squash = 0.6;
+    hero.anim.squash = calm ? 0.2 : 0.6;
     hero.anim.air = 1;
-    document.body.classList.add('is-flying');
+    if (!calm) document.body.classList.add('is-flying');
     ui.setPlanet(toPlanet);
   }
 
@@ -220,9 +214,9 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     state.flight = null;
     state.mode = 'auto';
     state.autoTarget = f.walkTo;
-    hero.anim.squash = 0.7;
+    hero.anim.squash = f.calm ? 0.25 : 0.7;
     hero.anim.air = 0;
-    state.shake = 0.3;
+    state.shake = f.calm ? 0 : 0.3;
     document.body.classList.remove('is-flying');
     rimPoint(planetOf(), state.angle, 0.05, ring.position);
     ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tmpA.copy(ring.position).sub(tmpB.set(planetOf().x, planetOf().y, 0)).normalize());
@@ -278,6 +272,11 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     let R;
     if (state.mode === 'flight') {
       const f = state.flight;
+      if (f.calm) {
+        // Calm glide: hold one frame that contains both planets; only the hero moves.
+        R = f.from.distanceTo(f.to) / 2 + 9;
+        focus.copy(f.frame);
+      } else {
       R = 12 + f.from.distanceTo(f.to) * 0.35;
       // Trail behind the hero along the arc so it visibly crosses the screen (on tall phone
       // screens a camera locked to the hero made the hop read as the world sliding past).
@@ -285,6 +284,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
       const e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
       focus.copy(f.from).lerp(f.to, e);
       focus.y = Math.max(focus.y, heroPos.y - R * 0.45);
+      }
     } else {
       const p = planetOf();
       R = p.radius;
@@ -306,7 +306,8 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     // Shift so the planet sits in the uncovered part of the screen.
     const tx = focus.x + (inset.right * visW) / 2;
     const ty = focus.y - ((inset.bottom - inset.top) * visH) / 2;
-    const k = snap ? 1 : 1 - Math.exp(-dt * (state.mode === 'flight' ? 4 : 3));
+    const calmFlight = state.mode === 'flight' && state.flight.calm;
+    const k = snap ? 1 : 1 - Math.exp(-dt * (calmFlight ? 2.5 : state.mode === 'flight' ? 4 : 3));
     camLook.x += (tx - camLook.x) * k;
     camLook.y += (ty - camLook.y) * k;
     camPos.set(camLook.x, camLook.y, camPos.z + (D - camPos.z) * k);

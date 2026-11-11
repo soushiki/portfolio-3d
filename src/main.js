@@ -26,7 +26,7 @@ const reducedMotion = forcedMotion ? forcedMotion === 'reduce' : savedMotion ? s
 const motionSource = forcedMotion ? 'url' : savedMotion ? 'saved' : 'OS';
 document.body.classList.toggle('is-reduced', reducedMotion);
 for (const b of document.querySelectorAll('[data-motion-toggle]')) {
-  b.textContent = t(reducedMotion ? 'motionReduced' : 'motionFull');
+  b.textContent = 'short' in b.dataset ? t(reducedMotion ? 'motionShortReduced' : 'motionShortFull') : t(reducedMotion ? 'motionReduced' : 'motionFull');
   b.setAttribute('aria-pressed', String(!reducedMotion));
   b.title = t('motionHelp');
   b.addEventListener('click', () => {
@@ -104,7 +104,8 @@ async function boot() {
       document.body.append(box);
       setInterval(() => {
         const s = game.stats;
-        box.textContent = `motion: ${reducedMotion ? 'reduced' : 'full'} (${motionSource}; OS says ${osReduced ? 'reduce' : 'no-preference'})\nquality: ${pickQuality().low ? 'low' : 'high'}  fps: ${s.fps.toFixed(0)}\nlast hop: ${s.lastHop ? s.lastHop.toFixed(2) + ' s' : '-'} (${s.lastHopKind})`;
+        const why = motionSource === 'OS' ? (osReduced ? 'the phone asks for reduced motion' : 'the phone allows motion') : motionSource === 'saved' ? 'you picked it with the Motion button' : 'the address says so';
+        box.textContent = `motion: ${reducedMotion ? 'reduced' : 'full'} because ${why}\nquality: ${pickQuality().low ? 'low' : 'high'}  fps: ${s.fps.toFixed(0)}\nlast hop: ${s.lastHopKind}${s.lastHop ? ', ' + s.lastHop.toFixed(2) + ' s' : ''}`;
       }, 500);
     }
     if (params.get('selftest') === 'hop') {

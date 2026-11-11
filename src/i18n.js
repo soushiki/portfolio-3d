@@ -68,6 +68,8 @@ const STRINGS = {
     motionFull: 'Animations: full',
     motionReduced: 'Animations: reduced',
     motionHelp: 'Switch between full and reduced animations',
+    motionShortFull: 'Motion: full',
+    motionShortReduced: 'Motion: calm',
     canvasLabel: 'Comic-style 3D tour: a cat astronaut walks around small planets, one per project',
   },
   es: {
@@ -124,6 +126,8 @@ const STRINGS = {
     motionFull: 'Animaciones: completas',
     motionReduced: 'Animaciones: reducidas',
     motionHelp: 'Cambiar entre animaciones completas y reducidas',
+    motionShortFull: 'Movimiento: completo',
+    motionShortReduced: 'Movimiento: suave',
     canvasLabel: 'Recorrido 3D estilo cómic: un gato astronauta camina por planetas pequeños, uno por proyecto',
   },
 };
