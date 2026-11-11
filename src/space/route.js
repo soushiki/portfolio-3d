@@ -94,6 +94,22 @@ ROUTE.forEach((p, i) => {
   p.index = i;
 });
 
+// Secret cats (Sebastian's 13 cats, see cats.js) per planet, on the underside, off the route.
+const CAT_PLACES = {
+  hello: ['skipper'],
+  minoscreto: ['ash', 'hazel'],
+  ingresos: ['java', 'orange'],
+  data: ['collie', 'duly', 'rosie'],
+  formato: ['nara', 'pelusa'],
+  gacha: ['charlie', 'panda'],
+  contact: ['oreo'],
+};
+const CAT_ANGLES = { 1: [270], 2: [242, 298], 3: [232, 270, 308] };
+for (const p of ROUTE) {
+  const ids = CAT_PLACES[p.id] ?? [];
+  p.cats = ids.map((id, i) => ({ id, angle: CAT_ANGLES[ids.length][i] }));
+}
+
 // Projects that are only in the plain list ("Earlier builds"), with the reason they're not on a planet.
 export const LIST_ONLY = ['brasa', 'davinci', 'apod', 'gym', 'todo', 'reddit', 'jammming'];
 

@@ -3,6 +3,7 @@ import { setPixelRatio } from './comic.js';
 import { createBackdrop } from './backdrop.js';
 import { buildPlanets, rimPoint } from './planets.js';
 import { makeCat } from './hero.js';
+import { collect, updateCat } from './cats.js';
 import { ROUTE, STOPS } from './route.js';
 import { createInput } from './input.js';
 
@@ -214,8 +215,8 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
       if (!h.found && Math.abs(angDiff(state.angle, h.angle)) < HIDDEN_RANGE) {
         h.found = true;
         state.found++;
-        h.cat.anim.squash = -0.6;
-        ui.foundCat(state.found, planets.reduce((n, q) => n + q.hidden.length, 0));
+        collect(h.cat, { reducedMotion });
+        ui.foundCat(h.cat.spec.name, state.found, planets.reduce((n, q) => n + q.hidden.length, 0));
       }
     }
     // Next/Back labels follow the hero.
@@ -408,6 +409,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     placeHero(dt, t);
     if (running) updateStops();
     world.update(t);
+    for (const p of planets) for (const h of p.hidden) updateCat(h.cat, dt, t);
     if (ringT < 1) {
       ringT = Math.min(1, ringT + dt * 2.5);
       ring.scale.setScalar(1 + ringT * 2.5);
