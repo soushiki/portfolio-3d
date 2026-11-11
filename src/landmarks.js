@@ -416,9 +416,115 @@ function streetClock(M) {
   };
 }
 
+// Space-tour landmarks (Fable 2026-11-10). Same contract as above.
+
+// Hello planet: a rocket-shaped cat tree, the hero's home base.
+function welcome(M) {
+  const g = new THREE.Group();
+  const cream = M('#FFF6E5');
+  const red = M('#E63946');
+  g.add(at(cyl(1.5, 1.7, 5, cream, 16), 0, 2.5, 0));
+  g.add(at(new THREE.Mesh(new THREE.ConeGeometry(1.6, 2.4, 16), red), 0, 6.2, 0));
+  for (let i = 0; i < 3; i++) {
+    const fin = box(0.25, 1.8, 1.4, red);
+    const a = (i / 3) * Math.PI * 2 + Math.PI / 6;
+    fin.position.set(Math.sin(a) * 1.6, 0.9, Math.cos(a) * 1.6);
+    fin.rotation.y = a;
+    g.add(fin);
+  }
+  // Round window with a cat bed peeking out, and a scratching-post band.
+  const win = cyl(0.75, 0.75, 0.2, M('#5AA9FF'), 18);
+  win.rotation.x = Math.PI / 2;
+  g.add(at(win, 0, 3.6, 1.55));
+  g.add(at(new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.14, 6, 18), M('#FFD23F')), 0, 3.6, 1.62));
+  g.add(at(cyl(1.58, 1.62, 0.7, M('#C8A979'), 16), 0, 1.4, 0));
+  // Little flag with a paw-coloured pennant
+  const flag = new THREE.Group();
+  flag.position.set(0, 7.4, 0);
+  flag.add(at(box(0.08, 1.4, 0.08, M('#3A3557')), 0, 0.7, 0), at(box(0.9, 0.5, 0.06, M('#FFD23F')), 0.48, 1.15, 0));
+  g.add(flag);
+  return {
+    group: g, w: 4, d: 4, h: 8.8,
+    update: (t) => {
+      flag.rotation.y = Math.sin(t * 2) * 0.5;
+    },
+  };
+}
+
+// Data planet hub: a bar chart of four columns with a trend arrow over it.
+function dataTower(M) {
+  const g = new THREE.Group();
+  const cols = ['#FFD23F', '#3FD0B6', '#FF7A6B', '#FFFFFF'];
+  const heights = [2.4, 4.0, 3.2, 5.6];
+  const bars = [];
+  heights.forEach((h, i) => {
+    const bar = box(1.1, 1, 1.1, M(cols[i]));
+    bar.scale.y = h;
+    bar.position.set(-2.1 + i * 1.4, h / 2, 0);
+    g.add(bar);
+    bars.push({ bar, h });
+  });
+  g.add(at(box(6.4, 0.3, 1.8, M('#2456C9')), 0, 0.15, 0));
+  const arrow = new THREE.Group();
+  arrow.position.set(0, 6.6, 0.2);
+  const shaft = box(5.4, 0.3, 0.3, M('#E63946'));
+  shaft.rotation.z = 0.42;
+  arrow.add(shaft);
+  const head = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.0, 4), M('#E63946'));
+  head.position.set(2.5, 1.15, 0);
+  head.rotation.z = -Math.PI / 2 + 0.42;
+  arrow.add(head);
+  g.add(arrow);
+  return {
+    group: g, w: 6.4, d: 1.8, h: 8,
+    update: (t) => {
+      bars.forEach(({ bar, h }, i) => {
+        const k = h * (1 + Math.sin(t * 1.6 + i) * 0.06);
+        bar.scale.y = k;
+        bar.position.y = k / 2;
+      });
+    },
+  };
+}
+
+// Contact planet: a radio beacon with a dish and a floating speech bubble.
+function beacon(M) {
+  const g = new THREE.Group();
+  const steel = M('#3A3557');
+  for (const s of [-1, 1]) {
+    const leg = box(0.25, 7, 0.25, steel);
+    leg.position.set(s * 0.9, 3.4, 0);
+    leg.rotation.z = -s * 0.12;
+    g.add(leg);
+  }
+  for (const y of [1.6, 3.4, 5.2]) g.add(at(box(1.8 - y * 0.18, 0.18, 0.2, steel), 0, y, 0));
+  const dish = new THREE.Mesh(new THREE.SphereGeometry(1.6, 18, 8, 0, Math.PI * 2, 0, Math.PI / 2.6), M('#FFF6E5', { side: THREE.DoubleSide }));
+  dish.rotation.x = Math.PI * 0.62;
+  dish.position.set(0, 7.2, 0.4);
+  g.add(dish);
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 8), M('#E63946', { emissive: true }));
+  g.add(at(tip, 0, 8.6, 0));
+  const bubble = new THREE.Group();
+  bubble.position.set(2.8, 7.6, 0.4);
+  bubble.add(box(2.6, 1.6, 0.3, M('#FFFFFF')));
+  const tail = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.8, 3), M('#FFFFFF'));
+  tail.position.set(-0.8, -1.0, 0);
+  tail.rotation.z = Math.PI + 0.5;
+  bubble.add(tail);
+  for (const x of [-0.6, 0, 0.6]) bubble.add(at(new THREE.Mesh(new THREE.SphereGeometry(0.17, 8, 6), M('#16122E')), x, 0, 0.18));
+  g.add(bubble);
+  return {
+    group: g, w: 6, d: 2, h: 9,
+    update: (t) => {
+      bubble.position.y = 7.6 + Math.sin(t * 2) * 0.25;
+      tip.scale.setScalar(1 + Math.max(0, Math.sin(t * 4)) * 0.4);
+    },
+  };
+}
+
 const BUILDERS = {
   hospital, observatory, gym, restaurant, bank, vault, bookStack, clipboard, gachaMachine, forumHall, speakers,
-  mailbox, windTurbine, streetClock,
+  mailbox, windTurbine, streetClock, welcome, dataTower, beacon,
 };
 
 // `material(color, extra)` comes from the world so landmarks share its shading and quality settings.

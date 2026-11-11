@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "portfolio-3d",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "5071", "--strictPort", "--host", "127.0.0.1"],
+      "port": 5071
+    }
+  ]
+}

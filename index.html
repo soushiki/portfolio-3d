@@ -3,87 +3,110 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#22223B" />
-    <meta name="description" content="Drive a small car around a low-poly world to discover Sebastian Herrera's projects." />
-    <title>Sebastian Herrera · 3D Portfolio</title>
+    <meta name="theme-color" content="#1B1340" />
+    <meta name="description" content="A guided comic-book tour of Sebastian Herrera's projects, one small planet per project. A plain list, resume and contact are one click away." />
+    <title>Sebastian Herrera · Planets of Code</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Mozilla+Headline:wght@200..700&family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <canvas id="scene" aria-label="3D world: drive the car to discover projects" data-i18n-aria="canvasLabel"></canvas>
+    <a class="skip-to-list" href="#list" data-open-list data-i18n="seeList">Just show me the projects</a>
 
-    <!-- Loading screen -->
+    <canvas id="scene" tabindex="-1" role="img" aria-label="Comic-style 3D tour" data-i18n-aria="canvasLabel"></canvas>
+    <div id="speed" class="speed-lines" aria-hidden="true"></div>
+    <div id="cut" class="panel-cut" aria-hidden="true"></div>
+
+    <!-- Loading screen: a comic cover. The skip paths work before the 3D world has loaded. -->
     <div id="loader" class="loader">
-      <div class="loader-inner">
-        <p class="eyebrow">Sebastian Herrera</p>
-        <h1 data-i18n="loaderTitle">Portfolio, the driving edition</h1>
+      <div class="cover">
+        <p class="cover-issue"><span data-i18n="coverIssue">Issue #1</span> · Sebastian Herrera</p>
+        <h1 class="cover-title" data-i18n="loaderTitle">Planets of Code</h1>
+        <p class="cover-sub" data-i18n="loaderSub">A guided tour of my projects, one small planet each.</p>
         <div class="bar" aria-hidden="true"><span id="loader-bar"></span></div>
-        <p id="loader-status" class="loader-status" role="status" data-i18n="loadingWorld">Loading the world…</p>
-        <button id="start-btn" class="btn btn-primary" type="button" data-i18n="start" hidden>Start driving</button>
-        <p class="loader-hint">
-          <span class="hint-keys" data-i18n="hintKeys">WASD / arrows to drive · Space to brake · R to reset</span>
-          <span class="hint-touch" data-i18n="hintTouch">Use the on-screen buttons to drive</span>
+        <p id="loader-status" class="loader-status" role="status" data-i18n="loadingWorld">Loading the planets…</p>
+        <div class="cover-actions">
+          <button id="start-btn" class="btn btn-primary btn-big" type="button" data-i18n="start" disabled>Start the tour</button>
+          <button class="btn" type="button" data-open-list data-i18n="seeList">Just show me the projects</button>
+        </div>
+        <p class="cover-links">
+          <a data-resume href="https://sebherr.netlify.app/public/html/english.html" target="_blank" rel="noopener" data-i18n="resume">Resume</a>
+          <a data-contact href="https://www.linkedin.com/in/sebastian-herrera-claro-23a0af/" target="_blank" rel="noopener" data-i18n="contact">Contact</a>
+          <a data-lang-link href="https://sebherr.netlify.app" data-i18n="skip">Simple portfolio →</a>
         </p>
-        <div class="lang-toggle lang-toggle-loader" role="group" aria-label="Language"><button type="button" data-lang="en">EN</button><button type="button" data-lang="es">ES</button></div>
-        <a class="skip-link" data-lang-link data-i18n="skip" href="https://sebherr.netlify.app">Skip to the simple portfolio →</a>
+        <p class="loader-hint">
+          <span class="hint-keys" data-i18n="hintKeys">← → walk · Space jump · Enter next stop · L list</span>
+          <span class="hint-touch" data-i18n="hintTouch">Hold ◀ ▶ to walk · tap Next to fly on</span>
+        </p>
+        <div class="lang-toggle" role="group" aria-label="Language"><button type="button" data-lang="en">EN</button><button type="button" data-lang="es">ES</button></div>
       </div>
     </div>
 
     <!-- HUD -->
     <header id="hud" class="hud" hidden>
       <span class="hud-name">Sebastian Herrera</span>
-      <nav class="hud-actions">
-        <button id="list-btn" class="btn btn-small" type="button" aria-haspopup="dialog"><span class="lbl-long" data-i18n="allProjects">All projects</span><span class="lbl-short" data-i18n="allProjectsShort">Projects</span></button>
-        <a class="btn btn-small" data-lang-link href="https://sebherr.netlify.app"><span class="lbl-long" data-i18n="simplePortfolio">Simple portfolio</span><span class="lbl-short" data-i18n="simplePortfolioShort">Simple site</span></a>
+      <nav id="strip" class="strip" aria-label="Planets" data-i18n-aria="planets"></nav>
+      <div class="hud-actions">
+        <button class="btn btn-small" type="button" data-open-list aria-haspopup="dialog"><span class="lbl-long" data-i18n="allProjects">All projects</span><span class="lbl-short" data-i18n="allProjectsShort">List</span></button>
+        <a class="btn btn-small" data-resume href="https://sebherr.netlify.app/public/html/english.html" target="_blank" rel="noopener" data-i18n="resume">Resume</a>
+        <a class="btn btn-small hide-phone" data-contact href="https://www.linkedin.com/in/sebastian-herrera-claro-23a0af/" target="_blank" rel="noopener" data-i18n="contact">Contact</a>
         <div class="lang-toggle" role="group" aria-label="Language"><button type="button" data-lang="en">EN</button><button type="button" data-lang="es">ES</button></div>
-      </nav>
+      </div>
     </header>
-    <p id="zone-hint" class="zone-hint" data-i18n="zoneHint" hidden>Drive onto a glowing pad to open a project</p>
 
-    <!-- Project card -->
-    <aside id="card" class="card" role="dialog" aria-modal="false" aria-labelledby="card-title" hidden>
+    <p id="announce" class="sr-only" aria-live="polite"></p>
+    <p id="launch-hint" class="caption caption-launch" data-i18n="launchHint" hidden>Space / Jump on the star to fly to the next planet</p>
+    <p id="toast" class="toast" hidden></p>
+
+    <!-- Bottom controls: Back / Next for everyone, walk + jump on touch screens. -->
+    <div id="controls" class="controls" hidden>
+      <div id="touch" class="touch" hidden>
+        <button type="button" class="pad-btn" data-action="left" aria-label="Walk left" data-i18n-aria="walkLeft">◀</button>
+        <button type="button" class="pad-btn" data-action="right" aria-label="Walk right" data-i18n-aria="walkRight">▶</button>
+        <button type="button" class="pad-btn pad-jump" data-action="jump" data-i18n="jump">Jump</button>
+      </div>
+      <div class="tour-nav">
+        <button id="back-btn" class="btn" type="button" data-i18n="back">Back</button>
+        <button id="next-btn" class="btn btn-primary btn-next" type="button"><span class="next-text"><span id="next-label" data-i18n="next">Next</span><span id="next-dest" class="next-dest"></span></span> <span aria-hidden="true">▶▶</span></button>
+      </div>
+    </div>
+
+    <!-- Project card: a comic panel -->
+    <aside id="card" class="card" aria-labelledby="card-title" hidden>
       <button id="card-close" class="card-close" type="button" aria-label="Close" data-i18n-aria="close">×</button>
+      <p id="card-number" class="card-number"></p>
       <h2 id="card-title"></h2>
       <p id="card-desc"></p>
       <ul id="card-tags" class="tags"></ul>
       <div id="card-links" class="card-links"></div>
     </aside>
 
-    <!-- Touch controls -->
-    <div id="touch" class="touch" hidden>
-      <div class="joystick" role="application" aria-label="Joystick: drag up to drive, sideways to steer, down to reverse" data-i18n-aria="joystick">
-        <span class="joy-arrow joy-up" aria-hidden="true">▲</span>
-        <span class="joy-arrow joy-down" aria-hidden="true">▼</span>
-        <span class="joy-arrow joy-left" aria-hidden="true">◀</span>
-        <span class="joy-arrow joy-right" aria-hidden="true">▶</span>
-        <span class="joy-knob" aria-hidden="true"></span>
-      </div>
-    </div>
-
-    <!-- Project list: used as the "All projects" dialog and as the no-WebGL fallback -->
-    <section id="list" class="list" aria-labelledby="list-title" hidden>
+    <!-- Project list: the "All projects" dialog and the no-WebGL fallback -->
+    <section id="list" class="list" role="dialog" aria-modal="true" aria-labelledby="list-title" hidden>
       <div class="list-inner">
         <button id="list-close" class="card-close" type="button" aria-label="Close" data-i18n-aria="close">×</button>
         <p class="eyebrow">Sebastian Herrera</p>
         <h2 id="list-title" data-i18n="projects">Projects</h2>
-        <p id="list-note" class="list-note"></p>
-        <ul id="list-items" class="list-items"></ul>
+        <p id="list-note" class="list-note" data-i18n="listNote">Every project, no game needed.</p>
         <p class="list-contact">
+          <a data-resume href="https://sebherr.netlify.app/public/html/english.html" target="_blank" rel="noopener" data-i18n="resume">Resume</a>
           <a href="https://www.linkedin.com/in/sebastian-herrera-claro-23a0af/" target="_blank" rel="noopener">LinkedIn</a>
-          ·
           <a href="https://github.com/soushiki" target="_blank" rel="noopener">GitHub</a>
-          ·
           <a href="https://sebherr.netlify.app" data-lang-link data-i18n="simplePortfolio">Simple portfolio</a>
         </p>
+        <h3 class="list-section" data-i18n="featured">On the tour</h3>
+        <ul id="list-featured" class="list-items"></ul>
+        <h3 class="list-section" data-i18n="earlier">Earlier builds</h3>
+        <p class="list-note" data-i18n="earlierNote">Course and practice projects, kept here for reference.</p>
+        <ul id="list-earlier" class="list-items list-compact"></ul>
       </div>
     </section>
 
     <noscript>
       <div class="noscript">
-        <p data-i18n="noscript">This 3D portfolio needs JavaScript.</p>
-        <p><a href="https://sebherr.netlify.app">Open the simple portfolio</a> · <a href="https://github.com/soushiki">GitHub</a></p>
+        <p>This 3D portfolio needs JavaScript.</p>
+        <p><a href="https://sebherr.netlify.app">Open the simple portfolio</a> · <a href="https://github.com/soushiki">GitHub</a> · <a href="https://www.linkedin.com/in/sebastian-herrera-claro-23a0af/">LinkedIn</a></p>
       </div>
     </noscript>
 
