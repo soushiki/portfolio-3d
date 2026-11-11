@@ -27,7 +27,14 @@ export function setPixelRatio(pr) {
 const comicVertex = /* glsl */ `
   varying vec3 vN;
   varying vec3 vView;
+  #ifdef PAINT
+  uniform mat4 uPaintMat;
+  varying vec3 vPaint;
+  #endif
   void main() {
+    #ifdef PAINT
+    vPaint = (uPaintMat * vec4(position, 1.0)).xyz;
+    #endif
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
     vN = normalize(normalMatrix * normal);
     vView = -mv.xyz;
@@ -47,6 +54,15 @@ const comicFragment = /* glsl */ `
   uniform float uSoft;
   uniform vec3 uRim;
   uniform float uRimAmt;
+  #ifdef PAINT
+  // Coat markings painted on the surface (no raised pieces). Each region: kind (0 blob, 1 half-space,
+  // 2 band), centre or normal, size, colour. Edges get a ragged, fur-like wobble.
+  uniform vec4 uPaintA[PAINT]; // xyz = centre (blob, band) or normal (half-space), w = kind
+  uniform vec4 uPaintB[PAINT]; // x = radius / offset / half-width, yzw unused
+  uniform vec3 uPaintC[PAINT]; // colour
+  uniform vec3 uShadowTint;
+  varying vec3 vPaint;
+  #endif
   varying vec3 vN;
   varying vec3 vView;
   void main() {
@@ -55,9 +71,25 @@ const comicFragment = /* glsl */ `
     float d = dot(n, uLight);
     // uSoft widens the band edge into a short ramp (fur); 0 keeps the hard comic step.
     float lit = smoothstep(0.08 - uSoft, 0.08 + uSoft + 0.0001, d);
-    vec3 col = mix(uShadow, uColor, lit);
+    vec3 baseC = uColor;
+    vec3 shadC = uShadow;
+    #ifdef PAINT
+    for (int i = 0; i < PAINT; i++) {
+      vec4 a = uPaintA[i];
+      float dist;
+      if (a.w < 0.5) dist = length(vPaint - a.xyz) - uPaintB[i].x;
+      else if (a.w < 1.5) dist = uPaintB[i].x - dot(vPaint, a.xyz);
+      else dist = abs(vPaint.y - a.y) - uPaintB[i].x;
+      // Ragged fur edge: two cheap waves in surface position.
+      float rag = (sin(vPaint.x * 53.0 + vPaint.z * 31.0) + sin(vPaint.y * 47.0 - vPaint.z * 29.0)) * 0.012;
+      float m = 1.0 - smoothstep(-0.012, 0.012, dist + rag);
+      baseC = mix(baseC, uPaintC[i], m);
+      shadC = mix(shadC, uPaintC[i] * uShadowTint, m);
+    }
+    #endif
+    vec3 col = mix(shadC, baseC, lit);
     // Highlight band
-    col = mix(col, mix(uColor, vec3(1.0), 0.35), step(0.86, d));
+    col = mix(col, mix(baseC, vec3(1.0), 0.35), step(0.86, d));
     // Halftone dots grow as the surface turns away from the light.
     vec2 p = gl_FragCoord.xy / (uDot * uPixelRatio);
     p = mat2(0.7071, -0.7071, 0.7071, 0.7071) * p;
@@ -69,7 +101,14 @@ const comicFragment = /* glsl */ `
     float rim = 1.0 - abs(dot(n, normalize(vView)));
     col = mix(col, uInk, smoothstep(0.82, 0.95, rim) * (1.0 - lit) * 0.6);
     // Rim light tinted to the coat on the lit side: reads as a soft, fluffy edge.
-    col = mix(col, uRim, smoothstep(0.55, 0.9, rim) * lit * uRimAmt);
+    // On painted coats the rim follows the local colour, and is weaker on dark fur so black stays black.
+    vec3 rimC = uRim;
+    float rimAmt = uRimAmt;
+    #ifdef PAINT
+    rimC = mix(baseC, vec3(1.0, 0.965, 0.898), 0.55);
+    rimAmt *= 0.25 + 0.75 * dot(baseC, vec3(0.2126, 0.7152, 0.0722));
+    #endif
+    col = mix(col, rimC, smoothstep(0.55, 0.9, rim) * lit * rimAmt);
     col = mix(col, vec3(1.0), uFlash);
     gl_FragColor = vec4(col, uOpacity);
     #include <colorspace_fragment>
@@ -105,6 +144,7 @@ const materialCache = new Map();
 // Comic material for one flat colour. `extra` mirrors the few MeshStandard options the
 // landmark builders pass: transparent/opacity, emissive (treated as "no shadow band").
 export function comicMaterial(color, extra = {}) {
+  if (extra.paint?.length) return paintedMaterial(color, extra);
   const key = `${color}|${extra.transparent ? extra.opacity : ''}|${extra.emissive ? 'e' : ''}|${extra.side ?? ''}|${extra.soft ?? ''}|${extra.rim ?? ''}`;
   if (materialCache.has(key)) return materialCache.get(key);
   const base = new THREE.Color(color);
@@ -132,6 +172,34 @@ export function comicMaterial(color, extra = {}) {
   m.userData.noOutline = Boolean(extra.transparent) || extra.side === THREE.DoubleSide;
   materialCache.set(key, m);
   return m;
+}
+
+// A coat with painted markings: one material per mesh (not cached). paint: [{ kind: 'blob' | 'half' |
+// 'band', at: [x, y, z] (centre, or the normal for 'half'), size, color }], in the coordinates of the
+// mesh's parent group (set uPaintMat to the mesh's own matrix once it is placed: bindPaint()).
+const KINDS = { blob: 0, half: 1, band: 2 };
+function paintedMaterial(color, extra) {
+  const base = comicMaterial(color, { ...extra, paint: null });
+  const m = base.clone();
+  const n = extra.paint.length;
+  m.defines = { PAINT: n };
+  m.uniforms = THREE.UniformsUtils.clone(base.uniforms);
+  for (const k of ['uInk', 'uLight', 'uDot', 'uPixelRatio']) m.uniforms[k] = base.uniforms[k]; // keep shared
+  m.uniforms.uPaintMat = { value: new THREE.Matrix4() };
+  m.uniforms.uShadowTint = { value: SHADOW_TINT };
+  m.uniforms.uPaintA = { value: extra.paint.map((p) => new THREE.Vector4(...p.at, KINDS[p.kind])) };
+  m.uniforms.uPaintB = { value: extra.paint.map((p) => new THREE.Vector4(p.size, 0, 0, 0)) };
+  m.uniforms.uPaintC = { value: extra.paint.map((p) => new THREE.Color(p.color)) };
+  m.userData = { ...base.userData, painted: true };
+  return m;
+}
+
+// Call after the mesh's position/rotation/scale are set: paint coordinates follow the parent frame.
+export function bindPaint(mesh) {
+  if (!mesh.material.userData?.painted) return mesh;
+  mesh.updateMatrix();
+  mesh.material.uniforms.uPaintMat.value.copy(mesh.matrix);
+  return mesh;
 }
 
 const outlineMaterials = new Map();

@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { comicMaterial, addOutlines } from './comic.js';
+import { comicMaterial, addOutlines, bindPaint } from './comic.js';
 
 // Fur materials: a short soft ramp and a rim light a little lighter than the coat.
-const M = (color) => comicMaterial(color, { soft: 0.14, rim: rimOf(color) });
+const M = (color, paint) => comicMaterial(color, { soft: 0.14, rim: rimOf(color), paint });
 function rimOf(hex) {
   const c = new THREE.Color(hex);
   return '#' + c.lerp(new THREE.Color('#FFF6E5'), 0.55).getHexString();
@@ -34,12 +34,24 @@ export const CATS = [
     chin: '#E8E2D8', idle: 'bellyUp', react: ['freeze', 'greet'], found: 'bellyUp',
   },
   {
-    id: 'duly', name: 'Duly', fur: '#6B6A70', belly: '#F7F3EA', socks: '#F7F3EA', eyes: '#3A2E2A', nose: '#E8A0AE',
-    stripes: '#45444C', blaze: true, size: 0.82, idle: 'sit', react: ['hop', 'zoomies'], found: 'tailUp',
+    // Same warm grey-brown tabby as Hazel; white face, chest and socks.
+    id: 'duly', name: 'Duly', fur: '#7A6E62', belly: '#F7F3EA', socks: '#F7F3EA', eyes: '#3A2E2A', nose: '#E8A0AE',
+    stripes: '#4C4239', blaze: true, size: 0.82,
+    paint: {
+      body: [{ kind: 'blob', at: [0.2, 0.2, 0.22], size: 0.13, color: '#8A7660' }, { kind: 'blob', at: [0.45, 0.22, -0.2], size: 0.12, color: '#85838A' }],
+      head: [{ kind: 'half', at: [0, -1, 0], size: -0.02, color: '#F7F3EA' }, { kind: 'blob', at: [0.22, 0.05, 0], size: 0.15, color: '#F7F3EA' }],
+    },
+    react: ['hop', 'zoomies'], found: 'tailUp',
   },
   {
-    id: 'hazel', name: 'Hazel', fur: '#7A6650', belly: '#F7F3EA', socks: '#F7F3EA', eyes: '#B8B04A', nose: '#F0A8B4',
-    stripes: '#4A3A2C', blaze: true, idle: 'peek', react: ['hop', 'greet'], found: 'sit',
+    // Same warm grey-brown tabby as Duly; white chest and muzzle, brown bridge above the nose.
+    id: 'hazel', name: 'Hazel', fur: '#7A6E62', belly: '#F7F3EA', socks: '#F7F3EA', eyes: '#B8B04A', nose: '#F0A8B4',
+    stripes: '#4C4239',
+    paint: {
+      body: [{ kind: 'blob', at: [0.15, 0.22, -0.2], size: 0.14, color: '#85838A' }, { kind: 'blob', at: [0.5, 0.2, 0.2], size: 0.12, color: '#8A7660' }],
+      head: [{ kind: 'blob', at: [0.27, 0.2, 0], size: 0.12, color: '#5E4A38' }, { kind: 'blob', at: [0.31, 0.08, 0], size: 0.06, color: '#5E4A38' }, { kind: 'blob', at: [-0.05, 0.2, 0.15], size: 0.12, color: '#85838A' }],
+    },
+    react: ['hop', 'greet'], found: 'sit',
   },
   {
     id: 'java', name: 'Java', fur: '#7C6A55', belly: '#A8977E', socks: '#7C6A55', eyes: '#B9C64A', nose: '#B07A6A',
@@ -55,14 +67,27 @@ export const CATS = [
     stripes: '#C26E22', size: 0.95, slim: true, idle: 'curled', react: ['hop', 'zoomies'], found: 'tailUp',
   },
   {
+    // White with Skipper's layout of black on top: black back, tail and cap over the head and one eye;
+    // big white belly and chest up to the chin. A black bracelet on her left front leg.
     id: 'oreo', name: 'Oreo', fur: '#FBF7EE', belly: '#FBF7EE', socks: '#FBF7EE', eyes: '#C8D45A', nose: '#E8A0AE',
-    patches: [['head', -0.05, 0.25, 0, 0.36, '#24202E', 0.75], ['body', -0.15, 0.3, 0, 0.22, '#24202E', 0.6], ['body', 0.2, 0.2, 0.24, 0.12, '#24202E', 0.7]],
-    tail: '#24202E', idle: 'side', react: ['hop', 'zooted'], found: 'sploot',
+    tail: '#24202E',
+    paint: {
+      body: [{ kind: 'half', at: [0, 1, 0], size: -0.03, color: '#24202E' }, { kind: 'blob', at: [0.05, -0.05, 0.27], size: 0.12, color: '#24202E' }],
+      head: [{ kind: 'half', at: [-0.3, 0.95, 0], size: -0.02, color: '#24202E' }, { kind: 'blob', at: [0.22, 0.08, -0.13], size: 0.11, color: '#24202E' }],
+      legFr: [{ kind: 'band', at: [0, -0.24, 0], size: 0.035, color: '#24202E' }],
+    },
+    idle: 'side', react: ['hop', 'zooted'], found: 'sploot',
   },
   {
+    // Chunky, white with Skipper's layout of black on top: black back and tail, black over the head
+    // and the far eye and ear; big white belly and chest up to the chin.
     id: 'panda', name: 'Panda', fur: '#FBF7EE', belly: '#FBF7EE', socks: '#FBF7EE', eyes: '#C8D45A', nose: '#E8A0AE',
-    patches: [['head', -0.05, 0.22, 0.16, 0.24, '#24202E', 0.8], ['body', -0.2, 0.3, 0, 0.24, '#24202E', 0.6], ['body', 0.18, 0.28, -0.2, 0.14, '#24202E', 0.7]],
-    tail: '#24202E', size: 1.12, chunky: true, idle: 'loaf', react: ['freeze', 'greet', 'headBump'], found: 'bellyUp',
+    tail: '#24202E', size: 1.12, chunky: true,
+    paint: {
+      body: [{ kind: 'half', at: [-0.15, 1, 0], size: 0.0, color: '#24202E' }, { kind: 'blob', at: [0.5, 0.05, -0.26], size: 0.13, color: '#24202E' }],
+      head: [{ kind: 'half', at: [-0.25, 0.9, -0.25], size: -0.04, color: '#24202E' }, { kind: 'blob', at: [0.2, 0.06, -0.14], size: 0.14, color: '#24202E' }],
+    },
+    idle: 'loaf', react: ['freeze', 'greet', 'headBump'], found: 'bellyUp',
   },
   {
     id: 'pelusa', name: 'Pelusa', fur: '#FBF7EE', belly: '#FBF7EE', socks: '#FBF7EE', eyes: '#A9C25A', nose: '#E8A0AE',
@@ -191,6 +216,10 @@ function addTufts({ spec, torso, head, tails, ears }) {
   const big = long ? 1.3 : 1;
   const fur = spec.fur;
   const bib = spec.belly;
+  // Back and head-top tufts take the colour of a painted cap/saddle when there is one.
+  const topOf = (list) => list?.find((p) => p.kind === 'half' && p.at[1] > 0)?.color;
+  const backHex = topOf(spec.paint?.body) ?? fur;
+  const headTopHex = topOf(spec.paint?.head) ?? fur;
   const s = 0.24 * big;
   const headR = 0.33 * (spec.fluffy ?? 1);
   const bodyW = (spec.chunky ? 1.15 : spec.slim ? 0.88 : 1) * (spec.fluffy ?? 1);
@@ -200,15 +229,15 @@ function addTufts({ spec, torso, head, tails, ears }) {
   const cheek = long ? [195, 212, 229, 246, 263, 282] : [205, 228, 252, 276];
   for (const d of cheek) add(head, d > 240 ? bib : fur, 0, 0, headR, d, s);
   // Back of the head.
-  for (const d of long ? [150, 168] : [160]) add(head, fur, 0, 0, headR, d, s * 0.8);
+  for (const d of long ? [150, 168] : [160]) add(head, headTopHex, 0, 0, headR, d, s * 0.8);
   // Chest bib (front-bottom of the chest sphere).
   const chest = long ? [250, 268, 286, 304, 322] : [262, 290, 318];
   for (const d of chest) add(torso, bib, 0.55, -0.06, 0.22 * bodyW, d, s * 0.95);
   // Back ridge and rump (top and back of the trunk).
   const back = long ? [70, 90, 110, 130, 150, 170] : [80, 105, 135, 160];
-  for (const [k, d] of back.entries()) add(torso, fur, 0.18 + (k % 2) * 0.08, 0, 0.27 * bodyW + 0.02, d, s * 0.8);
+  for (const [k, d] of back.entries()) add(torso, d < 165 ? backHex : fur, 0.18 + (k % 2) * 0.08, 0, 0.27 * bodyW + 0.02, d, s * 0.8);
   // Ear tips.
-  for (const ear of ears) add(ear, fur, 0, 0.06, 0.07, 90, s * 0.45);
+  for (const ear of ears) add(ear, headTopHex, 0, 0.06, 0.07, 90, s * 0.45);
   // Tail tip on every tail shape, pointing along the tail.
   const tipHex = spec.tail ?? fur;
   for (const g of Object.values(tails)) {
@@ -236,9 +265,14 @@ export function makeSecretCat(spec) {
   // Torso pivots at the back hips so sitting tilts it up around the rump.
   const torso = new THREE.Group();
   rig.add(torso);
-  const trunk = capsule(0.27 * bodyW, 0.42, fur);
+  // Coat markings are painted on the surface (spec.paint, plus legacy spec.patches as blobs).
+  const bodyPaint = [
+    ...(spec.paint?.body ?? []),
+    ...(spec.patches ?? []).filter((p) => p[0] === 'body').map(([, x, y, z, r, c]) => ({ kind: 'blob', at: [0.32 + x, y * bodyW * 0.9, z * bodyW], size: r * 1.1, color: c })),
+  ];
+  const trunk = capsule(0.27 * bodyW, 0.42, bodyPaint.length ? M(spec.fur, bodyPaint) : fur);
   trunk.rotation.z = Math.PI / 2;
-  torso.add(put(trunk, 0.32, 0, 0, 1, 1, bodyW > 1 ? 1.1 : 1));
+  torso.add(bindPaint(put(trunk, 0.32, 0, 0, 1, 1, bodyW > 1 ? 1.1 : 1)));
   torso.add(noLine(put(sphere(0.24 * bodyW, belly), 0.55, -0.06, 0, 0.8, 0.9, 0.95))); // chest
   if (spec.stripes) {
     for (const x of [0.12, 0.3, 0.48]) {
@@ -248,19 +282,16 @@ export function makeSecretCat(spec) {
       torso.add(noLine(put(band, x, 0, 0)));
     }
   }
-  for (const [part, x, y, z, r, c, sy] of spec.patches ?? []) {
-    if (part !== 'body') continue;
-    torso.add(noLine(put(sphere(r, M(c), 10, 8), 0.32 + x, y * bodyW * 0.9, z * bodyW, 1.2, sy, 1)));
-  }
 
   // Haunches: hidden inside the trunk in most poses, they round out the rump when sitting.
   for (const z of [-0.13, 0.13]) torso.add(noLine(put(sphere(0.19 * bodyW, fur, 10, 8), 0.1, -0.06, z)));
 
   // Legs: shoulder/hip pivots inside the torso so they follow it.
-  const leg = (x, z, front) => {
+  const leg = (x, z, front, key) => {
     const g = new THREE.Group();
     g.position.set(x, -0.08, z);
-    g.add(put(capsule(0.085 * bodyW, 0.2, front ? fur : fur), 0, -0.16, 0));
+    const legPaint = spec.paint?.[key];
+    g.add(bindPaint(put(capsule(0.085 * bodyW, 0.2, legPaint ? M(spec.socks, legPaint) : front ? fur : fur), 0, -0.16, 0)));
     g.add(put(sphere(0.1 * bodyW, socks, 8, 6), 0.03, -0.32, 0, 1.25, 0.7, 1));
     // Toe-bean pad under the paw: shows when the paws are in the air (belly up).
     const dark = new THREE.Color(spec.socks).getHSL({}).l < 0.3;
@@ -269,10 +300,10 @@ export function makeSecretCat(spec) {
     return g;
   };
   const legs = {
-    fl: leg(0.6, 0.13, true),
-    fr: leg(0.6, -0.13, true),
-    bl: leg(0.06, 0.14, false),
-    br: leg(0.06, -0.14, false),
+    fl: leg(0.6, 0.13, true, 'legFl'),
+    fr: leg(0.6, -0.13, true, 'legFr'), // the cat's left (it faces +x)
+    bl: leg(0.06, 0.14, false, 'legBl'),
+    br: leg(0.06, -0.14, false, 'legBr'),
   };
 
   // Tail: one tube per shape, toggled by the pose.
@@ -292,11 +323,11 @@ export function makeSecretCat(spec) {
   // Head with ears, muzzle, real eye colour and slit pupils.
   const head = new THREE.Group();
   rig.add(head);
-  head.add(sphere(0.33 * fluffy, fur, 18, 12));
-  for (const [part, x, y, z, r, c, sy] of spec.patches ?? []) {
-    if (part !== 'head') continue;
-    head.add(noLine(put(sphere(r, M(c), 10, 8), x, y * 0.9, z, 1, sy, 1)));
-  }
+  const headPaint = [
+    ...(spec.paint?.head ?? []),
+    ...(spec.patches ?? []).filter((p) => p[0] === 'head').map(([, x, y, z, r, c]) => ({ kind: 'blob', at: [x, y * 0.9, z], size: r * 1.05, color: c })),
+  ];
+  head.add(bindPaint(sphere(0.33 * fluffy, headPaint.length ? M(spec.fur, headPaint) : fur, 18, 12)));
   head.add(put(sphere(0.17, belly, 12, 8), 0.2, -0.1, 0, 0.8, 0.65, 1.2)); // muzzle
   if (spec.chin) head.add(noLine(put(sphere(0.07, M(spec.chin), 8, 6), 0.27, -0.18, 0)));
   if (spec.blaze) head.add(noLine(put(sphere(0.07, belly, 8, 6), 0.27, 0.06, 0, 0.5, 1.8, 0.8))); // white stripe up the nose
@@ -333,6 +364,7 @@ export function makeSecretCat(spec) {
 
 // Ear colour: patched cats get the patch colour on the side the patch covers.
 function earMat(spec, side) {
+  if (spec.paint?.head?.some((p) => p.kind === 'half' && p.at[1] > 0 && p.color === '#24202E')) return M('#24202E');
   const headPatch = (spec.patches ?? []).find((p) => p[0] === 'head' && (side === 'L' ? p[3] >= 0 : p[3] <= 0) && p[4] > 0.13);
   return M(headPatch ? headPatch[5] : spec.fur);
 }
@@ -396,7 +428,7 @@ const POSES = {
   },
   bellyUp(c) {
     // On its back, seen from the side: body flat and low, light belly on top, four paws in the
-    // air, head resting at the front with the chin up, tail out behind. Nothing hides behind the head.
+    // air, head upright at the front, tail out behind. Nothing hides behind the head.
     c.torso.position.set(-0.32, 0.3, 0);
     c.torso.rotation.set(Math.PI, 0, 0);
     resetLegs(c);
@@ -408,8 +440,10 @@ const POSES = {
     c.legs.br.rotation.z = 0.55;
     c.legs.bl.scale.set(1, 1.15, 1);
     c.legs.br.scale.set(1, 1.15, 1);
-    c.head.position.set(0.5, 0.26, 0);
-    c.head.rotation.set(0, 0, 0.75); // chin up, face still toward the camera side
+    // Head stays upright (ears up, face to the camera side) resting at the front of the body:
+    // tipping it back read as upside down from the fixed camera (Sebastian, 2026-11-11).
+    c.head.position.set(0.52, 0.34, 0);
+    c.head.rotation.set(0, 0, 0.12);
     showTail(c, 'back');
   },
   sploot(c) {
