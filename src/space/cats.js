@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import { comicMaterial as M, addOutlines } from './comic.js';
 
 // The 13 secret cats, modelled on Sebastian's own cats (likeness from coat, markings, eyes and size;
-// shapes stay simple and comic). Each has an idle pose, a short collect animation and a found pose.
+// shapes stay simple and comic). His photos give only the looks; the motion follows real cat body
+// language: idle hiding pose -> caught (freeze or startle hop) -> greeting (tail up, quivering tip)
+// -> the cat's own happy end pose. Chaotic cats add zoomies or a dazed wobble.
 // See docs/fable/ART-BIBLE.md §2b. The cat faces +x, +y is up, about 1 unit tall sitting.
 
 const DEG = Math.PI / 180;
@@ -11,61 +13,61 @@ const DEG = Math.PI / 180;
 export const CATS = [
   {
     id: 'ash', name: 'Ash', fur: '#8E95A8', belly: '#A9AFC0', socks: '#8E95A8', eyes: '#C8D45A', nose: '#E8A0AE',
-    fluffy: 1.08, idle: 'loaf', collect: 'slowBlink', found: 'sit',
+    fluffy: 1.08, idle: 'loaf', react: ['freeze', 'greet', 'slowBlink'], found: 'sit',
   },
   {
     id: 'charlie', name: 'Charlie', fur: '#24202E', belly: '#FBF7EE', socks: '#FBF7EE', eyes: '#C8D45A', nose: '#E8A0AE',
     blaze: true, patches: [['body', -0.1, 0.25, 0.22, 0.2, '#D9792E', 0.7], ['body', 0.2, 0.3, -0.2, 0.17, '#D9792E', 0.7], ['head', -0.15, 0.25, 0.2, 0.14, '#D9792E', 0.8]],
-    idle: 'side', collect: 'headBump', found: 'knead',
+    idle: 'side', react: ['freeze', 'zooted', 'greet'], found: 'sit',
   },
   {
     id: 'collie', name: 'Collie', fur: '#2A2230', belly: '#4A3A40', socks: '#3A2E36', eyes: '#E2C23A', nose: '#4A3A44',
     patches: [['body', 0, 0.25, 0.24, 0.16, '#8A4A22', 0.6], ['body', -0.25, 0.2, -0.22, 0.14, '#A35A26', 0.6], ['body', 0.25, 0.15, 0.25, 0.1, '#8A4A22', 0.6], ['head', 0.1, 0.3, -0.18, 0.12, '#8A4A22', 0.8]],
-    chin: '#E8E2D8', idle: 'bellyUp', collect: 'slowBlink', found: 'groom',
+    chin: '#E8E2D8', idle: 'bellyUp', react: ['freeze', 'greet'], found: 'bellyUp',
   },
   {
     id: 'duly', name: 'Duly', fur: '#6B6A70', belly: '#F7F3EA', socks: '#F7F3EA', eyes: '#3A2E2A', nose: '#E8A0AE',
-    stripes: '#45444C', blaze: true, size: 0.82, idle: 'sit', collect: 'pounce', found: 'tailUp',
+    stripes: '#45444C', blaze: true, size: 0.82, idle: 'sit', react: ['hop', 'zoomies'], found: 'tailUp',
   },
   {
     id: 'hazel', name: 'Hazel', fur: '#7A6650', belly: '#F7F3EA', socks: '#F7F3EA', eyes: '#B8B04A', nose: '#F0A8B4',
-    stripes: '#4A3A2C', blaze: true, idle: 'peek', collect: 'headBump', found: 'sit',
+    stripes: '#4A3A2C', blaze: true, idle: 'peek', react: ['hop', 'greet'], found: 'sit',
   },
   {
     id: 'java', name: 'Java', fur: '#7C6A55', belly: '#A8977E', socks: '#7C6A55', eyes: '#B9C64A', nose: '#B07A6A',
-    stripes: '#3E3328', idle: 'loaf', collect: 'stretch', found: 'sploot',
+    stripes: '#3E3328', idle: 'loaf', react: ['freeze', 'stretch', 'greet'], found: 'groom',
   },
   {
     id: 'nara', name: 'Nara', fur: '#FBF7EE', belly: '#FBF7EE', socks: '#FBF7EE', eyes: '#A9C25A', nose: '#F0A8B4',
     patches: [['head', -0.1, 0.3, 0.16, 0.17, '#D9792E', 0.7], ['head', -0.12, 0.3, -0.16, 0.15, '#2E2A34', 0.7], ['body', -0.3, 0.3, 0, 0.14, '#8A7A66', 0.6]],
-    idle: 'sit', collect: 'slowBlink', found: 'knead',
+    idle: 'sit', react: ['hop', 'greet'], found: 'knead',
   },
   {
     id: 'orange', name: 'Orange', fur: '#E39A45', belly: '#FBF2E2', socks: '#FBF2E2', eyes: '#A9BE6A', nose: '#E8A0AE',
-    stripes: '#C26E22', size: 0.95, slim: true, idle: 'curled', collect: 'pounce', found: 'tailUp',
+    stripes: '#C26E22', size: 0.95, slim: true, idle: 'curled', react: ['hop', 'zoomies'], found: 'tailUp',
   },
   {
     id: 'oreo', name: 'Oreo', fur: '#FBF7EE', belly: '#FBF7EE', socks: '#FBF7EE', eyes: '#C8D45A', nose: '#E8A0AE',
     patches: [['head', -0.05, 0.25, 0, 0.36, '#24202E', 0.75], ['body', -0.15, 0.3, 0, 0.22, '#24202E', 0.6], ['body', 0.2, 0.2, 0.24, 0.12, '#24202E', 0.7]],
-    tail: '#24202E', idle: 'side', collect: 'stretch', found: 'bellyUp',
+    tail: '#24202E', idle: 'side', react: ['hop', 'zooted'], found: 'sploot',
   },
   {
     id: 'panda', name: 'Panda', fur: '#FBF7EE', belly: '#FBF7EE', socks: '#FBF7EE', eyes: '#C8D45A', nose: '#E8A0AE',
     patches: [['head', -0.05, 0.22, 0.16, 0.24, '#24202E', 0.8], ['body', -0.2, 0.3, 0, 0.24, '#24202E', 0.6], ['body', 0.18, 0.28, -0.2, 0.14, '#24202E', 0.7]],
-    tail: '#24202E', size: 1.12, chunky: true, idle: 'loaf', collect: 'headBump', found: 'bellyUp',
+    tail: '#24202E', size: 1.12, chunky: true, idle: 'loaf', react: ['freeze', 'greet', 'headBump'], found: 'bellyUp',
   },
   {
     id: 'pelusa', name: 'Pelusa', fur: '#FBF7EE', belly: '#FBF7EE', socks: '#FBF7EE', eyes: '#A9C25A', nose: '#E8A0AE',
     patches: [['head', -0.1, 0.25, 0.1, 0.25, '#6E7384', 0.75], ['head', 0.32, 0.1, 0.16, 0.08, '#6E7384', 1], ['body', -0.2, 0.32, 0, 0.2, '#6E7384', 0.6]],
-    tail: '#6E7384', fluffy: 1.12, idle: 'loaf', collect: 'slowBlink', found: 'knead',
+    tail: '#6E7384', fluffy: 1.12, idle: 'loaf', react: ['freeze', 'greet', 'slowBlink'], found: 'sit',
   },
   {
     id: 'rosie', name: 'Rosie', fur: '#5C5450', belly: '#7A706A', socks: '#5C5450', eyes: '#C9B14A', nose: '#8A6A60',
-    stripes: '#2E2826', idle: 'curled', collect: 'stretch', found: 'sploot',
+    stripes: '#2E2826', idle: 'curled', react: ['freeze', 'greet'], found: 'knead',
   },
   {
     id: 'skipper', name: 'Skipper', fur: '#1F1C28', belly: '#FBF7EE', socks: '#1F1C28', eyes: '#E2C23A', nose: '#E8A0AE',
-    longTail: true, slim: true, idle: 'sit', collect: 'headBump', found: 'tailUp',
+    longTail: true, slim: true, idle: 'sit', react: ['freeze', 'greet'], found: 'tailUp',
   },
 ];
 
@@ -170,6 +172,7 @@ export function makeSecretCat(spec) {
   if (spec.blaze) head.add(put(sphere(0.07, belly, 8, 6), 0.27, 0.06, 0, 0.5, 1.8, 0.8)); // white stripe up the nose
   head.add(put(sphere(0.045, M(spec.nose), 8, 6), 0.33, -0.03, 0));
   const eyes = [];
+  const ears = [];
   for (const z of [-0.12, 0.12]) {
     const eye = new THREE.Group();
     eye.position.set(0.25, 0.06, z);
@@ -181,11 +184,13 @@ export function makeSecretCat(spec) {
     const ear = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.24, 4), z > 0 ? earMat(spec, 'L') : earMat(spec, 'R'));
     head.add(put(ear, 0.0, 0.28, z * 1.45));
     ear.rotation.x = z > 0 ? 0.3 : -0.3;
+    ear.userData.baseX = ear.rotation.x;
+    ears.push(ear);
   }
 
   addOutlines(root, 1.1);
 
-  const cat = { spec, root, rig, torso, legs, tails, head, eyes, pose: null, anim: null, time: 0, found: false };
+  const cat = { spec, root, rig, torso, legs, tails, head, eyes, ears, pose: null, anim: null, time: 0, found: false, place: null };
   setPose(cat, spec.idle);
   return cat;
 }
@@ -323,72 +328,159 @@ export function setPose(cat, name) {
   cat.base = { torsoY: cat.torso.position.y, headY: cat.head.position.y, headX: cat.head.position.x, headRz: cat.head.rotation.z };
 }
 
-// --- Collect animations (about 1.2 s), then the found pose --------------------------------------
-const COLLECT_TIME = 1.2;
+// --- Found reactions ---------------------------------------------------------------------------
+// Each step: { duration (s), enter(c) once, run(c, u) with u in 0..1, exit(c) }. Timings follow real
+// cat motion: a startle freeze is a fraction of a second, a greeting trot about a second, a zoomies
+// burst one to two seconds (docs/fable/cats-and-feedback-2026-11-11.md, "Timings used").
+const STEPS = {
+  // "You caught me!": a short freeze, eyes wide, ears forward, head up.
+  freeze: {
+    duration: 0.3,
+    run(c, u) {
+      const k = Math.sin(Math.min(1, u * 3) * Math.PI * 0.5);
+      for (const e of c.eyes) e.scale.set(1 + 0.25 * k, 1 + 0.3 * k, 1 + 0.25 * k);
+      for (const ear of c.ears) ear.rotation.x = ear.userData.baseX * (1 - 0.8 * k);
+      c.head.position.y = c.base.headY + 0.06 * k;
+    },
+  },
+  // A small startle hop straight up out of the hiding pose.
+  hop: {
+    duration: 0.45,
+    enter(c) {
+      setPose(c, 'sit');
+    },
+    run(c, u) {
+      const h = Math.sin(u * Math.PI);
+      c.rig.position.y = h * 0.45;
+      c.rig.scale.y = (c.spec.size ?? 1) * (u < 0.15 ? 1 - u * 1.5 : 1 + h * 0.1);
+      for (const e of c.eyes) e.scale.set(1.2, 1.3, 1.2);
+    },
+  },
+  // Happy greeting: trot in place toward the hero, tail up with a quivering tip, head tilt.
+  greet: {
+    duration: 1.1,
+    enter(c) {
+      setPose(c, 'tailUp');
+    },
+    run(c, u) {
+      const trot = Math.sin(u * Math.PI * 8);
+      c.legs.fl.rotation.z = c.legs.br.rotation.z = trot * 0.45;
+      c.legs.fr.rotation.z = c.legs.bl.rotation.z = -trot * 0.45;
+      c.rig.position.y = Math.abs(trot) * 0.04;
+      c.tails.up.rotation.z = Math.sin(u * 60) * 0.05; // quivering tip
+      c.head.rotation.z = 0.1 + Math.sin(u * Math.PI) * 0.25; // head tilt
+    },
+  },
+  headBump: {
+    duration: 0.7,
+    run(c, u) {
+      const s = Math.max(0, Math.sin(u * Math.PI * 2) * (1 - u));
+      c.head.position.x = c.base.headX + 0.18 * s;
+      c.head.rotation.z = c.base.headRz - 0.3 * s;
+      closeEyes(c, 1 - 0.7 * s);
+    },
+  },
+  slowBlink: {
+    duration: 0.8,
+    run(c, u) {
+      const k = u < 0.5 ? 1 - u * 1.6 : 0.2 + (u - 0.5) * 1.6;
+      closeEyes(c, Math.max(0.15, Math.min(1, k)));
+    },
+  },
+  stretch: {
+    duration: 0.9,
+    enter(c) {
+      setPose(c, 'tailUp');
+    },
+    run(c, u) {
+      const s = Math.sin(u * Math.PI);
+      c.torso.rotation.z = -0.35 * s; // front down, rear up
+      c.legs.fl.rotation.z = c.legs.fr.rotation.z = -1.2 * s;
+      c.head.position.y = c.base.headY - 0.25 * s;
+      c.head.position.x = c.base.headX + 0.2 * s;
+      closeEyes(c, 1 - 0.6 * s);
+    },
+  },
+  // Zoomies: a full sprint around the planet and back to the spot, ears back, tail streaming.
+  zoomies: {
+    duration: 1.6,
+    enter(c) {
+      setPose(c, 'tailUp');
+      showTail(c, 'back');
+    },
+    run(c, u) {
+      const e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      c.place?.(-360 * e);
+      const gallop = Math.sin(u * Math.PI * 22);
+      c.legs.fl.rotation.z = c.legs.fr.rotation.z = -0.9 * gallop;
+      c.legs.bl.rotation.z = c.legs.br.rotation.z = 0.9 * gallop;
+      c.torso.rotation.z = gallop * 0.12;
+      for (const ear of c.ears) ear.rotation.x = ear.userData.baseX * 2.2; // ears back
+      c.head.rotation.z = -0.15;
+    },
+    exit(c) {
+      c.place?.(0);
+    },
+  },
+  // Dazed "zooted" wobble: head circles, body sways, eyes half closed.
+  zooted: {
+    duration: 1.4,
+    enter(c) {
+      setPose(c, 'sit');
+    },
+    run(c, u) {
+      const a = u * Math.PI * 4;
+      c.head.position.x = c.base.headX + Math.cos(a) * 0.06;
+      c.head.position.y = c.base.headY + Math.sin(a) * 0.04;
+      c.head.rotation.z = Math.sin(a) * 0.3;
+      c.rig.rotation.x = Math.sin(a * 0.5) * 0.15;
+      closeEyes(c, 0.45);
+    },
+    exit(c) {
+      c.rig.rotation.x = 0;
+    },
+  },
+};
 
 export function collect(cat, { reducedMotion = false } = {}) {
   if (cat.found) return;
   cat.found = true;
-  if (reducedMotion) {
-    // Calm version: a slow blink, then the found pose.
-    cat.anim = { name: 'slowBlink', t: 0, duration: 0.6 };
-  } else {
-    cat.anim = { name: cat.spec.collect, t: 0, duration: COLLECT_TIME };
-  }
+  // Reduced motion: a calm slow blink only, then the end pose.
+  const steps = reducedMotion ? ['slowBlink'] : cat.spec.react ?? ['freeze', 'greet'];
+  cat.anim = { steps, i: -1, t: 0 };
+  nextStep(cat);
 }
 
-const ANIMS = {
-  slowBlink(c, u) {
-    const k = u < 0.5 ? 1 - u * 1.6 : 0.2 + (u - 0.5) * 1.6;
-    closeEyes(c, Math.max(0.15, Math.min(1, k)));
-  },
-  stretch(c, u) {
-    const s = Math.sin(u * Math.PI);
-    c.torso.rotation.z = -0.35 * s; // front down, rear up
-    c.legs.fl.rotation.z = c.legs.fr.rotation.z = -1.2 * s;
-    c.head.position.y = c.base.headY - 0.25 * s;
-    c.head.position.x = c.base.headX + 0.2 * s;
-    showTail(c, s > 0.3 ? 'up' : c.tails.up.visible ? 'up' : currentTail(c));
-  },
-  pounce(c, u) {
-    if (u < 0.6) {
-      c.torso.rotation.y = Math.sin(u * 40) * 0.12; // rear wiggle
-      c.torso.position.y = c.base.torsoY - 0.08;
-    } else {
-      const h = Math.sin(((u - 0.6) / 0.4) * Math.PI);
-      c.rig.position.y = h * 0.5;
-      c.torso.rotation.y = 0;
-    }
-  },
-  headBump(c, u) {
-    const s = Math.sin(u * Math.PI * 2) * (1 - u);
-    c.head.position.x = c.base.headX + 0.18 * Math.max(0, s);
-    c.head.rotation.z = c.base.headRz - 0.3 * Math.max(0, s);
-    closeEyes(c, 1 - 0.7 * Math.max(0, s));
-  },
-};
-
-function currentTail(c) {
-  return Object.keys(c.tails).find((k) => c.tails[k].visible) ?? 'back';
+function nextStep(cat) {
+  const a = cat.anim;
+  STEPS[a.steps[a.i]]?.exit?.(cat);
+  a.i++;
+  a.t = 0;
+  if (a.i >= a.steps.length) {
+    cat.anim = null;
+    cat.rig.position.y = 0;
+    cat.rig.scale.setScalar(cat.spec.size ?? 1);
+    for (const ear of cat.ears) ear.rotation.x = ear.userData.baseX;
+    setPose(cat, cat.spec.found);
+    return;
+  }
+  STEPS[a.steps[a.i]].enter?.(cat);
+  cat.base = { torsoY: cat.torso.position.y, headY: cat.head.position.y, headX: cat.head.position.x, headRz: cat.head.rotation.z };
 }
 
 // Call every frame. `t` is seconds (0 under reduced motion), dt the frame time.
 export function updateCat(cat, dt, t) {
   if (cat.anim) {
     const a = cat.anim;
+    const step = STEPS[a.steps[a.i]];
     a.t += dt;
-    const u = Math.min(1, a.t / a.duration);
-    ANIMS[a.name]?.(cat, u);
-    if (u >= 1) {
-      cat.anim = null;
-      cat.rig.position.y = 0;
-      cat.torso.rotation.y = 0;
-      setPose(cat, cat.spec.found);
-    }
+    const u = Math.min(1, a.t / step.duration);
+    step.run(cat, u);
+    if (u >= 1) nextStep(cat);
     return;
   }
   if (!t) return;
-  // Small idle life: breathing, an occasional ear flick via head tilt, kneading paws.
+  // Idle life: breathing, a tail flick now and then, kneading paws, tail-tip quiver.
   const phase = t + cat.spec.id.length;
   cat.torso.position.y = cat.base.torsoY + Math.sin(phase * 2) * 0.012;
   if (cat.pose === 'knead') {
@@ -397,8 +489,9 @@ export function updateCat(cat, dt, t) {
   } else if (cat.pose === 'groom') {
     cat.head.rotation.z = -0.35 + Math.sin(phase * 6) * 0.08;
   } else if (cat.pose === 'tailUp') {
-    cat.tails.up.rotation.z = Math.sin(phase * 3) * 0.12;
+    cat.tails.up.rotation.z = Math.sin(phase * 20) * 0.03 + Math.sin(phase * 2) * 0.08;
   } else {
-    cat.head.rotation.z = cat.base.headRz + (Math.sin(phase * 0.7) > 0.97 ? 0.08 : 0);
+    const flick = Math.max(0, Math.sin(phase * 1.3) - 0.9) * 4; // short flick every few seconds
+    for (const g of Object.values(cat.tails)) g.rotation.z = flick * 0.2;
   }
 }

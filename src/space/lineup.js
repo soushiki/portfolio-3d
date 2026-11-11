@@ -52,6 +52,12 @@ export function startLineup(canvas) {
       } else {
         cat = makeSecretCat(spec);
         cat.root.rotation.y = -0.5;
+        // No planet in the sheet: zoomies circle the plinth instead.
+        cat.place = (deg) => {
+          const r = (deg * Math.PI) / 180;
+          cat.root.position.set(Math.sin(r) * 0.6, 0, (1 - Math.cos(r)) * 0.6);
+          cat.root.rotation.y = -0.5 + r;
+        };
         if (found) setPose(cat, spec.found);
         holder.add(cat.root);
         items.push({ cat, found, spec });
@@ -89,7 +95,7 @@ export function startLineup(canvas) {
   const tick = (dt, now) => {
     const t = (now - t0) / 1000;
     if (play && t > loopAt) {
-      loopAt = t + 2.5;
+      loopAt = t + 4;
       for (const it of items) {
         if (!it.cat || !it.found) continue;
         it.cat.found = false;
