@@ -114,6 +114,15 @@ async function boot() {
         box.textContent = `motion: ${reducedMotion ? 'reduced' : 'full'} because ${why}\nquality: ${pickQuality().low ? 'low' : 'high'}  fps: ${s.fps.toFixed(0)}\nlast hop: ${s.lastHopKind}${s.lastHop ? ', ' + s.lastHop.toFixed(2) + ' s' : ''}`;
       }, 500);
     }
+    // ?start=1&stop=N: skip the cover and open at tour stop N (screenshots and tests).
+    if (params.get('start') === '1') {
+      document.getElementById('start-btn').click();
+      const n = Number(params.get('stop'));
+      if (n > 0) {
+        game.travelTo(n);
+        game.advance(4);
+      }
+    }
     if (params.get('selftest') === 'hop') {
       const { runHopTest } = await import('./space/selftest.js');
       runHopTest(game, { reducedMotion });
