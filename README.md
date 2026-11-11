@@ -1,8 +1,8 @@
-# Portfolio 3D
+# Portfolio 3D: Planets of Code
 
-A driving-game version of my portfolio, inspired by [bruno-simon.com](https://bruno-simon.com/). Drive a small car around a low-poly world; each glowing pad on the ring road is a project, and driving onto one opens a card with a description, tech tags and Live/Code links.
+A guided comic tour of my portfolio. Tinta, a tuxedo cat courier, walks between planets that sit in one line in space. Press Next to go from stop to stop; each planet opens a card with a short description, tags and links to the project. The list, Resume and Contact are always one click away on the cover and in the HUD, so the 3D tour is never the only way in.
 
-The main portfolio stays at [sebherr.netlify.app](https://sebherr.netlify.app). This one links back to it from the loading screen and the HUD.
+The main portfolio stays at [sebherr.netlify.app](https://sebherr.netlify.app). This one links back to it from the cover.
 
 ## Run it
 
@@ -15,28 +15,42 @@ npm run dev
 
 ## Controls
 
-- **Keyboard:** WASD or arrow keys to drive, Space to brake, R to reset the car.
-- **Touch:** on-screen buttons (shown on touch devices).
-- **All projects** (top right) lists every project, with a "Drive there" shortcut.
+| Action | Keyboard | Touch | Mouse |
+| --- | --- | --- | --- |
+| Walk | ← → or A D | Hold ◀ ▶ | — |
+| Jump (on the star: fly to next planet) | Space, ↑, W | Jump | — |
+| Next stop | Enter or N | Next ▶▶ | Next ▶▶ |
+| Previous stop | B or Backspace | Back | Back |
+| Fly to a planet | 0–6 | Strip dots | Strip dots |
+| Project list | L | List | List |
+| Close card / list | Esc | × | × |
+
+## URL switches
+
+- `?quality=low` forces the low-cost rendering preset.
+- `?webgl=0` skips the 3D scene and shows the plain project list.
+- `?lang=es` opens the Spanish version (the EN/ES toggle does the same).
+- `?motion=reduce` turns off the flight arc, camera shake and idle animation, as if the system asked for reduced motion.
 
 ## Stack
 
-Pinned exact versions: Vite 8.3.4, Three.js 0.186.1, Rapier (`@dimforge/rapier3d-compat` 0.21.0). All geometry is procedural; there are no model files.
+Pinned exact versions: Vite 8.3.4, Three.js 0.186.1. All geometry is procedural; there are no model files.
 
 | File | What it does |
 | --- | --- |
+| `src/space/game.js` | Scene loop, tour state, walking, jumping, flights and the camera. |
+| `src/space/planets.js` | Builds the planets and their stops and hidden cats. |
+| `src/space/hero.js` | Builds Tinta, the cat courier, and her animation state. |
+| `src/space/route.js` | The order of stops on the tour. |
+| `src/space/comic.js` | The comic shading: flat bands, halftone shadow, ink outlines. |
+| `src/space/backdrop.js` | Sky, stars and the space background. |
+| `src/space/input.js` | Keyboard and touch input for the tour. |
+| `src/landmarks.js` | Procedural landmark models placed on the planets. |
+| `src/ui.js` | Cover, HUD, cards, the project list and the no-WebGL fallback. |
+| `src/i18n.js` | English and Spanish strings. |
 | `src/data.js` | Project and contact content. Edit this to add or change projects. |
-| `src/main.js` | WebGL check, quality settings, loading screen, lazy-loads the game. |
-| `src/game.js` | Renderer, lights, physics loop, chase camera, zone detection. |
-| `src/world.js` | Ground, roads, pads, signs, trees, rocks and knockable crates/cones. |
-| `src/car.js` | Arcade car: a Y-only dynamic body driven by velocity. |
-| `src/input.js` | Keyboard and touch buttons. |
-| `src/ui.js` | Overlay card, project list and fallback. |
-| `src/signs.js` | Canvas textures for the signboards. |
+| `src/main.js` | WebGL check, quality settings, loading cover, lazy-loads the tour. |
 
-## Quality and fallbacks
+## More
 
-- Touch devices, small screens and machines with 4 or fewer CPU cores get the low preset: no shadows, no antialiasing, capped pixel ratio, fewer trees and props.
-- `?quality=low` or `?quality=high` forces a preset.
-- Without WebGL (or with `?webgl=0`) the page shows a plain list of every project and link instead.
-- Without JavaScript, a `<noscript>` message links to the simple portfolio.
+The design notes, art bible and build plan are in [docs/fable/](docs/fable/).
