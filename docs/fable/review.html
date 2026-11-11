@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Planets of Code Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one column of comic panels on a space ground; panels hold the content, the ground holds nothing. */
+:root {
+  color-scheme: dark;
+  --space: #1b1340;
+  --space-2: #2a2060;
+  --ink: #16122e;
+  --paper: #fff6e5;
+  --paper-2: #ffe7a8;
+  --red: #c41e3a;
+  --yellow: #ffd23f;
+  --muted: #4a4466;
+  --on-space: #fff6e5;
+  --display: 'Bangers', 'Impact', 'Arial Narrow', sans-serif;
+  --body: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle, rgba(255, 210, 63, 0.16) 1.2px, transparent 1.6px) 0 0 / 14px 14px,
+    var(--space);
+  color: var(--ink);
+  font: 16px/1.55 var(--body);
+}
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 28px;
+}
+header.cover { color: var(--on-space); display: grid; gap: 8px; }
+.badge {
+  justify-self: start;
+  background: var(--yellow);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  padding: 2px 10px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+h1 {
+  margin: 0;
+  font: 400 clamp(2.6rem, 8vw, 4.6rem)/0.95 var(--display);
+  letter-spacing: 0.03em;
+  color: var(--red);
+  -webkit-text-stroke: 2px var(--ink);
+  text-shadow: 4px 4px 0 var(--ink);
+  text-wrap: balance;
+}
+.lede { margin: 0; max-width: 62ch; font-size: 1.1rem; }
+.panel {
+  background: var(--paper);
+  border: 4px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 8px 8px 0 #0b0820;
+  padding: 22px;
+  min-width: 0;
+}
+.panel > h2 {
+  margin: 0 0 12px;
+  font: 400 2rem/1 var(--display);
+  letter-spacing: 0.04em;
+  text-wrap: balance;
+}
+h3 { margin: 18px 0 8px; font-size: 1.1rem; }
+p { margin: 0 0 10px; max-width: 70ch; }
+a { color: var(--red); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+a:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; box-shadow: 0 0 0 6px var(--ink); }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.grid > * { min-width: 0; }
+.status-list { margin: 0; padding-left: 20px; }
+.status-list li { margin-bottom: 4px; }
+.pill {
+  display: inline-block;
+  padding: 1px 9px;
+  border: 2px solid var(--ink);
+  border-radius: 99px;
+  background: var(--paper-2);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.pill.done { background: #8edb5a; }
+.pill.next { background: var(--yellow); }
+.pill.ask { background: #ff8fc7; }
+
+/* Palette swatches */
+.swatches { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.sw { border: 3px solid var(--ink); border-radius: 6px; overflow: hidden; background: #fff; }
+.sw span { display: block; height: 56px; border-bottom: 3px solid var(--ink); }
+.sw div { padding: 6px 8px; font-size: 0.85rem; }
+.sw b { display: block; }
+.mono { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: 0.85rem; }
+
+/* Shading demo: two bands, halftone, ink outline drawn in CSS */
+.demo { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+.ball {
+  width: 120px; height: 120px; border-radius: 50%;
+  border: 5px solid var(--ink);
+  background: linear-gradient(135deg, #3fd0b6 0 52%, #2a7f9e 52% 100%);
+  position: relative; overflow: hidden;
+}
+.ball::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle, rgba(22, 18, 46, 0.55) 1.6px, transparent 2.2px) 0 0 / 7px 7px;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 96%);
+  -webkit-mask-image: linear-gradient(135deg, transparent 52%, #000 70%);
+  mask-image: linear-gradient(135deg, transparent 52%, #000 70%);
+}
+.ball::before {
+  content: ""; position: absolute; left: 16%; top: 12%; width: 34%; height: 22%;
+  border-radius: 50%; background: rgba(255, 255, 255, 0.45); transform: rotate(-30deg);
+}
+.rules { margin: 0; padding-left: 20px; flex: 1 1 320px; min-width: 0; }
+.rules li { margin-bottom: 6px; }
+
+/* Route */
+.route { display: flex; gap: 12px; overflow-x: auto; padding: 6px 2px 12px; }
+.stop {
+  flex: 0 0 150px; text-align: center; display: grid; gap: 6px; justify-items: center;
+}
+.planet {
+  width: 84px; height: 84px; border-radius: 50%;
+  border: 4px solid var(--ink);
+  background: var(--c);
+  box-shadow: inset -12px -12px 0 rgba(22, 18, 46, 0.25), 3px 3px 0 var(--ink);
+  display: grid; place-items: center;
+  font: 400 1.6rem var(--display); color: var(--ink);
+}
+.stop strong { font-size: 0.95rem; line-height: 1.2; }
+.stop small { font-size: 0.8rem; line-height: 1.3; color: var(--muted); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 2px solid rgba(22, 18, 46, 0.15); vertical-align: top; }
+th { background: var(--ink); color: var(--paper); font-weight: 600; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Screens */
+.shots { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+figure { margin: 0; border: 3px solid var(--ink); border-radius: 6px; overflow: hidden; background: var(--ink); }
+figure img { display: block; width: 100%; height: auto; max-width: 100%; }
+figcaption { background: var(--paper); padding: 6px 10px; font-size: 0.85rem; border-top: 3px solid var(--ink); }
+.tall img { max-height: 460px; object-fit: contain; background: var(--space); }
+
+footer { color: var(--on-space); font-size: 0.9rem; }
+footer a { color: var(--yellow); }
+
+@media (max-width: 600px) {
+  .panel { padding: 16px; box-shadow: 5px 5px 0 #0b0820; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="cover">
+  <span class="badge">Fable 5.2 review · pass 1 · 2026-11-10</span>
+  <h1>Planets of Code</h1>
+  <p class="lede">Sebastian's 3D portfolio, redesigned as a guided comic tour: a cat courier walks around small planets in space, one per project, and the visitor turns the page with Next. The list, resume and contact are one click away from the first screen.</p>
+</header>
+
+<section class="panel" aria-labelledby="status">
+  <h2 id="status">Where it stands</h2>
+  <div class="grid">
+    <div>
+      <h3><span class="pill done">Built and checked</span></h3>
+      <ul class="status-list">
+        <li>Comic shading: two bands, halftone, ink outlines</li>
+        <li>Hero Tinta, 14 sleeping cats, 7 planets, 10 landmarks</li>
+        <li>Guided walk, jump, hop arcs, Next / Back, planet strip</li>
+        <li>Cover with skip paths, list dialog and no-WebGL fallback</li>
+        <li>Phone, phone landscape, tablet and desktop layouts</li>
+        <li>Reduced-motion cuts, EN/ES, AA palette</li>
+      </ul>
+    </div>
+    <div>
+      <h3><span class="pill next">Next</span></h3>
+      <ul class="status-list">
+        <li>Remove the old driving files and Rapier</li>
+        <li>Sound (off by default) and haptics</li>
+        <li>Hidden-cat reactions and a counter (12 cats)</li>
+        <li>Landmark recolour, tap-to-walk, smoke tests, axe audit</li>
+        <li>Fable: hero polish, data planet layout, phone perf pass</li>
+      </ul>
+    </div>
+    <div>
+      <h3><span class="pill ask">Questions for Sebastian</span></h3>
+      <ul class="status-list">
+        <li>Keep "junior QA, data and developer roles" in the copy?</li>
+        <li>Hero name Tinta, or one of your cats' names?</li>
+        <li>Resume as the HTML page, or a direct PDF?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="hero">
+  <h2 id="hero">Hero and world</h2>
+  <div class="grid">
+    <div>
+      <h3>Tinta, the courier cat</h3>
+      <p>An original tuxedo cat with chibi proportions (head about 40% of the height), big comic eyes, a yellow scarf and a red jet pack that fires while airborne. Ears, tail curl and pack read as a silhouette at 60 px. It stops just left of each landmark and faces it.</p>
+      <p>The other 12 cats of Sebastian's household sleep on the planet undersides as easter eggs that never block the route.</p>
+    </div>
+    <figure><img src="shots/gacha-desktop.jpg" alt="Tinta standing beside the capsule machine on the pink Whisker Gacha planet, with its card open on the right" loading="lazy"><figcaption>Planet 05, Whisker Gacha: Tinta beside the capsule machine.</figcaption></figure>
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="palette">
+  <h2 id="palette">Palette</h2>
+  <p>UI tokens pass WCAG 2.1 AA in light and dark (checked with palette-check). Planet colours are fills only; text on them is always ink, at 7.1:1 or better.</p>
+  <h3>UI</h3>
+  <div class="swatches">
+    <div class="sw"><span style="background:#16122e"></span><div><b>Ink</b><span class="mono">#16122E</span> · text, outlines</div></div>
+    <div class="sw"><span style="background:#fff6e5"></span><div><b>Paper</b><span class="mono">#FFF6E5</span> · 16.9:1 with ink</div></div>
+    <div class="sw"><span style="background:#c41e3a"></span><div><b>Comic red</b><span class="mono">#C41E3A</span> · links 5.4:1</div></div>
+    <div class="sw"><span style="background:#ffe7a8"></span><div><b>Panel yellow</b><span class="mono">#FFE7A8</span> · tags</div></div>
+    <div class="sw"><span style="background:#2456c9"></span><div><b>Blue</b><span class="mono">#2456C9</span> · accent 6.0:1</div></div>
+    <div class="sw"><span style="background:#1b1340"></span><div><b>Space</b><span class="mono">#1B1340</span> · dark ground</div></div>
+  </div>
+  <h3>Planets (colour is the label)</h3>
+  <div class="swatches">
+    <div class="sw"><span style="background:#fff1c9"></span><div><b>00 Hello</b><span class="mono">#FFF1C9</span></div></div>
+    <div class="sw"><span style="background:#3fd0b6"></span><div><b>01 Minoscreto</b><span class="mono">#3FD0B6</span></div></div>
+    <div class="sw"><span style="background:#8edb5a"></span><div><b>02 Ingresos</b><span class="mono">#8EDB5A</span></div></div>
+    <div class="sw"><span style="background:#5aa9ff"></span><div><b>03 Data science</b><span class="mono">#5AA9FF</span></div></div>
+    <div class="sw"><span style="background:#ff7a6b"></span><div><b>04 Formato Médico</b><span class="mono">#FF7A6B</span></div></div>
+    <div class="sw"><span style="background:#ff8fc7"></span><div><b>05 Whisker Gacha</b><span class="mono">#FF8FC7</span></div></div>
+    <div class="sw"><span style="background:#ffd23f"></span><div><b>06 Contact</b><span class="mono">#FFD23F</span></div></div>
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="shading">
+  <h2 id="shading">Shading and outline rules</h2>
+  <div class="demo">
+    <div class="ball" role="img" aria-label="Example ball: teal lit half, violet-shifted shadow half with halftone dots, thick ink outline"></div>
+    <ul class="rules">
+      <li><b>Two flat bands.</b> Lit colour and a shadow made by multiplying by violet (0.58, 0.50, 0.86). No gradients, no scene lights.</li>
+      <li><b>Halftone</b> dots, 7 CSS px, 45°, only in the shadow band. The always-on signature.</li>
+      <li><b>Ink outlines</b> by inverted hull at constant screen width: hero 1.5×, planets 1.3×, landmarks 1×.</li>
+      <li><b>Type:</b> Bangers for titles and sound-effect buttons only; Outfit 16 px+ for reading.</li>
+      <li>One file owns all of it: <span class="mono">src/space/comic.js</span>.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="route">
+  <h2 id="route">The route</h2>
+  <p>Aimed at junior QA, data and developer roles: real problems with real users or data go on planets, strongest first.</p>
+  <div class="route" role="list">
+    <div class="stop" role="listitem"><div class="planet" style="--c:#fff1c9">0</div><strong>Hello</strong><small>Who he is, resume and LinkedIn first.</small></div>
+    <div class="stop" role="listitem"><div class="planet" style="--c:#3fd0b6">1</div><strong>Minoscreto</strong><small>Live demo, Vitest, privacy by design.</small></div>
+    <div class="stop" role="listitem"><div class="planet" style="--c:#8edb5a">2</div><strong>Ingresos App</strong><small>Python, OCR and local AI to Excel for a real business.</small></div>
+    <div class="stop" role="listitem"><div class="planet" style="--c:#5aa9ff">3</div><strong>Data science</strong><small>Hub plus A/B test, demand forecast, 311 delays.</small></div>
+    <div class="stop" role="listitem"><div class="planet" style="--c:#ff7a6b">4</div><strong>Formato Médico</strong><small>A physician's forms, web and Android.</small></div>
+    <div class="stop" role="listitem"><div class="planet" style="--c:#ff8fc7">5</div><strong>Whisker Gacha</strong><small>Game logic and personality; fits the theme.</small></div>
+    <div class="stop" role="listitem"><div class="planet" style="--c:#ffd23f">6</div><strong>Contact</strong><small>LinkedIn, resume, GitHub.</small></div>
+  </div>
+  <h3>List only: "Earlier builds"</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">Project</th><th scope="col">Why not on a planet</th></tr></thead>
+      <tbody>
+        <tr><td>Brasa Food &amp; Drinks</td><td>Static landing prototype; less depth than the tour projects.</td></tr>
+        <tr><td>Da Vinci Diary</td><td>Course-style notes app with login.</td></tr>
+        <tr><td>NASA APOD</td><td>Small API demo.</td></tr>
+        <tr><td>Gym Routine Generator</td><td>Course project on someone else's data.</td></tr>
+        <tr><td>Todo App</td><td>Tutorial-level CRUD.</td></tr>
+        <tr><td>Reddit Plus</td><td>Course project, no live demo.</td></tr>
+        <tr><td>Jammming</td><td>Course project, no live demo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="flow">
+  <h2 id="flow">How a visitor moves</h2>
+<pre class="mermaid">
+flowchart LR
+  C[Comic cover] -->|Start the tour| H[00 Hello card]
+  C -->|Just show me the projects| L[Project list]
+  C -->|Resume / Contact| X[Opens in a new tab]
+  H -->|Next or Enter| P[Next stop]
+  P -->|same planet| W[Walk to the stop, card pops]
+  P -->|other planet| F[Hop arc, land, walk]
+  W --> P
+  F --> P
+  P -->|strip dot or Fly there| F
+  L -->|Fly there| F
+</pre>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">Action</th><th scope="col">Keyboard</th><th scope="col">Touch</th></tr></thead>
+      <tbody>
+        <tr><td>Walk</td><td>← → or A D</td><td>Hold ◀ ▶</td></tr>
+        <tr><td>Jump (on the star: hop to the next planet)</td><td>Space, ↑, W</td><td>Jump</td></tr>
+        <tr><td>Next / previous stop</td><td>Enter or N / B</td><td>Next / Back</td></tr>
+        <tr><td>Fly to a planet</td><td>0–6</td><td>Strip dots</td></tr>
+        <tr><td>Project list, close</td><td>L, Esc</td><td>List, ×</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Reduced motion: no arc, no roll or shake, a short fade between planets. Cards never steal focus; a polite live region announces planets and stops.</p>
+</section>
+
+<section class="panel" aria-labelledby="screens">
+  <h2 id="screens">Screens checked in the browser</h2>
+  <div class="shots">
+    <figure><img src="shots/minoscreto-desktop.jpg" alt="Desktop: teal faceted Minoscreto planet with its vault, card on the right, Next button at the bottom right" loading="lazy"><figcaption>Desktop, planet 01. The camera shifts so the planet sits beside the card.</figcaption></figure>
+    <figure><img src="shots/hop-desktop.jpg" alt="Desktop mid-hop: Tinta flying between the green and blue planets with radial speed lines" loading="lazy"><figcaption>Hop between planets: speed lines and flame.</figcaption></figure>
+    <figure><img src="shots/data-desktop.jpg" alt="Desktop: the big blue data science planet with four landmarks and the Email Uplift Test card" loading="lazy"><figcaption>Planet 03 carries four stops.</figcaption></figure>
+    <figure><img src="shots/list-desktop.jpg" alt="Project list dialog with resume and contact links on top and project cards with Fly there buttons" loading="lazy"><figcaption>The skip-the-game list: tour and earlier builds.</figcaption></figure>
+    <figure class="tall"><img src="shots/cover-phone.jpg" alt="Phone: the comic cover with Start the tour, Just show me the projects, Resume and Contact" loading="lazy"><figcaption>Phone cover: every skip path before the 3D loads.</figcaption></figure>
+    <figure class="tall"><img src="shots/ingresos-phone.jpg" alt="Phone: the green Ingresos planet above a bottom-sheet card, with walk, jump, back and next buttons" loading="lazy"><figcaption>Phone portrait: bottom sheet above the controls.</figcaption></figure>
+    <figure><img src="shots/data-landscape.jpg" alt="Phone landscape: the data planet on the left and the card on the right" loading="lazy"><figcaption>Phone landscape (max-height 500px): side card, slim HUD.</figcaption></figure>
+    <figure class="tall"><img src="shots/data-tablet.jpg" alt="Tablet portrait: the data planet with a wide card at the bottom" loading="lazy"><figcaption>Tablet portrait.</figcaption></figure>
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="roadmap">
+  <h2 id="roadmap">Roadmap</h2>
+  <p>Full specs with files and acceptance checks are in <span class="mono">docs/fable/PLAN.md</span>.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">#</th><th scope="col">Task</th><th scope="col">Model</th><th scope="col">Difficulty</th><th scope="col">Time</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td>Remove the old driving game and Rapier</td><td>Haiku</td><td>Easy</td><td class="num">15 min</td></tr>
+        <tr><td class="num">2</td><td>Rewrite the README for the tour</td><td>Haiku</td><td>Easy</td><td class="num">20 min</td></tr>
+        <tr><td class="num">3</td><td>Sound effects, off by default</td><td>Sonnet</td><td>Medium</td><td class="num">60 min</td></tr>
+        <tr><td class="num">4</td><td>Haptics on touch devices</td><td>Haiku</td><td>Easy</td><td class="num">10 min</td></tr>
+        <tr><td class="num">5</td><td>Hidden cats: 12, reaction and counter</td><td>Sonnet</td><td>Medium</td><td class="num">45 min</td></tr>
+        <tr><td class="num">6</td><td>Recolour reused landmarks</td><td>Sonnet</td><td>Easy</td><td class="num">30 min</td></tr>
+        <tr><td class="num">7</td><td>Tap to walk on touch</td><td>Sonnet</td><td>Medium</td><td class="num">40 min</td></tr>
+        <tr><td class="num">8</td><td>First-visit controls caption</td><td>Haiku</td><td>Easy</td><td class="num">20 min</td></tr>
+        <tr><td class="num">9</td><td>Keyboard help dialog</td><td>Haiku</td><td>Easy</td><td class="num">25 min</td></tr>
+        <tr><td class="num">10</td><td>Accessibility audit with axe</td><td>Sonnet</td><td>Medium</td><td class="num">45 min</td></tr>
+        <tr><td class="num">11</td><td>Playwright smoke test</td><td>Sonnet</td><td>Medium</td><td class="num">60 min</td></tr>
+        <tr><td class="num">12</td><td>Cache headers and social image</td><td>Haiku</td><td>Easy</td><td class="num">20 min</td></tr>
+        <tr><td class="num">13</td><td>Card tilt toward the pointer</td><td>Sonnet</td><td>Medium</td><td class="num">30 min</td></tr>
+        <tr><td class="num">F1–F5</td><td>Hero polish, data planet layout, hop polish, phone performance, this page</td><td>Fable</td><td>Hard</td><td class="num">3–4 h</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  Branch <span class="mono">fable-redesign</span> in soushiki/portfolio-3d, not pushed or deployed. Art bible, plan and state: <span class="mono">docs/fable/</span>.
+</footer>
+
+</div>
+</body>
+</html>

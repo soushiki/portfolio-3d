@@ -81,7 +81,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     let best = -1;
     STOPS.forEach((s, i) => {
       if (s.planet.index !== state.planet) return;
-      if (angDiff(state.angle, s.angle) <= STOP_RANGE) best = i; // clockwise = decreasing angle
+      if (angDiff(state.angle, s.stand) <= STOP_RANGE) best = i; // clockwise = decreasing angle
     });
     if (best === -1) best = STOPS.findIndex((s) => s.planet.index === state.planet) - 1;
     return best;
@@ -101,9 +101,9 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     if (!stop || state.mode === 'flight') return;
     if (stop.planet.index === state.planet) {
       state.mode = 'auto';
-      state.autoTarget = stop.angle;
+      state.autoTarget = stop.stand;
     } else {
-      launch(stop.planet.index, stop.angle + 22, stop.angle);
+      launch(stop.planet.index, stop.stand + 22, stop.stand);
     }
   }
 
@@ -113,7 +113,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     // On the launch pad, a jump is the hop to the next planet.
     if (p.launch != null && Math.abs(angDiff(state.angle, p.launch)) < 6 && state.height === 0) {
       const nextStop = STOPS.find((s) => s.planet.index === state.planet + 1);
-      if (nextStop) launch(state.planet + 1, nextStop.angle + 22, nextStop.angle);
+      if (nextStop) launch(state.planet + 1, nextStop.stand + 22, nextStop.stand);
       return;
     }
     if (state.height > 0.01) return;
@@ -178,14 +178,14 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     if (state.mode === 'flight') return;
     const p = planetOf();
     let stop = state.activeStop;
-    if (stop && (stop.planet.index !== state.planet || Math.abs(angDiff(state.angle, stop.angle)) > LEAVE_RANGE)) {
+    if (stop && (stop.planet.index !== state.planet || Math.abs(angDiff(state.angle, stop.stand)) > LEAVE_RANGE)) {
       state.activeStop = null;
       if (state.dismissed === stop) state.dismissed = null;
       ui.closeCard();
       stop = null;
     }
     if (!stop) {
-      const s = STOPS.find((x) => x.planet.index === state.planet && Math.abs(angDiff(state.angle, x.angle)) < STOP_RANGE);
+      const s = STOPS.find((x) => x.planet.index === state.planet && Math.abs(angDiff(state.angle, x.stand)) < STOP_RANGE);
       if (s) {
         state.activeStop = s;
         if (state.dismissed !== s) ui.openCard(s.item, s.planet);
@@ -293,6 +293,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
       if (Math.abs(d) < 0.8) {
         state.angle = state.autoTarget;
         state.mode = 'walk';
+        state.facing = 1; // stops sit to the hero's right: face the landmark
         dir = 0;
       } else dir = Math.sign(d);
     }
@@ -370,7 +371,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     ui.setPlanet(0);
     // Walk to the first stop so the visitor sees how it works.
     state.mode = 'auto';
-    state.autoTarget = STOPS[0].angle;
+    state.autoTarget = STOPS[0].stand;
   });
 
   ui.onNav(() => next(1), () => next(-1));

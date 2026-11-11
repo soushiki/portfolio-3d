@@ -97,5 +97,9 @@ ROUTE.forEach((p, i) => {
 // Projects that are only in the plain list ("Earlier builds"), with the reason they're not on a planet.
 export const LIST_ONLY = ['brasa', 'davinci', 'apod', 'gym', 'todo', 'reddit', 'jammming'];
 
+// Where the hero stands for each stop: about 2.6 units left of the landmark, facing it,
+// so it never hides the landmark.
+for (const p of ROUTE) for (const s of p.stops) s.stand = s.angle + ((2.6 / p.radius) * 180) / Math.PI;
+
 // Flat list of every stop, in tour order (used by Next / Back and the planet strip).
 export const STOPS = ROUTE.flatMap((planet) => planet.stops.map((s) => ({ ...s, planet })));
