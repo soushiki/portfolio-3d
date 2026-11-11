@@ -29,6 +29,8 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 
 - 2026-11-11, Sebastian's screenshots (`docs/fable/feedback/`): Tinta now draws in his own pass on top of everything (checked at the Formato Médico clinic and the data planet in Chrome); belly-up re-posed for the side camera with toe-bean pads (Panda, Collie read as whole cats); tuft ink only past the silhouette (Nara clean). Lineup checked in Chrome.
 
+- 2026-11-11, coat feedback: markings painted on the surface with ragged edges (Oreo, Panda in Skipper's layout with big white bellies; Oreo's bracelet on her left front leg; Duly and Hazel share a warm grey-brown tabby with mixed tones, Duly with a white face, Hazel with a brown bridge). Panda's belly-up head is upright. Checked on the lineup in Chrome; coat fills ≥ 3.65:1 against the ink.
+
 ## Tried and failed (and why)
 
 - **Testing in the hidden browser pane with real time:** `requestAnimationFrame` barely runs while the pane is hidden, so waits showed stale frames. Fixed for testing with the dev-only `__game.advance(seconds)`, which steps the simulation and renders. Screenshots can still show the frame before the last render; take a second screenshot.
@@ -48,9 +50,13 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 - **Inked tuft texture:** the ink edge painted into the tuft showed as scribbles over white coats. Fixed with fill-only cards plus a pushed-back ink card.
 - **Belly-up tipped toward the camera (0.78 pi):** the head covered the body; from the fixed camera Panda looked like a head only.
 
+- **Patches as raised spheres:** read as a cap sitting on top of the cat. Replaced by painted regions.
+- **Belly-up head tipped back 43°:** read as upside down from the fixed camera (Sebastian). The head now stays upright.
+
 ## Not tried yet / next
 
 0. Cat reactions follow Sebastian's clarification (looks from photos only, dynamic caught → greeting → end pose; zoomies and dazed wobble for chaotic cats). Next: study the GIF references in a visible Chrome tab and tune the `STEPS` durations; add the trill sound with PLAN task 3.
+0a. Hazel's brown bridge is faint at small sizes (the highlight band lightens it); Oreo's bracelet is on her far leg, so it is mostly hidden from the camera. Ask Sebastian if either should be stronger.
 0b. Profile the cats on a real phone (`?debug=1` shows fps). If under 50 fps: merge each cat's static meshes and tufts into one geometry per part, or drop tufts on cats off screen.
 1. PLAN.md tasks 3–14 for Haiku/Sonnet (start with 3 or 6). Tasks 1–2 done 2026-11-10 by Haiku (old driving files, Rapier and Kenney models removed; README rewritten), checked by Fable: build passes, full tour runs with no console errors.
 2. Fable F1–F5: hero polish (blink, wave, crouch, dust), data planet layout on a real phone, hop polish, real-device performance on a mid-range Android, update the review page.

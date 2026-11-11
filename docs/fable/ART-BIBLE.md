@@ -26,17 +26,17 @@ Modelled on Sebastian's cats from his photos (the photos stay in `D:\cats`; they
 | --- | --- | --- | --- | --- | --- |
 | Skipper | Sleek black tuxedo, long tail, yellow eyes | Sit | Freeze → greeting | Tail-up | 00 Hello |
 | Ash | Solid blue-grey, soft fur | Loaf | Freeze → greeting → slow blink | Sit | 01 Minoscreto |
-| Hazel | Brown tabby and white, big eyes | Peek | Startle hop → greeting | Sit | 01 Minoscreto |
+| Hazel | Warm grey-brown tabby (shared with Duly), brown bridge above the nose, white muzzle | Peek | Startle hop → greeting | Sit | 01 Minoscreto |
 | Java | Brown mackerel tabby, green eyes | Loaf | Freeze → big stretch → greeting | Grooming | 02 Ingresos |
 | Orange | Orange tabby and white, slim | Curled | Startle hop → zoomies lap | Tail-up | 02 Ingresos |
 | Collie | Dark tortoiseshell, yellow eyes | Belly up | Freeze → greeting | Belly up (trust) | 03 Data |
-| Duly | Small grey tabby and white, white face | Sit | Startle hop → zoomies lap | Tail-up | 03 Data |
+| Duly | Small warm grey-brown tabby (shared with Hazel), white face | Sit | Startle hop → zoomies lap | Tail-up | 03 Data |
 | Rosie | Dark tabby | Curled | Freeze → greeting | Kneading | 03 Data |
 | Nara | White with a calico cap | Sit | Startle hop → greeting | Kneading | 04 Formato |
 | Pelusa | Fluffy white and grey, grey eye patch | Loaf | Freeze → greeting → slow blink | Sit | 04 Formato |
 | Charlie | Calico, mostly black, white blaze and paws | On its side | Freeze → dazed wobble → greeting | Sit | 05 Gacha |
-| Panda | Chunky, white with black patches | Loaf | Freeze → greeting → head bump | Belly up (trust) | 05 Gacha |
-| Oreo | White with a black cap and patches | On its side | Startle hop → dazed wobble | Sploot | 06 Contact |
+| Panda | Chunky, white with Skipper's layout of black on the back, head and far eye; big white belly to the chin | Loaf | Freeze → greeting → head bump | Belly up (trust) | 05 Gacha |
+| Oreo | White with Skipper's layout of black on the back, head and one eye; big white belly to the chin; black bracelet on her left front leg | On its side | Startle hop → dazed wobble | Sploot | 06 Contact |
 
 Rules (updated 2026-11-11 from Sebastian's clarification): his photos give **only the looks**. Lying poses are for hiding (idle) at most. A found reaction is always caught → happy: a 0.3 s freeze (eyes wide, ears forward, head up) or a 0.45 s startle hop, then the **greeting** (1.1 s trot in place, tail straight up with a quivering tip, head tilt), the main "I'm happy" signal. Chaotic cats add **zoomies** (1.6 s sprint once around the planet, ears back, tail streaming) or a **dazed wobble** (1.4 s head circles, half-closed eyes). Never the arched "Halloween" back: that means fear. Belly up only as a relaxed end pose (trust). Under reduced motion every cat does a 0.8 s slow blink, then its end pose. Feedback: reaction + named toast ("Oreo found! 4 of 13 cats") + the list's "Secret cats" section; a trill sound is part of PLAN task 3. Real eye colours with slit pupils (the hero keeps comic white eyes, so he stays the lead).
 
@@ -44,7 +44,8 @@ Rules (updated 2026-11-11 from Sebastian's clarification): his photos give **onl
 
 - **Silhouette lines only.** Each silhouette part (body, head, muzzle, ears, legs, paws, tails) gets a hull; patches, stripes, chest, blaze, nose and pupils get none (`userData.outline = 0`). All cat and hero hulls are pushed 0.22–0.25 units away from the camera (`addOutlines(root, scale, { bias })`), so where two parts cross, the line hides behind the front part and only the outer silhouette is inked. The irises keep a thin feature line (`userData.outline = 0.5`). Chosen over one merged hull because the rig animates its parts; the depth push is the Guilty Gear Xrd "push inner backfaces away" idea applied per part.
 - **Tufts carry no ink inside the body.** Each tuft is a fill-only card in the coat colour plus a slightly larger ink card pushed 0.22 units away from the camera, so the ink only shows past the silhouette (Sebastian's 2026-11-11 screenshot of Nara showed scribbles from inked tufts over the body).
-- **Every end pose must read as a whole cat from the camera** (head, body, legs and tail visible). Belly-up is on its back seen from the side, chin up, with pink toe-bean pads facing up.
+- **Markings are painted, never raised.** Patches, caps, saddles, face masks and bracelets are painted onto the coat surface in the shader (`paint` in `cats.js`: blobs, half-spaces and bands, each with a ragged fur edge). Tufts on a painted area take its colour; the rim light follows the painted colour and is weaker on dark fur so black stays black. Coat fills keep at least 3:1 against the ink outline (grey-brown `#7A6E62` 3.65:1).
+- **Every end pose must read as a whole cat from the camera** (head, body, legs and tail visible). Belly-up is on its back seen from the side with the head upright (ears up, facing the camera side), and pink toe-bean pads facing up. A head tipped back reads as upside down from this camera.
 - **Fur.** Fur materials use a short soft ramp (`soft: 0.14`) and a rim light 55% toward paper in the coat's own colour. Jagged tuft cards (a five-spike clump with an ink edge, alpha-tested, no blending) sit on each part's side-view edge with the spikes pointing out: cheek ruff, back of the head, chest bib, back ridge and rump, ear tips, tail tip. Short-haired cats get about 20, long-haired cats (fluffy > 1.05: Ash, Pelusa) about 30 and 30% bigger; the low preset keeps every second tuft. Shell fur is not used; try it only after profiling on a real phone.
 
 ## 3. Palette
