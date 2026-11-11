@@ -113,8 +113,12 @@ Rules for every task: work on `fable-redesign`, pin exact versions, don't change
 - **F4. Real-device performance pass:** measure on a mid-range Android with `?quality=low`; if under 50 fps, merge static landmark meshes per planet and drop hidden-cat outlines first.
 - **F5. Review page:** update the review artifact and its local copy after each pass.
 
-## Questions for Sebastian
+## Answers from Sebastian (2026-11-10)
 
-1. The intro and contact copy now say "junior QA, data and developer roles" (was "frontend and full-stack"). Keep?
-2. Hero name *Tinta*: fine, or name it after one of your cats? The hidden cats could carry your cats' names in the toast if you send them.
-3. Resume links go to the HTML resumes on the main portfolio (`english.html` / `spanish.html`, which have a print/download button). Do you want a direct PDF file instead?
+1. The copy "junior QA, data and developer roles" stays.
+2. The hero stays *Tinta*.
+3. Resume: a direct PDF. `public/resume/Sebastian-Herrera-resume-en.pdf` and `-es.pdf` are copies of `D:\Claude\job-applications\Sebastian-Herrera-developer-en.pdf` / `-es.pdf`. When he updates his resume, copy the new PDFs over these two files.
+
+## Ownership
+
+Sebastian (2026-11-10): the portfolio is Fable's own, and Fable oversees its evolution from now on. Each pass: read STATE.md, pick the next work, update STATE.md and the review page.

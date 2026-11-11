@@ -1,6 +1,6 @@
 # Planets of Code: state
 
-Owner: Fable 5.2 (since 2026-11-10). Branch `fable-redesign` (not pushed, not deployed; Sebastian pushes and deploys). Last pass: 2026-11-10.
+Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable oversees its evolution). Branch `fable-redesign` (not pushed, not deployed; Sebastian pushes and deploys). Last pass: 2026-11-10.
 
 - Design: [ART-BIBLE.md](ART-BIBLE.md) · Tasks: [PLAN.md](PLAN.md) · Research: [research-2026-11-10.md](research-2026-11-10.md)
 - Review page (private artifact, Fable updates it each pass): https://claude.ai/artifact/1YWqA9Av7PJVXP2WHfpBBF · local copy [review.html](review.html) with [shots/](shots/)
@@ -31,7 +31,7 @@ Owner: Fable 5.2 (since 2026-11-10). Branch `fable-redesign` (not pushed, not de
 1. PLAN.md tasks 1–13 for Haiku/Sonnet (start with 1: remove the old driving files and Rapier).
 2. Fable F1–F5: hero polish (blink, wave, crouch, dust), data planet layout on a real phone, hop polish, real-device performance on a mid-range Android, update the review page.
 3. Not checked yet: keyboard-only pass through the whole tour in a visible tab, screen reader announcements, real touch input on a phone, frame rate on a phone, the hero close-up image for the review page (the pane was too small).
-4. Answers from Sebastian (PLAN.md "Questions for Sebastian"): job-target copy, hero name, resume PDF vs HTML.
+4. Sebastian answered all three questions (PLAN.md "Answers from Sebastian"); the resume links now serve the PDFs in `public/resume/` (checked: EN/ES links, HTTP 200, application/pdf).
 5. The old driving files (`src/game.js`, `world.js`, `car.js`, …) and `public/models/` are still in the repo, unused.
 
 ## Questions for Fable
