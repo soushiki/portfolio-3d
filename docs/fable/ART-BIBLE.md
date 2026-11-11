@@ -14,6 +14,7 @@ Owner: Fable 5.2 (since 2026-11-10). Direction set by Sebastian: comic art in th
 - Poses: walk cycle (diagonal leg pairs), squash on landing, stretch on take-off, scarf flaps faster when walking. Facing: 3/4 toward the camera (yaw ±0.55 rad), never a pure profile.
 - The **13 secret cats** are Sebastian's own cats (see §2b). They never block the route.
 - Built in `src/space/hero.js` (`makeCat({ coat, gear })`).
+- **Always on top:** Tinta is drawn in a second render pass after the world, on a cleared depth buffer (`heroScene` in `game.js`), so no landmark, planet or cat ever covers him; his own parts still sort by depth.
 
 **Why a character and not a rocket or ship** (Sebastian left this choice to Fable, 2026-11-10): the guided movement has two halves, walking a planet's rim to each stop and hopping between planets. A walking character reads clearly on a curved rim (it stands upright, faces the landmark, stops beside it), while a rocket or ship would have to hover or orbit, which reads less clearly next to a landmark and hides it more. The jet pack already covers the flight half, so one model does both. It is cheap to animate: the walk is four leg rotations, take-off and landing are a squash/stretch of one group, and flight is the flame toggling on. A cat also ties the portfolio to its owner (13 cats, Whisker Gacha) and gives the 12 hidden cats a reason to exist. Cost: about 40 small meshes with outlines, fine on the low preset; if a phone pass shows otherwise, merge the hero's static meshes before changing the concept.
 
@@ -42,6 +43,8 @@ Rules (updated 2026-11-11 from Sebastian's clarification): his photos give **onl
 ### Cat fur and lines (2026-11-11)
 
 - **Silhouette lines only.** Each silhouette part (body, head, muzzle, ears, legs, paws, tails) gets a hull; patches, stripes, chest, blaze, nose and pupils get none (`userData.outline = 0`). All cat and hero hulls are pushed 0.22–0.25 units away from the camera (`addOutlines(root, scale, { bias })`), so where two parts cross, the line hides behind the front part and only the outer silhouette is inked. The irises keep a thin feature line (`userData.outline = 0.5`). Chosen over one merged hull because the rig animates its parts; the depth push is the Guilty Gear Xrd "push inner backfaces away" idea applied per part.
+- **Tufts carry no ink inside the body.** Each tuft is a fill-only card in the coat colour plus a slightly larger ink card pushed 0.22 units away from the camera, so the ink only shows past the silhouette (Sebastian's 2026-11-11 screenshot of Nara showed scribbles from inked tufts over the body).
+- **Every end pose must read as a whole cat from the camera** (head, body, legs and tail visible). Belly-up is on its back seen from the side, chin up, with pink toe-bean pads facing up.
 - **Fur.** Fur materials use a short soft ramp (`soft: 0.14`) and a rim light 55% toward paper in the coat's own colour. Jagged tuft cards (a five-spike clump with an ink edge, alpha-tested, no blending) sit on each part's side-view edge with the spikes pointing out: cheek ruff, back of the head, chest bib, back ridge and rump, ear tips, tail tip. Short-haired cats get about 20, long-haired cats (fluffy > 1.05: Ash, Pelusa) about 30 and 30% bigger; the low preset keeps every second tuft. Shell fur is not used; try it only after profiling on a real phone.
 
 ## 3. Palette

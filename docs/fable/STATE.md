@@ -27,6 +27,8 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 
 - 2026-11-11, fur and outlines: silhouette-only hulls with a depth push (no inner lines on cats or hero), soft ramp + coat rim light, jagged tuft cards on the silhouette. Checked on the lineup in a visible Chrome tab. Hop selftest still passes (1.73 s). Cost: 830 cat meshes in total incl. hulls on the low preset (168 tufts); desktop low preset 83 fps. Not yet measured on a real phone.
 
+- 2026-11-11, Sebastian's screenshots (`docs/fable/feedback/`): Tinta now draws in his own pass on top of everything (checked at the Formato Médico clinic and the data planet in Chrome); belly-up re-posed for the side camera with toe-bean pads (Panda, Collie read as whole cats); tuft ink only past the silhouette (Nara clean). Lineup checked in Chrome.
+
 ## Tried and failed (and why)
 
 - **Testing in the hidden browser pane with real time:** `requestAnimationFrame` barely runs while the pane is hidden, so waits showed stale frames. Fixed for testing with the dev-only `__game.advance(seconds)`, which steps the simulation and renders. Screenshots can still show the frame before the last render; take a second screenshot.
@@ -42,6 +44,9 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 - **Phone checks that only read `state.mode`:** they said "flight" while the user saw a teleport. Visual checks must measure on screen (hero pixel size, per-frame jump); `?selftest=hop` does that now.
 
 - **Tufts as camera-facing sprites:** they sat inside the head and showed as white "teeth" on the cheeks. Replaced with flat cards on each part's side-view edge, spikes outward.
+
+- **Inked tuft texture:** the ink edge painted into the tuft showed as scribbles over white coats. Fixed with fill-only cards plus a pushed-back ink card.
+- **Belly-up tipped toward the camera (0.78 pi):** the head covered the body; from the fixed camera Panda looked like a head only.
 
 ## Not tried yet / next
 
