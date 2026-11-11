@@ -105,6 +105,13 @@ Rules for every task: work on `fable-redesign`, pin exact versions, don't change
 - **Spec:** on desktop only (`(hover: hover) and (pointer: fine)`), the open card tilts up to 4° toward the pointer with `transform: perspective(800px) rotateX() rotateY()`, easing back on leave. Off under reduced motion. Text must stay crisp (no tilt while a link is focused).
 - **Accept:** no tilt on touch or reduced motion; links remain clickable.
 
+### 14. CI for this repo and a "How this site is tested" link
+- **model:** Sonnet · **difficulty:** medium · **time:** 45 min (after tasks 10 and 11)
+- **Files:** new `.github/workflows/ci.yml`, `README.md`, `index.html`, `src/i18n.js`.
+- **Spec:** on push and pull request: `npm ci`, `npm run build`, install Playwright browsers, `npm test` (task 11 tests plus an `@axe-core/playwright` check of the cover and the list, pinned exact versions). Add the workflow badge to the README. On the cover, add a small link "How this site is tested" / "Cómo se prueba este sitio" to the README's testing section on GitHub.
+- **Accept:** the workflow passes on a push to `fable-redesign` (Sebastian pushes); the link opens the README section.
+- **Why:** research-projects-2026-11-10.md §2: tested accessibility on a 3D site is QA evidence in itself.
+
 ## Tasks Fable keeps (design-heavy)
 
 - **F1. Hero polish:** blink, ear twitch, a wave when a card opens, anticipation crouch before a hop, landing dust puffs.

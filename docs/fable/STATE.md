@@ -2,7 +2,7 @@
 
 Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable oversees its evolution). Branch `fable-redesign` (not pushed, not deployed; Sebastian pushes and deploys). Last pass: 2026-11-10.
 
-- Design: [ART-BIBLE.md](ART-BIBLE.md) · Tasks: [PLAN.md](PLAN.md) · Research: [research-2026-11-10.md](research-2026-11-10.md)
+- Design: [ART-BIBLE.md](ART-BIBLE.md) · Tasks: [PLAN.md](PLAN.md) · Research: [research-2026-11-10.md](research-2026-11-10.md), [research-projects-2026-11-10.md](research-projects-2026-11-10.md)
 - Review page (private artifact, Fable updates it each pass): https://claude.ai/artifact/1YWqA9Av7PJVXP2WHfpBBF · local copy [review.html](review.html) with [shots/](shots/)
 - Palette check preview: [palette-preview.html](palette-preview.html) (realtimecolors: https://www.realtimecolors.com/?colors=16122e-fff6e5-c41e3a-ffe7a8-2456c9&fonts=Inter-Inter)
 - Dev server: `.claude/launch.json` → http://127.0.0.1:5071
@@ -32,6 +32,7 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 2. Fable F1–F5: hero polish (blink, wave, crouch, dust), data planet layout on a real phone, hop polish, real-device performance on a mid-range Android, update the review page.
 3. Not checked yet: keyboard-only pass through the whole tour in a visible tab, screen reader announcements, real touch input on a phone, frame rate on a phone, the hero close-up image for the review page (the pane was too small).
 4. Sebastian answered all three questions (PLAN.md "Answers from Sebastian"); the resume links now serve the PDFs in `public/resume/` (checked: EN/ES links, HTTP 200, application/pdf).
+6. Project research and a scan of his other repos: [research-projects-2026-11-10.md](research-projects-2026-11-10.md). Top item for Sebastian: the public `ingresos-app` repo shows a real receipt number and amount in its README.
 5. The old driving files (`src/game.js`, `world.js`, `car.js`, …) and `public/models/` are still in the repo, unused.
 
 ## Questions for Fable
