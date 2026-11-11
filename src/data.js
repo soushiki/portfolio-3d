@@ -1,7 +1,13 @@
-import { localize, withLang } from './i18n.js';
+import { localize, withLang, pick } from './i18n.js';
 
 // Content shown on the in-world signs and overlay cards.
 export const SIMPLE_PORTFOLIO = 'https://sebherr.netlify.app';
+
+// Resume: the HTML resume on the main portfolio (it has its own download/print button).
+export const RESUME = {
+  en: `${SIMPLE_PORTFOLIO}/public/html/english.html`,
+  es: `${SIMPLE_PORTFOLIO}/public/html/spanish.html`,
+};
 
 export const CONTACT = {
   github: 'https://github.com/soushiki',
@@ -147,9 +153,9 @@ const RAW_HUB = {
   id: 'ds-hub',
   title: 'Data Science Portfolio',
   description:
-    'End-to-end data science on real public data: live API pipelines, honest out-of-time evaluation and interactive dashboards. Drive around the island to see each project.',
+    'End-to-end data science on real public data: live API pipelines, honest out-of-time evaluation and interactive dashboards. Walk around the planet to see each project.',
   description_es:
-    'Ciencia de datos de punta a punta con datos públicos reales: pipelines con APIs en vivo, evaluación fuera de tiempo sin trampa y dashboards interactivos. Recorre la isla para ver cada proyecto.',
+    'Ciencia de datos de punta a punta con datos públicos reales: pipelines con APIs en vivo, evaluación fuera de tiempo sin trampa y dashboards interactivos. Camina alrededor del planeta para ver cada proyecto.',
   tags: ['Data science', 'Python', 'scikit-learn'],
   tags_es: ['Ciencia de datos', 'Python', 'scikit-learn'],
   title_es: 'Portafolio de ciencia de datos',
@@ -210,23 +216,42 @@ const RAW_CONTACT = {
   id: 'contact',
   title: 'Say hi',
   title_es: 'Saluda',
-  description: 'Open to junior frontend and full-stack roles. The quickest way to reach me is LinkedIn.',
-  description_es: 'Busco roles junior de frontend y full-stack. La forma más rápida de contactarme es LinkedIn.',
+  description: 'Open to junior QA, data and developer roles. The quickest way to reach me is LinkedIn.',
+  description_es: 'Busco roles junior de QA, datos y desarrollo. La forma más rápida de contactarme es LinkedIn.',
   tags: ['Contact'],
   tags_es: ['Contacto'],
   links: [
     { label: 'LinkedIn', href: CONTACT.linkedin },
+    { label: 'Resume', label_es: 'Hoja de vida', href: RESUME.en, href_es: RESUME.es },
     { label: 'GitHub', href: CONTACT.github },
+  ],
+};
+
+// First stop of the tour: who I am and how the tour works.
+const RAW_INTRO = {
+  id: 'hello',
+  title: "Hi, I'm Sebastian",
+  title_es: 'Hola, soy Sebastian',
+  description:
+    'Systems engineering graduate from Colombia. I build web apps, data projects and small tools that solve real problems. This tour stops at my best work: press Next to fly to the first planet.',
+  description_es:
+    'Ingeniero de sistemas de Colombia. Construyo apps web, proyectos de datos y herramientas pequeñas que resuelven problemas reales. Este recorrido para en mis mejores trabajos: pulsa Siguiente para volar al primer planeta.',
+  tags: ['Web', 'Data', 'QA'],
+  tags_es: ['Web', 'Datos', 'QA'],
+  links: [
+    { label: 'Resume', label_es: 'Hoja de vida', href: RESUME.en, href_es: RESUME.es },
+    { label: 'LinkedIn', href: CONTACT.linkedin },
   ],
 };
 
 // Localized views (language is fixed at startup). Sister sites get ?lang=es in Spanish.
 const view = (item) => {
   const o = localize(item);
-  if (o.links) o.links = o.links.map((l) => ({ ...l, href: withLang(l.href) }));
+  if (o.links) o.links = o.links.map((l) => ({ ...l, href: withLang(pick(l, 'href')) }));
   return o;
 };
 export const PROJECTS = RAW_PROJECTS.map((p) => ({ ...view(p), caseStudy: withLang(p.caseStudy) }));
 export const DATA_SCIENCE_HUB = view(RAW_HUB);
 export const DATA_SCIENCE = RAW_DS.map((p) => ({ ...view(p), live: withLang(p.live) }));
 export const CONTACT_ZONE = view(RAW_CONTACT);
+export const INTRO_ZONE = view(RAW_INTRO);

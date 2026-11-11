@@ -1,13 +1,23 @@
-import { PROJECTS, CONTACT_ZONE, DATA_SCIENCE, DATA_SCIENCE_HUB } from './data.js';
+import { PROJECTS } from './data.js';
 import { createUI } from './ui.js';
 import { t, applyStaticText } from './i18n.js';
+import { ROUTE, STOPS, LIST_ONLY } from './space/route.js';
 
 applyStaticText();
 
-const ui = createUI({ projects: [...PROJECTS, DATA_SCIENCE_HUB, ...DATA_SCIENCE] });
+const ui = createUI({
+  featured: STOPS.filter((s) => !['hello'].includes(s.item.id)).map((s) => ({ item: s.item, planet: s.planet })),
+  earlier: LIST_ONLY.map((id) => PROJECTS.find((p) => p.id === id)).filter(Boolean),
+  planets: ROUTE,
+});
 
 const isTouch = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
 document.body.classList.toggle('is-touch', isTouch);
+// ?motion=reduce forces the reduced-motion path (handy for testing it).
+const reducedMotion =
+  new URLSearchParams(location.search).get('motion') === 'reduce' ||
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.body.classList.toggle('is-reduced', reducedMotion);
 
 function hasWebGL() {
   // ?webgl=0 forces the fallback list, handy for testing it.
@@ -29,11 +39,8 @@ function pickQuality() {
   const dpr = window.devicePixelRatio || 1;
   return {
     low,
-    shadows: !low,
-    shadowMapSize: 2048,
     antialias: !low,
-    pixelRatio: low ? Math.min(dpr, 1.25) : Math.min(dpr, 2),
-    trees: low ? 55 : 110,
+    pixelRatio: low ? Math.min(dpr, 1.5) : Math.min(dpr, 2),
   };
 }
 
@@ -41,11 +48,7 @@ async function loadFonts() {
   if (!document.fonts) return;
   const timeout = new Promise((resolve) => setTimeout(resolve, 3000));
   await Promise.race([
-    Promise.all([
-      document.fonts.load('600 64px "Mozilla Headline"'),
-      document.fonts.load('600 40px "Outfit"'),
-      document.fonts.load('500 40px "Outfit"'),
-    ]),
+    Promise.all([document.fonts.load('64px "Bangers"'), document.fonts.load('500 16px "Outfit"')]),
     timeout,
   ]).catch(() => {});
 }
@@ -59,15 +62,14 @@ async function boot() {
     ui.progress(0.1, t('loadingFonts'));
     await loadFonts();
     ui.progress(0.3, t('loadingEngine'));
-    const { startGame } = await import('./game.js');
+    const { startGame } = await import('./space/game.js');
+    ui.progress(0.5, t('buildingWorld'));
     const game = await startGame({
       canvas: document.getElementById('scene'),
       quality: pickQuality(),
       isTouch,
       ui,
-      projects: PROJECTS,
-      contact: CONTACT_ZONE,
-      dataScience: { hub: DATA_SCIENCE_HUB, projects: DATA_SCIENCE },
+      reducedMotion,
     });
     if (import.meta.env.DEV) window.__game = game;
   } catch (err) {
