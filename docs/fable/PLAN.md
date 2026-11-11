@@ -12,6 +12,11 @@ Owner: Fable 5.2. Branch: `fable-redesign`. Design: [ART-BIBLE.md](ART-BIBLE.md)
 6. **Accessibility first**: keyboard for everything, focus never stolen, live-region announcements, reduced-motion cuts, AA palette, the list as a real dialog and as the fallback.
 7. **Procedural models only**, no model files: the hero, planets and landmarks are built in code and cost no download.
 
+## Standing rules
+
+- **Netlify badge corner.** Every Netlify deploy can show a fixed "Powered by Netlify" badge (about 210 × 50 px) at the bottom right. On every Netlify site, keep a 240 × 72 px area at the bottom-right edge free of anything interactive, at every screen size. Here: `--badge-w` / `--badge-h` in `src/style.css`; wide screens pad the controls' right side, phones (≤ 600 px) lift the controls above it. Check it in every screenshot pass.
+- **Cat photos stay private.** `D:\cats` is reference only: never copy, upload or publish the photos.
+
 ## How to run and check
 
 ```bash
@@ -42,7 +47,7 @@ Rules for every task: work on `fable-redesign`, pin exact versions, don't change
 ### 3. Sound effects, off by default
 - **model:** Sonnet · **difficulty:** medium · **time:** 60 min
 - **Files:** new `src/space/sound.js`; `src/space/game.js`, `src/ui.js`, `index.html`, `src/i18n.js`, `src/style.css`.
-- **Spec:** Web Audio synth only (no audio files). Sounds: card pop (short square blip, 660→880 Hz, 80 ms), jump (sine slide up, 120 ms), hop whoosh (filtered noise, 400 ms), landing thud (sine 90 Hz, 120 ms), hidden-cat meow (two sine glides). A HUD toggle button "Sound: off/on" (`aria-pressed`) next to EN/ES; the choice is saved in `localStorage` (wrapped in try/catch). Create the AudioContext only on the first toggle-on click.
+- **Spec:** Web Audio synth only (no audio files). Sounds: cat found (a short two-note chirp, or a 0.6 s purr under reduced motion), card pop (short square blip, 660→880 Hz, 80 ms), jump (sine slide up, 120 ms), hop whoosh (filtered noise, 400 ms), landing thud (sine 90 Hz, 120 ms), hidden-cat meow (two sine glides). A HUD toggle button "Sound: off/on" (`aria-pressed`) next to EN/ES; the choice is saved in `localStorage` (wrapped in try/catch). Create the AudioContext only on the first toggle-on click.
 - **Accept:** silent until switched on; each event plays its sound once; no console errors when `localStorage` throws; reduced motion doesn't change sound.
 
 ### 4. Haptics on touch devices
@@ -51,11 +56,11 @@ Rules for every task: work on `fable-redesign`, pin exact versions, don't change
 - **Spec:** `navigator.vibrate?.(12)` on jump, `navigator.vibrate?.(25)` on landing after a hop, only when `isTouch` and not `reducedMotion`.
 - **Accept:** no errors on desktop browsers that lack `navigator.vibrate`.
 
-### 5. Hidden cats: 12, with a reaction and a counter
+### 5. Hidden cats: counter, list and saved progress (in progress 2026-11-11, Sonnet helper)
 - **model:** Sonnet · **difficulty:** medium · **time:** 45 min
-- **Files:** `src/space/planets.js`, `src/space/game.js`, `src/ui.js`, `src/i18n.js`, `index.html`.
-- **Spec:** 1) Exactly 12 hidden cats: one on Hello and one on Contact (angle 270°), two on each other planet (245°, 300°). 2) On find: the cat stretches up (`cat.anim.squash = -0.6`, already there), then three small heart sprites (canvas texture, `#FF8FA3` with ink outline) float up 1.5 units over 0.8 s and fade; under reduced motion show the hearts without movement for 0.8 s. 3) The list dialog shows "Cats found: n of 12" under its title. 4) Found cats persist in `localStorage` key `p3d-cats` (array of ids `planetId:angle`), wrapped in try/catch.
-- **Accept:** walking under every planet finds 12 cats; reload keeps the count; the route and the cards are unaffected.
+- **Files:** `src/space/game.js`, `src/ui.js`, `src/i18n.js`, `index.html`, `src/style.css`. Cat models, poses and placements (`src/space/cats.js`, `route.js`) are Fable's: don't change them.
+- **Spec:** found cat ids saved in `localStorage` key `p3d-cats` (try/catch); found cats load straight into their found pose with no toast; the list dialog gets a "Secret cats" section with "Found n of 13" and the 13 names in `CATS` order (found = name + ✓ on a green pill, unfound = "???"), updated live; a "Reset cats" button clears the key and reloads.
+- **Accept:** find Charlie, reload: the list shows Charlie ✓ and "Found 1 of 13", Charlie is already in the found pose; Spanish strings with `?lang=es`; no console errors.
 
 ### 6. Recolour the reused landmarks to the comic palette
 - **model:** Sonnet · **difficulty:** easy · **time:** 30 min

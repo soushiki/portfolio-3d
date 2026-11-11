@@ -12,10 +12,32 @@ Owner: Fable 5.2 (since 2026-11-10). Direction set by Sebastian: comic art in th
 - Chibi proportions: the head is about 40% of the height, so it reads at 60 px tall on a phone. Big white comic eyes with ink pupils and a white glint; pink nose; cone ears with pink insides; curled tail with a white tip.
 - Silhouette rule: ears, tail curl and jet pack must read as a black shape alone. No thin parts under 0.08 units.
 - Poses: walk cycle (diagonal leg pairs), squash on landing, stretch on take-off, scarf flaps faster when walking. Facing: 3/4 toward the camera (yaw ±0.55 rad), never a pure profile.
-- The other **12 cats** (13 with Tinta, like Sebastian's household) sleep curled up on the undersides of the planets as easter eggs: orange, grey, calico, black, cream and tuxedo coats, no gear. They never block the route.
+- The **13 secret cats** are Sebastian's own cats (see §2b). They never block the route.
 - Built in `src/space/hero.js` (`makeCat({ coat, gear })`).
 
 **Why a character and not a rocket or ship** (Sebastian left this choice to Fable, 2026-11-10): the guided movement has two halves, walking a planet's rim to each stop and hopping between planets. A walking character reads clearly on a curved rim (it stands upright, faces the landmark, stops beside it), while a rocket or ship would have to hover or orbit, which reads less clearly next to a landmark and hides it more. The jet pack already covers the flight half, so one model does both. It is cheap to animate: the walk is four leg rotations, take-off and landing are a squash/stretch of one group, and flight is the flame toggling on. A cat also ties the portfolio to its owner (13 cats, Whisker Gacha) and gives the 12 hidden cats a reason to exist. Cost: about 40 small meshes with outlines, fine on the low preset; if a phone pass shows otherwise, merge the hero's static meshes before changing the concept.
+
+## 2b. The 13 secret cats
+
+Modelled on Sebastian's cats from his photos (the photos stay in `D:\cats`; they are never copied into the repo or published). Likeness comes from coat colour, patches, tabby stripes, the white blaze, eye colour, size and fur length; shapes stay simple and comic. All in `src/space/cats.js`; model sheet at `?lineup=cats` (`&only=ash,oreo`, `&play=1` loops the collect animations).
+
+| Cat | Coat | Idle | Collect | Found | Planet |
+| --- | --- | --- | --- | --- | --- |
+| Skipper | Sleek black tuxedo, long tail, yellow eyes | Sit | Head bump | Tail-up | 00 Hello |
+| Ash | Solid blue-grey, soft fur | Loaf | Slow blink | Sit | 01 Minoscreto |
+| Hazel | Brown tabby and white, big eyes | Peek | Head bump | Sit | 01 Minoscreto |
+| Java | Brown mackerel tabby, green eyes | Loaf | Big stretch | Sploot | 02 Ingresos |
+| Orange | Orange tabby and white, slim | Curled | Pounce wiggle | Tail-up | 02 Ingresos |
+| Collie | Dark tortoiseshell, yellow eyes | Belly up | Slow blink | Grooming | 03 Data |
+| Duly | Small grey tabby and white, white face | Sit | Pounce wiggle | Tail-up | 03 Data |
+| Rosie | Dark tabby | Curled | Big stretch | Sploot | 03 Data |
+| Nara | White with a calico cap | Sit | Slow blink | Kneading | 04 Formato |
+| Pelusa | Fluffy white and grey, grey eye patch | Loaf | Slow blink | Kneading | 04 Formato |
+| Charlie | Calico, mostly black, white blaze and paws | On its side | Head bump | Kneading | 05 Gacha |
+| Panda | Chunky, white with black patches | Loaf | Head bump | Belly up | 05 Gacha |
+| Oreo | White with a black cap and patches | On its side | Big stretch | Belly up | 06 Contact |
+
+Rules: idle poses are calm and low (loaf, sit, peek, curled); found poses show trust or play (belly up, sploot, kneading, tail-up). The collect animation lasts about 1.2 s; under reduced motion every cat does a 0.6 s slow blink instead. Feedback: pose change + named toast ("Oreo found! 4 of 13 cats") + the list's cat section. Real eye colours with slit pupils (the hero keeps comic white eyes, so he stays the lead).
 
 ## 3. Palette
 
@@ -120,9 +142,10 @@ Aim: junior QA, data and developer roles in Colombia, written/async work. The to
 | Action | Keyboard | Touch | Mouse |
 | --- | --- | --- | --- |
 | Walk | ← → or A D | Hold ◀ ▶ | — |
-| Jump (on the star: fly to next planet) | Space, ↑, W | Jump | — |
+| Jump | Space, ↑, W | Jump | — |
+| Hop to the next / previous planet | Hold Space for 0.6 s on the right / left star | Hold Jump on a star | — |
 | Next stop | Enter or N | Next ▶▶ | Next ▶▶ |
-| Previous stop | B or Backspace | Back | Back |
+| Previous stop | B, P, Backspace or Shift+Enter | Back | Back |
 | Fly to a planet | 0–6 | Strip dots | Strip dots |
 | Project list | L | List | List |
 | Close card / list | Esc | × | × |
@@ -150,7 +173,7 @@ Phone ≤ 600 px, tablet 601–1024 px (portrait gets the bottom sheet), short s
 
 - **Core loop**: arrive → walk (or auto-walk) to the stop → card pops → read, click Live/Code → Next → hop → land. A recruiter can press Enter ten times and see every project, or click a strip dot or a list item to fly straight there.
 - **Gravity**: the hero's position is one number (angle on the rim) plus a height; jumping is a radial jump with gravity toward the centre. No physics engine.
-- **Hops**: a fixed Bezier arc between planets, 0.8–1.7 s with ease-in-out and one flip; the camera follows and zooms out. Jumping on the star pad hops to the next planet too.
+- **Hops**: a fixed Bezier arc between planets, 0.8–1.7 s with ease-in-out and one flip; the camera follows and zooms out. Every planet has two star pads: the right one hops forward, the left one back. Holding Space or Jump on a star for 0.6 s crouches Tinta and grows the star, then hops; letting go early cancels. Under reduced motion a hop is a small jump in place, then a panel cut.
 - **Camera**: side-on, field of view 32°, distance fitted to the planet and the free screen area, slight roll toward the hero on the upper arc (never under reduced motion).
 - **Juice (2–3 channels, scaled to the event)**: jump = stretch + squash; card = panel pop + live-region announcement; hop = speed lines + flame + flip; landing = squash + ink ring + 0.3 s shake; hidden cat = toast + cat bounce. Sound and vibration are tasks 3 and 4.
 - **Easter eggs**: 12 sleeping cats on the planet undersides, counted in a toast. Never needed for anything.
