@@ -15,6 +15,8 @@ Owner: Fable 5.2 (since 2026-11-10). Direction set by Sebastian: comic art in th
 - The other **12 cats** (13 with Tinta, like Sebastian's household) sleep curled up on the undersides of the planets as easter eggs: orange, grey, calico, black, cream and tuxedo coats, no gear. They never block the route.
 - Built in `src/space/hero.js` (`makeCat({ coat, gear })`).
 
+**Why a character and not a rocket or ship** (Sebastian left this choice to Fable, 2026-11-10): the guided movement has two halves, walking a planet's rim to each stop and hopping between planets. A walking character reads clearly on a curved rim (it stands upright, faces the landmark, stops beside it), while a rocket or ship would have to hover or orbit, which reads less clearly next to a landmark and hides it more. The jet pack already covers the flight half, so one model does both. It is cheap to animate: the walk is four leg rotations, take-off and landing are a squash/stretch of one group, and flight is the flame toggling on. A cat also ties the portfolio to its owner (13 cats, Whisker Gacha) and gives the 12 hidden cats a reason to exist. Cost: about 40 small meshes with outlines, fine on the low preset; if a phone pass shows otherwise, merge the hero's static meshes before changing the concept.
+
 ## 3. Palette
 
 UI tokens (checked with `palette-check`, all WCAG 2.1 AA pairs pass in light and dark, preview in `docs/fable/palette-preview.html`):
