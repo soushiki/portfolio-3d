@@ -28,12 +28,11 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 
 ## Not tried yet / next
 
-1. PLAN.md tasks 1–13 for Haiku/Sonnet (start with 1: remove the old driving files and Rapier).
+1. PLAN.md tasks 3–14 for Haiku/Sonnet (start with 3 or 6). Tasks 1–2 done 2026-11-10 by Haiku (old driving files, Rapier and Kenney models removed; README rewritten), checked by Fable: build passes, full tour runs with no console errors.
 2. Fable F1–F5: hero polish (blink, wave, crouch, dust), data planet layout on a real phone, hop polish, real-device performance on a mid-range Android, update the review page.
 3. Not checked yet: keyboard-only pass through the whole tour in a visible tab, screen reader announcements, real touch input on a phone, frame rate on a phone, the hero close-up image for the review page (the pane was too small).
 4. Sebastian answered all three questions (PLAN.md "Answers from Sebastian"); the resume links now serve the PDFs in `public/resume/` (checked: EN/ES links, HTTP 200, application/pdf).
 6. Project research and a scan of his other repos: [research-projects-2026-11-10.md](research-projects-2026-11-10.md). Top item for Sebastian: the public `ingresos-app` repo shows a real receipt number and amount in its README.
-5. The old driving files (`src/game.js`, `world.js`, `car.js`, …) and `public/models/` are still in the repo, unused.
 
 ## Questions for Fable
 
