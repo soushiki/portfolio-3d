@@ -29,7 +29,7 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 
 - 2026-11-11, Sebastian's screenshots (`docs/fable/feedback/`): Tinta now draws in his own pass on top of everything (checked at the Formato Médico clinic and the data planet in Chrome); belly-up re-posed for the side camera with toe-bean pads (Panda, Collie read as whole cats); tuft ink only past the silhouette (Nara clean). Lineup checked in Chrome.
 
-- 2026-11-11, coat feedback: markings painted on the surface with ragged edges (Oreo, Panda in Skipper's layout with big white bellies; Oreo's bracelet on her left front leg; Duly and Hazel share a warm grey-brown tabby with mixed tones, Duly with a white face, Hazel with a brown bridge). Panda's belly-up head is upright. Checked on the lineup in Chrome; coat fills ≥ 3.65:1 against the ink.
+- 2026-11-11, coat feedback: markings painted on the surface with ragged edges (Oreo, Panda in Skipper's layout with big white bellies; Oreo's bracelet on her left front leg; Duly and Hazel share a warm grey-brown tabby with mixed tones, Duly with a white face, Hazel with a brown bridge). Panda's belly-up head now turns over with the body (Sebastian confirmed it looks better). Checked on the lineup in Chrome; coat fills ≥ 3.65:1 against the ink.
 
 ## Tried and failed (and why)
 
@@ -51,7 +51,7 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 - **Belly-up tipped toward the camera (0.78 pi):** the head covered the body; from the fixed camera Panda looked like a head only.
 
 - **Patches as raised spheres:** read as a cap sitting on top of the cat. Replaced by painted regions.
-- **Belly-up head tipped back 43°:** read as upside down from the fixed camera (Sebastian). The head now stays upright.
+- **Belly-up head tipped back 43°, then upright:** both looked wrong because the head did not match the body, which lies on its back. The head now flips with the body.
 
 ## Not tried yet / next
 
