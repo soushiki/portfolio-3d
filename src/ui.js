@@ -146,6 +146,12 @@ export function createUI({ featured, earlier, planets }) {
   $('next-btn').addEventListener('click', () => onNext());
   $('back-btn').addEventListener('click', () => onBack());
 
+  $('card-more').addEventListener('click', () => {
+    const open = $('card-desc').classList.toggle('is-open');
+    $('card-more').setAttribute('aria-expanded', String(open));
+    $('card-more').textContent = t(open ? 'less' : 'more');
+  });
+
   $('card-close').addEventListener('click', () => {
     card.hidden = true;
     onCardClosed();
@@ -213,6 +219,12 @@ export function createUI({ featured, earlier, planets }) {
       $('card-number').hidden = !planet || planet.stops.length < 2;
       $('card-title').textContent = item.title;
       $('card-desc').textContent = item.description;
+      // Phones show two lines and a More button (CSS clamps); long text only.
+      const more = $('card-more');
+      $('card-desc').classList.remove('is-open');
+      more.setAttribute('aria-expanded', 'false');
+      more.textContent = t('more');
+      more.hidden = item.description.length < 110;
       $('card-tags').replaceWith(Object.assign(tagList(item.tags), { id: 'card-tags' }));
       $('card-links').replaceChildren(...linksFor(item).map((l, i) => link(l.label, l.href, i === 0)));
       card.style.setProperty('--planet', planet?.color ?? '#FFD23F');

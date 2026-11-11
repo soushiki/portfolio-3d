@@ -850,3 +850,46 @@ a {
     font-size: 0.8rem;
   }
 }
+
+/* Phone rhythm (Sebastian 2026-11-11: "looks like a book"): cards show two lines and a More
+   button, at most three tags; the cover drops the hint line. Desktop is unchanged. */
+.card-more {
+  display: none;
+  margin: -6px 0 12px;
+  padding: 4px 12px;
+  min-height: 36px;
+  border: 2px solid var(--ink);
+  border-radius: 99px;
+  background: var(--paper-2);
+  font: 700 0.85rem var(--font);
+  color: var(--ink);
+  cursor: pointer;
+}
+@media (max-width: 600px) {
+  #card-desc:not(.is-open) {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+  .card-more:not([hidden]) {
+    display: inline-flex;
+    align-items: center;
+  }
+  .card .tags li:nth-child(n + 4) {
+    display: none;
+  }
+  .card {
+    padding: 14px 16px 16px;
+  }
+  .card .tags {
+    margin-bottom: 12px;
+  }
+  .loader-hint {
+    display: none;
+  }
+  .cover-sub {
+    font-size: 1rem;
+  }
+}
