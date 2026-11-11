@@ -3,7 +3,7 @@ import { setPixelRatio } from './comic.js';
 import { createBackdrop } from './backdrop.js';
 import { buildPlanets, rimPoint } from './planets.js';
 import { makeCat } from './hero.js';
-import { collect, updateCat } from './cats.js';
+import { CATS, collect, setPose, updateCat } from './cats.js';
 import { ROUTE, STOPS } from './route.js';
 import { createInput } from './input.js';
 
@@ -69,6 +69,27 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     charge: null, // { dir, t } while Space / Jump is held on a star pad
     cut: null, // reduced motion: { t, toPlanet, walkTo } short hop before the panel cut
   };
+
+  // Cats found on earlier visits go straight to their found pose, with no toast.
+  const catInfo = CATS.map((c) => ({ id: c.id, name: c.name }));
+  const foundIds = [];
+  try {
+    const saved = JSON.parse(localStorage.getItem('p3d-cats') ?? '[]');
+    if (Array.isArray(saved)) {
+      for (const p of planets) {
+        for (const h of p.hidden) {
+          if (saved.includes(h.cat.spec.id)) {
+            setPose(h.cat, h.cat.spec.found);
+            h.cat.found = true;
+            h.found = true;
+            state.found++;
+            foundIds.push(h.cat.spec.id);
+          }
+        }
+      }
+    }
+  } catch {}
+  ui.setCats(foundIds, catInfo);
 
   const input = createInput({
     touchRoot: document.getElementById('touch'),
@@ -216,6 +237,11 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
         h.found = true;
         state.found++;
         collect(h.cat, { reducedMotion });
+        foundIds.push(h.cat.spec.id);
+        try {
+          localStorage.setItem('p3d-cats', JSON.stringify(foundIds));
+        } catch {}
+        ui.setCats(foundIds, catInfo);
         ui.foundCat(h.cat.spec.name, state.found, planets.reduce((n, q) => n + q.hidden.length, 0));
       }
     }
