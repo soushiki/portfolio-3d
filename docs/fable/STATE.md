@@ -31,6 +31,8 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 
 - 2026-11-11, coat feedback: markings painted on the surface with ragged edges (Oreo, Panda in Skipper's layout with big white bellies; Oreo's bracelet on her left front leg; Duly and Hazel share a warm grey-brown tabby with mixed tones, Duly with a white face, Hazel with a brown bridge). Panda's belly-up head now turns over with the body (Sebastian confirmed it looks better). Checked on the lineup in Chrome; coat fills ≥ 3.65:1 against the ink.
 
+- 2026-11-11, Pelusa: grey ridge painted from the forehead over the head and spine to the tail, yellow eyes (#E2C23A, checked in the material); face parts now scale with fluffy heads (Pelusa's and Ash's eyes were buried). Checked on the lineup in Chrome (`&zoom=` added for close-ups).
+
 ## Tried and failed (and why)
 
 - **Testing in the hidden browser pane with real time:** `requestAnimationFrame` barely runs while the pane is hidden, so waits showed stale frames. Fixed for testing with the dev-only `__game.advance(seconds)`, which steps the simulation and renders. Screenshots can still show the frame before the last render; take a second screenshot.
@@ -52,6 +54,8 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 
 - **Patches as raised spheres:** read as a cap sitting on top of the cat. Replaced by painted regions.
 - **Belly-up head tipped back 43°, then upright:** both looked wrong because the head did not match the body, which lies on its back. The head now flips with the body.
+
+- **Narrow spine stripe (0.17):** seen edge-on by the side camera, it barely showed. Widened to wrap the upper sides.
 
 ## Not tried yet / next
 

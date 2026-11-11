@@ -6,7 +6,7 @@ import { makeCat } from './hero.js';
 
 // Model sheet for the cats (?lineup=cats): idle pose on the top row, found pose below,
 // Tinta on the left for scale. A design and review tool; the tour never loads it.
-// ?lineup=cats&play=1 plays every collect animation on a loop.
+// ?lineup=cats&play=1 plays every collect animation on a loop; &zoom=3 moves the camera closer.
 
 export function startLineup(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
@@ -80,7 +80,8 @@ export function startLineup(canvas) {
     const needW = COLS * GAP_X + 1;
     const needH = rows * GAP_Y;
     const tan = Math.tan((camera.fov * Math.PI) / 360);
-    const D = Math.max(needH / (2 * tan), needW / (2 * tan * camera.aspect));
+    const zoom = Number(params.get('zoom')) || 1; // &zoom=3 for close-ups
+    const D = Math.max(needH / (2 * tan), needW / (2 * tan * camera.aspect)) / zoom;
     camera.position.set(0, -(rows - 1) * GAP_Y * 0.5 + 0.6, D + 2);
     camera.lookAt(0, -(rows - 1) * GAP_Y * 0.5 + 0.6, 0);
     camera.updateProjectionMatrix();
