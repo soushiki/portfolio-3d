@@ -164,6 +164,7 @@ export function buildPlanets({ scene, route, low }) {
       const holder = new THREE.Group();
       holder.add(cat.root);
       standOnRim(holder, p, angle, 0.05);
+      cat.place = (offsetDeg) => standOnRim(holder, p, angle + offsetDeg, 0.05); // zoomies run around the rim
       root.add(holder);
       hidden.push({ angle, holder, cat, found: false });
     }

@@ -21,23 +21,23 @@ Owner: Fable 5.2 (since 2026-11-10). Direction set by Sebastian: comic art in th
 
 Modelled on Sebastian's cats from his photos (the photos stay in `D:\cats`; they are never copied into the repo or published). Likeness comes from coat colour, patches, tabby stripes, the white blaze, eye colour, size and fur length; shapes stay simple and comic. All in `src/space/cats.js`; model sheet at `?lineup=cats` (`&only=ash,oreo`, `&play=1` loops the collect animations).
 
-| Cat | Coat | Idle | Collect | Found | Planet |
+| Cat | Coat | Idle (hiding) | Found reaction | End pose | Planet |
 | --- | --- | --- | --- | --- | --- |
-| Skipper | Sleek black tuxedo, long tail, yellow eyes | Sit | Head bump | Tail-up | 00 Hello |
-| Ash | Solid blue-grey, soft fur | Loaf | Slow blink | Sit | 01 Minoscreto |
-| Hazel | Brown tabby and white, big eyes | Peek | Head bump | Sit | 01 Minoscreto |
-| Java | Brown mackerel tabby, green eyes | Loaf | Big stretch | Sploot | 02 Ingresos |
-| Orange | Orange tabby and white, slim | Curled | Pounce wiggle | Tail-up | 02 Ingresos |
-| Collie | Dark tortoiseshell, yellow eyes | Belly up | Slow blink | Grooming | 03 Data |
-| Duly | Small grey tabby and white, white face | Sit | Pounce wiggle | Tail-up | 03 Data |
-| Rosie | Dark tabby | Curled | Big stretch | Sploot | 03 Data |
-| Nara | White with a calico cap | Sit | Slow blink | Kneading | 04 Formato |
-| Pelusa | Fluffy white and grey, grey eye patch | Loaf | Slow blink | Kneading | 04 Formato |
-| Charlie | Calico, mostly black, white blaze and paws | On its side | Head bump | Kneading | 05 Gacha |
-| Panda | Chunky, white with black patches | Loaf | Head bump | Belly up | 05 Gacha |
-| Oreo | White with a black cap and patches | On its side | Big stretch | Belly up | 06 Contact |
+| Skipper | Sleek black tuxedo, long tail, yellow eyes | Sit | Freeze → greeting | Tail-up | 00 Hello |
+| Ash | Solid blue-grey, soft fur | Loaf | Freeze → greeting → slow blink | Sit | 01 Minoscreto |
+| Hazel | Brown tabby and white, big eyes | Peek | Startle hop → greeting | Sit | 01 Minoscreto |
+| Java | Brown mackerel tabby, green eyes | Loaf | Freeze → big stretch → greeting | Grooming | 02 Ingresos |
+| Orange | Orange tabby and white, slim | Curled | Startle hop → zoomies lap | Tail-up | 02 Ingresos |
+| Collie | Dark tortoiseshell, yellow eyes | Belly up | Freeze → greeting | Belly up (trust) | 03 Data |
+| Duly | Small grey tabby and white, white face | Sit | Startle hop → zoomies lap | Tail-up | 03 Data |
+| Rosie | Dark tabby | Curled | Freeze → greeting | Kneading | 03 Data |
+| Nara | White with a calico cap | Sit | Startle hop → greeting | Kneading | 04 Formato |
+| Pelusa | Fluffy white and grey, grey eye patch | Loaf | Freeze → greeting → slow blink | Sit | 04 Formato |
+| Charlie | Calico, mostly black, white blaze and paws | On its side | Freeze → dazed wobble → greeting | Sit | 05 Gacha |
+| Panda | Chunky, white with black patches | Loaf | Freeze → greeting → head bump | Belly up (trust) | 05 Gacha |
+| Oreo | White with a black cap and patches | On its side | Startle hop → dazed wobble | Sploot | 06 Contact |
 
-Rules: idle poses are calm and low (loaf, sit, peek, curled); found poses show trust or play (belly up, sploot, kneading, tail-up). The collect animation lasts about 1.2 s; under reduced motion every cat does a 0.6 s slow blink instead. Feedback: pose change + named toast ("Oreo found! 4 of 13 cats") + the list's cat section. Real eye colours with slit pupils (the hero keeps comic white eyes, so he stays the lead).
+Rules (updated 2026-11-11 from Sebastian's clarification): his photos give **only the looks**. Lying poses are for hiding (idle) at most. A found reaction is always caught → happy: a 0.3 s freeze (eyes wide, ears forward, head up) or a 0.45 s startle hop, then the **greeting** (1.1 s trot in place, tail straight up with a quivering tip, head tilt), the main "I'm happy" signal. Chaotic cats add **zoomies** (1.6 s sprint once around the planet, ears back, tail streaming) or a **dazed wobble** (1.4 s head circles, half-closed eyes). Never the arched "Halloween" back: that means fear. Belly up only as a relaxed end pose (trust). Under reduced motion every cat does a 0.8 s slow blink, then its end pose. Feedback: reaction + named toast ("Oreo found! 4 of 13 cats") + the list's "Secret cats" section; a trill sound is part of PLAN task 3. Real eye colours with slit pupils (the hero keeps comic white eyes, so he stays the lead).
 
 ## 3. Palette
 

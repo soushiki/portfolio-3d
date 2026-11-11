@@ -49,3 +49,17 @@ His photos are random moments, mostly lying down: use them **only for each cat's
 Suggested sequence per cat: idle hiding pose (peeking, loaf, tail flick) → caught: a 0.2 s freeze, wide eyes, ears forward, a small hop → greeting: tail up with quivering tip, trot or head bump toward Tinta, trill → found pose: its own happy end pose (tail-up sit, sploot, belly-up, kneading, grooming). Vary the end pose per cat.
 
 Collect feedback: 2–3 channels (pose change, a small sound like a chirp or purr, and a counter tick or name label such as "Oreo found 4/13"), shorter and calmer under `prefers-reduced-motion`. The cat list in the plain-list path can show which ones were found.
+
+### Timings used (Fable, 2026-11-11)
+
+| Step | Duration | Basis |
+| --- | --- | --- |
+| Caught freeze (eyes wide, ears forward) | 0.3 s | Startle reactions are a fraction of a second; the sources above say "short freeze" |
+| Startle hop | 0.45 s | One small vertical hop, about the length of a quick cat jump |
+| Greeting trot, tail up with quivering tip, head tilt | 1.1 s | Tail-up greeting and trill (International Cat Care, PangoVet links above) |
+| Slow blink | 0.8 s | Eyes close halfway slowly and reopen |
+| Big stretch | 0.9 s | Front down, rear up |
+| Zoomies lap | 1.6 s | One fast lap around the planet; kept short so it never delays the tour |
+| Dazed wobble | 1.4 s | Two head circles |
+
+Note on the GIF references: the GIPHY search page opened in the built-in browser, but the pane was hidden, so the GIFs didn't animate and a cookie banner covered them. No frames could be studied, nothing was downloaded or copied, and the timings above come from the behaviour sources and common cat motion. A later pass can study the GIFs in a visible Chrome tab and adjust the durations in `STEPS` in `src/space/cats.js`.

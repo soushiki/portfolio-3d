@@ -56,7 +56,7 @@ Rules for every task: work on `fable-redesign`, pin exact versions, don't change
 - **Spec:** `navigator.vibrate?.(12)` on jump, `navigator.vibrate?.(25)` on landing after a hop, only when `isTouch` and not `reducedMotion`.
 - **Accept:** no errors on desktop browsers that lack `navigator.vibrate`.
 
-### 5. Hidden cats: counter, list and saved progress (in progress 2026-11-11, Sonnet helper)
+### 5. Hidden cats: counter, list and saved progress (done 2026-11-11, Sonnet; checked by Fable)
 - **model:** Sonnet · **difficulty:** medium · **time:** 45 min
 - **Files:** `src/space/game.js`, `src/ui.js`, `src/i18n.js`, `index.html`, `src/style.css`. Cat models, poses and placements (`src/space/cats.js`, `route.js`) are Fable's: don't change them.
 - **Spec:** found cat ids saved in `localStorage` key `p3d-cats` (try/catch); found cats load straight into their found pose with no toast; the list dialog gets a "Secret cats" section with "Found n of 13" and the 13 names in `CATS` order (found = name + ✓ on a green pill, unfound = "???"), updated live; a "Reset cats" button clears the key and reloads.
