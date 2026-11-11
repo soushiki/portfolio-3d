@@ -428,7 +428,7 @@ const POSES = {
   },
   bellyUp(c) {
     // On its back, seen from the side: body flat and low, light belly on top, four paws in the
-    // air, head upright at the front, tail out behind. Nothing hides behind the head.
+    // air, head upside down at the front (ears to the floor), tail out behind. Nothing hides behind the head.
     c.torso.position.set(-0.32, 0.3, 0);
     c.torso.rotation.set(Math.PI, 0, 0);
     resetLegs(c);
@@ -440,10 +440,10 @@ const POSES = {
     c.legs.br.rotation.z = 0.55;
     c.legs.bl.scale.set(1, 1.15, 1);
     c.legs.br.scale.set(1, 1.15, 1);
-    // Head stays upright (ears up, face to the camera side) resting at the front of the body:
-    // tipping it back read as upside down from the fixed camera (Sebastian, 2026-11-11).
-    c.head.position.set(0.52, 0.34, 0);
-    c.head.rotation.set(0, 0, 0.12);
+    // Head upside down like a real cat on its back (Sebastian, 2026-11-11): flipped 180 degrees
+    // front-to-back so the face still points forward, ears toward the floor, chin up.
+    c.head.position.set(0.5, 0.4, 0);
+    c.head.rotation.set(Math.PI, 0, -0.2);
     showTail(c, 'back');
   },
   sploot(c) {
