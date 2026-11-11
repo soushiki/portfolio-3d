@@ -1,6 +1,8 @@
 import { PROJECTS, DATA_SCIENCE, DATA_SCIENCE_HUB, CONTACT_ZONE, INTRO_ZONE } from '../data.js';
 
-// The guided tour: planets left to right, in this order. Each planet has stops along its
+// The guided tour: planets left to right, in this order. Standing rule: the featured order matches
+// the 2D site (sebherr.netlify.app): Minoscreto, Ingresos, Formato Médico, Data science. Whisker Gacha
+// is an earlier build there; here it stays as a bonus planet (it carries two secret cats). Each planet has stops along its
 // upper arc; the hero walks clockwise over the top (left = 150°, top = 90°, right = 30°).
 // See docs/fable/PLAN.md "Project selection" for why these projects and this order.
 
@@ -39,8 +41,18 @@ export const ROUTE = [
     launch: 35,
   },
   {
-    id: 'data',
+    id: 'formato',
     number: '03',
+    radius: 7,
+    color: '#FF7A6B',
+    accent: '#C8102E',
+    style: 'pill',
+    stops: [{ angle: 92, landmark: 'hospital', item: byId(PROJECTS, 'formato') }],
+    launch: 35,
+  },
+  {
+    id: 'data',
+    number: '04',
     radius: 11,
     color: '#5AA9FF',
     accent: '#2456C9',
@@ -52,16 +64,6 @@ export const ROUTE = [
       { angle: 56, landmark: 'streetClock', item: byId(DATA_SCIENCE, 'ds-311') },
     ],
     launch: 30,
-  },
-  {
-    id: 'formato',
-    number: '04',
-    radius: 7,
-    color: '#FF7A6B',
-    accent: '#C8102E',
-    style: 'pill',
-    stops: [{ angle: 92, landmark: 'hospital', item: byId(PROJECTS, 'formato') }],
-    launch: 35,
   },
   {
     id: 'gacha',
@@ -111,7 +113,7 @@ for (const p of ROUTE) {
 }
 
 // Projects that are only in the plain list ("Earlier builds"), with the reason they're not on a planet.
-export const LIST_ONLY = ['brasa', 'davinci', 'apod', 'gym', 'todo', 'reddit', 'jammming'];
+export const LIST_ONLY = ['gacha', 'brasa', 'davinci', 'apod', 'gym', 'todo', 'reddit', 'jammming'];
 
 // Where the hero stands for each stop: about 2.6 units left of the landmark, facing it,
 // so it never hides the landmark.

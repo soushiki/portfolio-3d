@@ -6,7 +6,7 @@ import { ROUTE, STOPS, LIST_ONLY } from './space/route.js';
 applyStaticText();
 
 const ui = createUI({
-  featured: STOPS.filter((s) => !['hello'].includes(s.item.id)).map((s) => ({ item: s.item, planet: s.planet })),
+  featured: STOPS.filter((s) => !['hello', 'gacha'].includes(s.item.id)).map((s) => ({ item: s.item, planet: s.planet })),
   earlier: LIST_ONLY.map((id) => PROJECTS.find((p) => p.id === id)).filter(Boolean),
   planets: ROUTE,
 });
@@ -77,6 +77,12 @@ async function boot() {
     document.getElementById('loader').hidden = true;
     const { startLineup } = await import('./space/lineup.js');
     startLineup(document.getElementById('scene'));
+    return;
+  }
+  if (new URLSearchParams(location.search).get('lineup') === 'landmarks' && hasWebGL()) {
+    document.getElementById('loader').hidden = true;
+    const { startLandmarkLineup } = await import('./space/landmarkLineup.js');
+    startLandmarkLineup(document.getElementById('scene'));
     return;
   }
   if (!hasWebGL()) {

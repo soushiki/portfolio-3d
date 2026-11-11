@@ -9,6 +9,9 @@ export const RESUME = {
   es: '/resume/Sebastian-Herrera-resume-es.pdf',
 };
 
+// Services for freelance clients (websites, translation) on the 2D site.
+export const SERVICES_URL = `${SIMPLE_PORTFOLIO}/services.html`;
+
 export const CONTACT = {
   github: 'https://github.com/soushiki',
   linkedin: 'https://www.linkedin.com/in/sebastian-herrera-claro-23a0af/',
@@ -20,10 +23,10 @@ const RAW_PROJECTS = [
     landmark: 'vault',
     title: 'Minoscreto',
     description:
-      'Anonymizes Word documents before you paste them into an AI, then restores the real names in the answer. Everything runs in the browser, so nothing leaves your computer.',
+      'Anonymizes Word documents before you paste them into an AI, then restores the real names in the answer. Everything runs in the browser, so nothing leaves your computer. 160 automated tests.',
     tags: ['React', 'Vite', 'Vitest', '.docx'],
     description_es:
-      "Anonimiza documentos de Word antes de pegarlos en una IA y luego restaura los nombres reales en la respuesta. Todo se ejecuta en el navegador, así que nada sale de tu computador.",
+      "Anonimiza documentos de Word antes de pegarlos en una IA y luego restaura los nombres reales en la respuesta. Todo se ejecuta en el navegador, así que nada sale de tu computador. 160 pruebas automáticas.",
     live: 'https://minoscreto.netlify.app/',
     caseStudy: `${SIMPLE_PORTFOLIO}/public/html/minoscreto.html`,
     code: 'https://github.com/soushiki/minoscreto',
@@ -224,6 +227,7 @@ const RAW_CONTACT = {
     { label: 'LinkedIn', href: CONTACT.linkedin },
     { label: 'Resume', label_es: 'Hoja de vida', href: RESUME.en, href_es: RESUME.es },
     { label: 'GitHub', href: CONTACT.github },
+    { label: 'Services for businesses', label_es: 'Servicios para negocios', href: SERVICES_URL },
   ],
 };
 
@@ -233,9 +237,9 @@ const RAW_INTRO = {
   title: "Hi, I'm Sebastian",
   title_es: 'Hola, soy Sebastian',
   description:
-    'Systems engineering graduate from Colombia. I build web apps, data projects and small tools that solve real problems. This tour stops at my best work: press Next to fly to the first planet.',
+    'Open to junior QA, data and developer roles. I build tested tools for real problems: 160 automated tests in Minoscreto, 3 data science projects, a web + Android app. Press Next to fly to the first planet.',
   description_es:
-    'Ingeniero de sistemas de Colombia. Construyo apps web, proyectos de datos y herramientas pequeñas que resuelven problemas reales. Este recorrido para en mis mejores trabajos: pulsa Siguiente para volar al primer planeta.',
+    'Busco roles junior de QA, datos y desarrollo. Construyo herramientas probadas para problemas reales: 160 pruebas automáticas en Minoscreto, 3 proyectos de ciencia de datos y una app web y Android. Pulsa Siguiente para volar al primer planeta.',
   tags: ['Web', 'Data', 'QA'],
   tags_es: ['Web', 'Datos', 'QA'],
   links: [
