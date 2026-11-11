@@ -65,6 +65,9 @@ const STRINGS = {
     startFailed: 'Something went wrong while starting the 3D tour, so here are all the projects.',
     listNote: 'Every project, no game needed.',
     langLabel: 'Language',
+    motionFull: 'Animations: full',
+    motionReduced: 'Animations: reduced',
+    motionHelp: 'Switch between full and reduced animations',
     canvasLabel: 'Comic-style 3D tour: a cat astronaut walks around small planets, one per project',
   },
   es: {
@@ -118,6 +121,9 @@ const STRINGS = {
     startFailed: 'Algo salió mal al iniciar el recorrido 3D, así que aquí están todos los proyectos.',
     listNote: 'Todos los proyectos, sin jugar.',
     langLabel: 'Idioma',
+    motionFull: 'Animaciones: completas',
+    motionReduced: 'Animaciones: reducidas',
+    motionHelp: 'Cambiar entre animaciones completas y reducidas',
     canvasLabel: 'Recorrido 3D estilo cómic: un gato astronauta camina por planetas pequeños, uno por proyecto',
   },
 };

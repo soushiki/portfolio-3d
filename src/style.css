@@ -643,22 +643,45 @@ a {
 }
 
 /* ---------- Reduced motion: no pops, no speed lines, no button hops ---------- */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-  .speed-lines {
-    display: none;
-  }
-  .cover {
-    transform: none;
-  }
-  .panel-cut.is-on {
-    animation: cut 0.25s linear !important;
-  }
+/* body.is-reduced follows prefers-reduced-motion unless the visitor picked a setting
+   with the Animations toggle (main.js). */
+.is-reduced *,
+.is-reduced *::before,
+.is-reduced *::after {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+.is-reduced .speed-lines {
+  display: none;
+}
+.is-reduced .cover {
+  transform: none;
+}
+.is-reduced .panel-cut.is-on {
+  animation: cut 0.25s linear !important;
+}
+.motion-toggle {
+  min-height: 36px;
+  padding: 4px 12px;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  font: 600 0.85rem var(--font);
+  cursor: pointer;
+}
+.debug-readout {
+  position: fixed;
+  z-index: 60;
+  left: 8px;
+  top: 50%;
+  margin: 0;
+  padding: 6px 10px;
+  background: var(--ink);
+  color: var(--paper);
+  font: 12px/1.4 ui-monospace, Consolas, monospace;
+  white-space: pre;
+  pointer-events: none;
 }
 
 /* ---------- Tablet (601–1024px) ---------- */

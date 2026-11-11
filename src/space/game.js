@@ -113,6 +113,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
   };
 
   const busy = () => state.mode === 'flight' || state.mode === 'cut';
+  const stats = { fps: 60, lastHop: 0, lastHopKind: '-', hopStart: 0 };
 
   function next(dir) {
     if (busy()) return;
@@ -177,6 +178,8 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
       hero.anim.air = 1;
       state.cut = { t: 0, toPlanet, walkTo };
       state.mode = 'cut';
+      stats.hopStart = performance.now();
+      stats.lastHopKind = 'cut (reduced motion)';
       return;
     }
     const dist = from.distanceTo(to);
@@ -188,6 +191,8 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
       startTilt: (state.angle - 90) * DEG, endTilt: (landAngle - 90) * DEG,
     };
     state.mode = 'flight';
+    stats.hopStart = performance.now();
+    stats.lastHopKind = 'arc';
     state.facing = toPlanet > state.planet ? 1 : -1;
     hero.anim.squash = 0.6;
     hero.anim.air = 1;
@@ -197,6 +202,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
 
   function land() {
     const f = state.flight;
+    stats.lastHop = (performance.now() - stats.hopStart) / 1000;
     state.planet = f.toPlanet;
     state.angle = f.landAngle;
     state.height = 0;
@@ -263,7 +269,12 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     if (state.mode === 'flight') {
       const f = state.flight;
       R = 12 + f.from.distanceTo(f.to) * 0.35;
-      focus.copy(heroPos);
+      // Trail behind the hero along the arc so it visibly crosses the screen (on tall phone
+      // screens a camera locked to the hero made the hop read as the world sliding past).
+      const u = Math.max(0, f.t - 0.18) / 0.82;
+      const e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      focus.copy(f.from).lerp(f.to, e);
+      focus.y = Math.max(focus.y, heroPos.y - R * 0.45);
     } else {
       const p = planetOf();
       R = p.radius;
@@ -338,6 +349,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
       state.height = Math.max(0, state.height + state.vy * dt);
       if (c.t >= 0.35) {
         ui.panelCut();
+        stats.lastHop = (performance.now() - stats.hopStart) / 1000;
         state.planet = c.toPlanet;
         state.angle = c.walkTo;
         state.height = 0;
@@ -445,7 +457,9 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     backdrop.update(camLook.x, camLook.y, t);
   };
   const frame = (now) => {
-    const dt = Math.min(Math.max((now - last) / 1000, 0), 0.05);
+    const raw = (now - last) / 1000;
+    if (raw > 0) stats.fps += (1 / raw - stats.fps) * 0.05;
+    const dt = Math.min(Math.max(raw, 0), 0.05);
     last = now;
     tick(dt, now);
     renderer.render(scene, camera);
@@ -469,11 +483,13 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     if (i >= 0) travelTo(i);
   });
 
-  return { state, travelTo, next, planets, camera, debug: () => ({ camPos, camLook, focus, roll, hero: heroOuter.position }),
+  return { state, stats, travelTo, next, planets, camera, debug: () => ({ camPos, camLook, focus, roll, hero: heroOuter.position }),
     // Dev/test helper: advance the simulation without animation frames (hidden tabs, tests).
-    advance(seconds) {
+    advance(seconds, fps = 60) {
+      // fps < 60 imitates a slow phone: bigger steps, same clamping as the real frame loop.
       let now = performance.now();
-      for (let i = 0; i < Math.round(seconds * 60); i++) tick(1 / 60, (now += 1000 / 60));
+      const step = 1000 / fps;
+      for (let i = 0; i < Math.round(seconds * fps); i++) tick(Math.min(step / 1000, 0.05), (now += step));
       renderer.render(scene, camera);
     },
   };

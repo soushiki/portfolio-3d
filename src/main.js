@@ -13,11 +13,29 @@ const ui = createUI({
 
 const isTouch = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
 document.body.classList.toggle('is-touch', isTouch);
-// ?motion=reduce forces the reduced-motion path (handy for testing it).
-const reducedMotion =
-  new URLSearchParams(location.search).get('motion') === 'reduce' ||
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Motion: ?motion=reduce|full (tests) > the visitor's saved choice > the OS setting.
+// Android reports "reduce" when animations are removed in system settings or by some battery savers,
+// which turns the hop between planets into a cut; the Animations toggle lets the visitor override it.
+const osReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let savedMotion = null;
+try {
+  savedMotion = localStorage.getItem('p3d-motion');
+} catch {}
+const forcedMotion = new URLSearchParams(location.search).get('motion');
+const reducedMotion = forcedMotion ? forcedMotion === 'reduce' : savedMotion ? savedMotion === 'reduced' : osReduced;
+const motionSource = forcedMotion ? 'url' : savedMotion ? 'saved' : 'OS';
 document.body.classList.toggle('is-reduced', reducedMotion);
+for (const b of document.querySelectorAll('[data-motion-toggle]')) {
+  b.textContent = t(reducedMotion ? 'motionReduced' : 'motionFull');
+  b.setAttribute('aria-pressed', String(!reducedMotion));
+  b.title = t('motionHelp');
+  b.addEventListener('click', () => {
+    try {
+      localStorage.setItem('p3d-motion', reducedMotion ? 'full' : 'reduced');
+    } catch {}
+    location.reload();
+  });
+}
 
 function hasWebGL() {
   // ?webgl=0 forces the fallback list, handy for testing it.
@@ -78,7 +96,21 @@ async function boot() {
       ui,
       reducedMotion,
     });
-    if (import.meta.env.DEV) window.__game = game;
+    window.__game = game; // test hooks (advance, travelTo, next); harmless in production
+    const params = new URLSearchParams(location.search);
+    if (params.get('debug') === '1') {
+      // On-device diagnosis: what the browser reports and how the last hop ran.
+      const box = Object.assign(document.createElement('p'), { className: 'debug-readout' });
+      document.body.append(box);
+      setInterval(() => {
+        const s = game.stats;
+        box.textContent = `motion: ${reducedMotion ? 'reduced' : 'full'} (${motionSource}; OS says ${osReduced ? 'reduce' : 'no-preference'})\nquality: ${pickQuality().low ? 'low' : 'high'}  fps: ${s.fps.toFixed(0)}\nlast hop: ${s.lastHop ? s.lastHop.toFixed(2) + ' s' : '-'} (${s.lastHopKind})`;
+      }, 500);
+    }
+    if (params.get('selftest') === 'hop') {
+      const { runHopTest } = await import('./space/selftest.js');
+      runHopTest(game, { reducedMotion });
+    }
   } catch (err) {
     console.error(err);
     ui.showFallback(t('startFailed'));

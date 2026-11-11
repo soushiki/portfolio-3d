@@ -26,7 +26,7 @@ npm run dev
 
 The preview config `.claude/launch.json` serves on http://127.0.0.1:5071. Useful URLs: `?quality=low`, `?webgl=0` (fallback list), `?lang=es`, `?motion=reduce`. In dev, `window.__game.advance(seconds)` steps the simulation without animation frames (a hidden browser tab barely runs them), and `__game.next(1)` / `__game.travelTo(i)` drive the tour.
 
-Every task ends with `npm run build` passing and a browser check at desktop, phone (375 × 812), phone landscape (812 × 375) and tablet (768 × 1024).
+Every task that touches movement or the camera also runs `?selftest=hop&quality=low` at 375 × 812 (it must say PASS). `?debug=1` shows the motion setting, quality and fps on a real device. Every task ends with `npm run build` passing and a browser check at desktop, phone (375 × 812), phone landscape (812 × 375) and tablet (768 × 1024).
 
 ## Build tasks for other models
 

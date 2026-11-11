@@ -63,3 +63,23 @@ Collect feedback: 2–3 channels (pose change, a small sound like a chirp or pur
 | Dazed wobble | 1.4 s | Two head circles |
 
 Note on the GIF references: the GIPHY search page opened in the built-in browser, but the pane was hidden, so the GIFs didn't animate and a cookie banner covered them. No frames could be studied, nothing was downloaded or copied, and the timings above come from the behaviour sources and common cat motion. A later pass can study the GIFs in a visible Chrome tab and adjust the durations in `STEPS` in `src/space/cats.js`.
+
+## Fur and outlines (owner feedback + research, 2026-11-11)
+
+**His verdict:** he likes the poses and models. Two problems: (1) the "drawn" outlines overlap and show lines on inner parts, when only the relevant details should be outlined; (2) the cats don't read as furry.
+
+**Why the outlines overlap (sources):** inverted-hull outlines get gaps and overlaps from split vertex normals, and each separate part (head, ear, leg, tail) gets its own hull, so the hulls cross inside the body.
+- Fix: one merged hull per cat with smoothed normals, baked into UV2 or a vertex colour with a smoothing angle. https://github.com/Delt06/urp-toon-shader/wiki/Outline · https://forums.unrealengine.com/t/best-way-to-fix-gaps-in-toon-outlines-when-using-inverted-hull-method/1319625
+- Guilty Gear Xrd line control (Arc System Works, translated slides): outline width scales with vertex-colour alpha, and 0 removes the line. Set it to 0 in valleys and on inner parts; a second channel pushes inner backfaces away so only the silhouette remains. https://docswell.com/s/ASW_Academy/5LVY67-GG-Toonline-Eng
+- Post-process edges (depth and normal differences) are an alternative, but they need an extra depth pass per object; check the cost on phones first. https://discourse.threejs.org/t/how-to-render-full-outlines-as-a-post-process-tutorial/22674
+- Rule: outline the silhouette, plus hand-picked feature lines (eyes, mouth, inner ear edge) drawn as geometry or texture, not as hulls.
+
+**Fur that reads as fur on phones:**
+- Keep the opaque low-poly body, and add about 20–40 small alpha-card tufts where a cat's outline is fluffy: cheek ruffs, chest bib, ear tips, tail tip, the back of the legs. Use fewer, sparser cards at the edges, with varied size and rotation. https://community.secondlife.com/forums/topic/494106-low-poly-fur/ · https://sketchfab.com/blogs/community/tutorial-real-time-fur-hair
+- Tuft textures 64–128 px with mipmaps, alpha-test (not blend) for phones.
+- Jagged, clumped silhouette shapes (zig-zag edges on the cheeks and chest) read as fur even without cards; the outline then follows the fluffy edge.
+- A soft two-step toon ramp, plus a rim light tinted to each coat colour, gives a fluffy edge.
+- Shell fur copies the whole mesh per layer. Only try it after profiling on a real phone, and then only 8–12 shells on the head. https://godotshaders.com/shader/simplest-fur-shader-shell-texturing/
+- Long-haired cats (check the photos, for example Pelusa) get bigger, more tufts; short-haired cats only a few at the cheeks and tail.
+
+**Not found:** fur breakdowns for Stray, Little Kitty Big City, Ghibli or Spider-Verse.

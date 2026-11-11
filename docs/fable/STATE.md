@@ -23,6 +23,8 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 
 - 2026-11-11: PLAN task 5 (Sonnet) merged and checked: found cats saved in `p3d-cats`, list section "Secret cats" with found count and names, reset button. Cat reactions checked: Orange hops, runs a zoomies lap (moved about 15 units) and ends tail-up; mid-sequence frames in Chrome show the greeting trot with tail up and the dazed wobble.
 
+- 2026-11-11, phone "teleport" report: reproduced mobile conditions (375 × 812, touch, `?quality=low`, 15 fps stepping). The hop runs: 1.73 s in flight, at most 29 px per frame, hero about 22 px tall. Low preset, dt clamping, the Next button path and the camera were ruled out. Most likely cause on his phone: the browser reports `prefers-reduced-motion: reduce` (Android "Remove animations" or a battery saver), which correctly swaps the hop for a cut. Not confirmed on his device yet: ask him to open the live site with `?debug=1` after the next deploy. Added: an "Animations: full / reduced" toggle (cover and list dialog, saved as `p3d-motion`) that overrides the OS setting; a trailing camera during hops (hero travel on a phone 120 → 163 px); `?selftest=hop` (passes the flight, fails the cut with `&motion=reduce&assert=flight`).
+
 ## Tried and failed (and why)
 
 - **Testing in the hidden browser pane with real time:** `requestAnimationFrame` barely runs while the pane is hidden, so waits showed stale frames. Fixed for testing with the dev-only `__game.advance(seconds)`, which steps the simulation and renders. Screenshots can still show the frame before the last render; take a second screenshot.
@@ -34,6 +36,8 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 - **Judging cat poses in the built-in pane:** the pane was about 418 px wide; use Claude in Chrome on localhost for model checks.
 
 - **GIF motion study:** GIPHY in the hidden built-in pane showed static thumbnails behind a cookie banner; nothing to study. Use a visible Chrome tab next time.
+
+- **Phone checks that only read `state.mode`:** they said "flight" while the user saw a teleport. Visual checks must measure on screen (hero pixel size, per-frame jump); `?selftest=hop` does that now.
 
 ## Not tried yet / next
 
