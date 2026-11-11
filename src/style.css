@@ -19,6 +19,11 @@
   --radius: 6px;
   --gutter: 20px;
   --controls-h: 76px;
+  /* Netlify adds a fixed "Powered by Netlify" badge (about 210 x 50 px) at the bottom right of
+     every deploy. Nothing interactive may sit in this corner (PLAN.md standing rule). */
+  --badge-w: 240px;
+  --badge-h: 72px;
+  --controls-lift: 0px;
   --hud-h: 64px;
   --tap: 56px;
 }
@@ -353,12 +358,12 @@ a {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
   z-index: 10;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px var(--gutter) max(14px, env(safe-area-inset-bottom));
+  padding: 10px calc(var(--gutter) + var(--badge-w)) max(14px, env(safe-area-inset-bottom)) var(--gutter);
+  bottom: var(--controls-lift);
   pointer-events: none;
 }
 .controls * {
@@ -681,6 +686,10 @@ a {
 /* ---------- Phone (≤600px) ---------- */
 @media (max-width: 600px) {
   :root {
+    /* Too narrow to keep the badge corner free beside the controls: lift the whole bar above it. */
+    --controls-lift: var(--badge-h);
+    --badge-w: 0px;
+    --controls-h: calc(76px + var(--badge-h));
     --gutter: 12px;
     --hud-h: 108px;
     --tap: 52px;

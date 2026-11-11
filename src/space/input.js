@@ -1,11 +1,15 @@
 // Keyboard and touch input for the guided tour.
 // ← → / A D walk · ↑ W Space jump (on the star pad: hop to the next planet)
-// Enter / N next stop · B / Backspace previous stop · 0–6 fly to a planet.
+// Enter / N next stop · B / P / Backspace / Shift+Enter previous stop · 0–6 fly to a planet.
+// Holding Space (or the Jump button) on a star pad charges a hop to the next/previous planet.
 const WALK = { ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right' };
 const JUMP = new Set(['ArrowUp', 'KeyW', 'Space']);
 
-export function createInput({ touchRoot, onNext, onBack, onJump, onPlanet }) {
-  const state = { left: 0, right: 0 };
+export function createInput({ touchRoot, onNext, onBack, onPlanet }) {
+  const state = { left: 0, right: 0, jumpHeld: false };
+  const jumpKeys = new Set();
+  let touchJump = false;
+  const refreshJump = () => (state.jumpHeld = jumpKeys.size > 0 || touchJump);
   const held = new Set();
   const touches = new Map();
   let jumpQueued = false;
@@ -32,11 +36,16 @@ export function createInput({ touchRoot, onNext, onBack, onJump, onPlanet }) {
     if (focusOnControl) return;
     if (JUMP.has(e.code)) {
       if (!e.repeat) jumpQueued = true;
+      jumpKeys.add(e.code);
+      refreshJump();
+      e.preventDefault();
+    } else if (e.code === 'Enter' && e.shiftKey && !e.repeat) {
+      onBack();
       e.preventDefault();
     } else if ((e.code === 'Enter' || e.code === 'KeyN') && !e.repeat) {
       onNext();
       e.preventDefault();
-    } else if ((e.code === 'KeyB' || e.code === 'Backspace') && !e.repeat) {
+    } else if ((e.code === 'KeyB' || e.code === 'KeyP' || e.code === 'Backspace') && !e.repeat) {
       onBack();
       e.preventDefault();
     } else if (/^Digit[0-6]$/.test(e.code) && !e.repeat) {
@@ -45,12 +54,17 @@ export function createInput({ touchRoot, onNext, onBack, onJump, onPlanet }) {
   });
   window.addEventListener('keyup', (e) => {
     held.delete(e.code);
+    jumpKeys.delete(e.code);
     refresh();
+    refreshJump();
   });
   window.addEventListener('blur', () => {
     held.clear();
     touches.clear();
+    jumpKeys.clear();
+    touchJump = false;
     refresh();
+    refreshJump();
   });
 
   // Touch: hold ◀ ▶ to walk, tap Jump. Next/Back are ordinary HUD buttons.
@@ -59,9 +73,15 @@ export function createInput({ touchRoot, onNext, onBack, onJump, onPlanet }) {
       const action = btn.dataset.action;
       btn.addEventListener('pointerdown', (e) => {
         e.preventDefault();
-        btn.setPointerCapture(e.pointerId);
-        if (action === 'jump') onJump();
-        else {
+        // Capture can throw (e.g. a pointer the browser already released); never let it block the action.
+        try {
+          btn.setPointerCapture(e.pointerId);
+        } catch {}
+        if (action === 'jump') {
+          jumpQueued = true;
+          touchJump = true;
+          refreshJump();
+        } else {
           touches.set(e.pointerId, action);
           refresh();
         }
@@ -69,6 +89,10 @@ export function createInput({ touchRoot, onNext, onBack, onJump, onPlanet }) {
       });
       const up = (e) => {
         touches.delete(e.pointerId);
+        if (action === 'jump') {
+          touchJump = false;
+          refreshJump();
+        }
         refresh();
         btn.classList.remove('is-down');
       };
