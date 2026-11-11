@@ -6,6 +6,7 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 - Review page (private artifact, Fable updates it each pass): https://claude.ai/artifact/1YWqA9Av7PJVXP2WHfpBBF · local copy [review.html](review.html) with [shots/](shots/)
 - Palette check preview: [palette-preview.html](palette-preview.html) (realtimecolors: https://www.realtimecolors.com/?colors=16122e-fff6e5-c41e3a-ffe7a8-2456c9&fonts=Inter-Inter)
 - Dev server: `.claude/launch.json` → http://127.0.0.1:5071
+- Live: https://sebherr-3d.netlify.app (Netlify project `sebherr-3d`, deploys from `main` on push). Check a deploy with `curl -s https://sebherr-3d.netlify.app/ | grep -c data-motion-toggle`.
 
 ## Verified working (browser, 2026-11-10)
 
