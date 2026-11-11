@@ -43,7 +43,17 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
   heroInner.add(hero.group);
   heroOuter.add(heroInner);
   heroInner.scale.setScalar(1.2);
-  scene.add(heroOuter);
+  // Tinta is drawn in a second pass after the world, on a cleared depth buffer: no landmark,
+  // planet or cat can ever cover him, and his own parts still depth-sort among themselves.
+  const heroScene = new THREE.Scene();
+  heroScene.add(heroOuter);
+  renderer.autoClear = false;
+  const draw = () => {
+    renderer.clear();
+    renderer.render(scene, camera);
+    renderer.clearDepth();
+    renderer.render(heroScene, camera);
+  };
 
   // Landing ring: a flat ink circle that expands and fades.
   const ring = new THREE.Mesh(
@@ -436,7 +446,8 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
   placeHero(0, 0);
   updateCamera(0, true);
   renderer.compile(scene, camera);
-  renderer.render(scene, camera);
+  renderer.compile(heroScene, camera);
+  draw();
 
   let running = false;
   let last = performance.now();
@@ -462,7 +473,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
     const dt = Math.min(Math.max(raw, 0), 0.05);
     last = now;
     tick(dt, now);
-    renderer.render(scene, camera);
+    draw();
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
@@ -490,7 +501,7 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
       let now = performance.now();
       const step = 1000 / fps;
       for (let i = 0; i < Math.round(seconds * fps); i++) tick(Math.min(step / 1000, 0.05), (now += step));
-      renderer.render(scene, camera);
+      draw();
     },
   };
 }

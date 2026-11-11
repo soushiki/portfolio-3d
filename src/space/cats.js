@@ -119,10 +119,7 @@ function getTuftTexture() {
   g.quadraticCurveTo(62, 40, 60, 60);
   g.closePath();
   g.fillStyle = '#FFFFFF';
-  g.fill();
-  g.lineWidth = 4;
-  g.strokeStyle = '#16122E';
-  g.stroke();
+  g.fill(); // fill only: the ink comes from a second card pushed back in depth (inkMat)
   tuftTexture = new THREE.CanvasTexture(c);
   tuftTexture.colorSpace = THREE.SRGBColorSpace;
   return tuftTexture;
@@ -136,6 +133,35 @@ function tuftMat(hex) {
   }
   return tuftMats.get(hex);
 }
+// Ink card: the same tuft, a little larger, pushed away from the camera like the outline hulls,
+// so its ink only shows past the silhouette (never as scribbles over the body).
+let inkMat = null;
+function getInkMat() {
+  if (inkMat) return inkMat;
+  inkMat = new THREE.ShaderMaterial({
+    uniforms: { uMap: { value: getTuftTexture() }, uInk: { value: new THREE.Color('#16122E') } },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        mv.z -= 0.22;
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform sampler2D uMap;
+      uniform vec3 uInk;
+      varying vec2 vUv;
+      void main() {
+        if (texture2D(uMap, vUv).a < 0.5) discard;
+        gl_FragColor = vec4(uInk, 1.0);
+        #include <colorspace_fragment>
+      }`,
+    side: THREE.DoubleSide,
+  });
+  inkMat.userData.noOutline = true;
+  return inkMat;
+}
 const tuftGeo = new THREE.PlaneGeometry(1, 1).translate(0, 0.35, 0); // base near the bottom edge
 
 // One tuft on the edge of a round part seen from the side: centre (cx, cy), radius r,
@@ -148,6 +174,11 @@ function edgeTuft(parent, hex, cx, cy, r, deg, size, z = 0) {
   m.rotation.z = a - Math.PI / 2;
   m.scale.set(size, size, 1);
   m.userData.outline = 0;
+  const ink = new THREE.Mesh(tuftGeo, getInkMat());
+  ink.scale.set(1.18, 1.14, 1);
+  ink.position.y = -0.03;
+  ink.userData.outline = 0;
+  m.add(ink);
   parent.add(m);
   return m;
 }
@@ -231,6 +262,9 @@ export function makeSecretCat(spec) {
     g.position.set(x, -0.08, z);
     g.add(put(capsule(0.085 * bodyW, 0.2, front ? fur : fur), 0, -0.16, 0));
     g.add(put(sphere(0.1 * bodyW, socks, 8, 6), 0.03, -0.32, 0, 1.25, 0.7, 1));
+    // Toe-bean pad under the paw: shows when the paws are in the air (belly up).
+    const dark = new THREE.Color(spec.socks).getHSL({}).l < 0.3;
+    g.add(noLine(put(sphere(0.06 * bodyW, M(dark ? '#9C6A86' : '#F29BB0'), 8, 6), 0.03, -0.39, 0, 1.3, 0.45, 1)));
     torso.add(g);
     return g;
   };
@@ -361,16 +395,21 @@ const POSES = {
     showTail(c, 'back');
   },
   bellyUp(c) {
-    c.torso.position.set(-0.3, 0.3, 0);
-    c.torso.rotation.set(Math.PI * 0.78, 0, 0); // belly turned partly toward the camera
+    // On its back, seen from the side: body flat and low, light belly on top, four paws in the
+    // air, head resting at the front with the chin up, tail out behind. Nothing hides behind the head.
+    c.torso.position.set(-0.32, 0.3, 0);
+    c.torso.rotation.set(Math.PI, 0, 0);
     resetLegs(c);
-    for (const l of Object.values(c.legs)) l.scale.set(1.1, 1.15, 1.1);
-    c.legs.fl.rotation.z = -0.35;
-    c.legs.fr.rotation.z = -1.0;
-    c.legs.bl.rotation.z = 0.25;
-    c.legs.br.rotation.z = 0.8;
-    c.head.position.set(0.36, 0.3, 0);
-    c.head.rotation.set(Math.PI * 0.85, 0, 0.2);
+    c.legs.fl.rotation.z = -0.35; // front paws curled up toward the chest
+    c.legs.fr.rotation.z = -0.75;
+    c.legs.fl.scale.set(1, 0.85, 1);
+    c.legs.fr.scale.set(1, 0.85, 1);
+    c.legs.bl.rotation.z = 0.25; // back paws up and a little behind
+    c.legs.br.rotation.z = 0.55;
+    c.legs.bl.scale.set(1, 1.15, 1);
+    c.legs.br.scale.set(1, 1.15, 1);
+    c.head.position.set(0.5, 0.26, 0);
+    c.head.rotation.set(0, 0, 0.75); // chin up, face still toward the camera side
     showTail(c, 'back');
   },
   sploot(c) {
