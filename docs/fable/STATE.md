@@ -36,6 +36,8 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 
 - 2026-11-11, phone still teleported (his phone reports reduced motion; the toggle had missed the deploy): reduced motion now plays a calm glide (0.9 s lower arc, no flip, speed lines or shake, camera holds a frame with both planets) instead of a cut. Self-test now demands in-between frames in every mode: reduced 1.2 s / 207 px / max 25 px per frame, full 1.73 s, both PASS at 375 × 812, `?quality=low`, 15 fps. Motion button added to the HUD; `?debug=1` says which hop ran and why.
 
+- 2026-11-11, sync with the 2D site and landmark audit: tour order now Hello → Minoscreto → Ingresos → Formato Médico → Data science (4 stops) → Whisker Gacha (bonus) → Contact (checked by stepping Next through all stops); list "On the tour" = the featured set, Whisker Gacha under Earlier builds; intro and Minoscreto card carry the 160-tests proof; Contact card and list link to the 2D services page. Landmarks: `npm run check:models` found no duplicate meshes; the "copies inside itself" look on the clock (and the vault, turbine, clinic) was one outline hull per tiny part with no depth push. Fixed with `LANDMARK_OUTLINE`; all 10 landmarks checked on `?lineup=landmarks` in Chrome. Hop selftest PASS at 375 × 812 (full and reduced).
+
 ## Tried and failed (and why)
 
 - **Testing in the hidden browser pane with real time:** `requestAnimationFrame` barely runs while the pane is hidden, so waits showed stale frames. Fixed for testing with the dev-only `__game.advance(seconds)`, which steps the simulation and renders. Screenshots can still show the frame before the last render; take a second screenshot.
@@ -68,6 +70,7 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 0. Cat reactions follow Sebastian's clarification (looks from photos only, dynamic caught → greeting → end pose; zoomies and dazed wobble for chaotic cats). Next: study the GIF references in a visible Chrome tab and tune the `STEPS` durations; add the trill sound with PLAN task 3.
 0a. Hazel's brown bridge is faint at small sizes (the highlight band lightens it); Oreo's bracelet is on her far leg, so it is mostly hidden from the camera. Ask Sebastian if either should be stronger.
 0b. Profile the cats on a real phone (`?debug=1` shows fps). If under 50 fps: merge each cat's static meshes and tufts into one geometry per part, or drop tufts on cats off screen.
+0c. The services link points to sebherr.netlify.app/services.html, which goes live only when the 2D branch `fable/doors-services` is merged and pushed; deploy the 2D site first.
 1. PLAN.md tasks 3–14 for Haiku/Sonnet (start with 3 or 6). Tasks 1–2 done 2026-11-10 by Haiku (old driving files, Rapier and Kenney models removed; README rewritten), checked by Fable: build passes, full tour runs with no console errors.
 2. Fable F1–F5: hero polish (blink, wave, crouch, dust), data planet layout on a real phone, hop polish, real-device performance on a mid-range Android, update the review page.
 3. Not checked yet: keyboard-only pass through the whole tour in a visible tab, screen reader announcements, real touch input on a phone, frame rate on a phone, the hero close-up image for the review page (the pane was too small).

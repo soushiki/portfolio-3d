@@ -103,6 +103,10 @@ function launchPad() {
   return { group: g, star };
 }
 
+// Landmark ink: silhouette only. Hulls are pushed back so lines where parts cross disappear,
+// and parts smaller than 0.22 units get none (the clock's ticks and hands, windows, buttons).
+export const LANDMARK_OUTLINE = { bias: 0.22, minSize: 0.22 };
+
 export function buildPlanets({ scene, route, low }) {
   const planets = [];
   const updaters = [];
@@ -125,7 +129,7 @@ export function buildPlanets({ scene, route, low }) {
       standOnRim(holder, p, stop.angle, 0.3);
       // Set back from the hero's lane (z = 0) so the hero walks in front of it.
       holder.position.z = -(lm.d * s) / 2 - 0.15;
-      addOutlines(holder, 1);
+      addOutlines(holder, 1, LANDMARK_OUTLINE);
       root.add(holder);
       stop.object = holder;
       stop.height = lm.h * s;

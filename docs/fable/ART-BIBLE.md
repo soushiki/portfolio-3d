@@ -96,9 +96,9 @@ Planets sit left to right on a gentle wave, all in the z = 0 plane. Each has: a 
 | 00 | Hello | Cream moon with craters | Rocket-shaped cat tree with a round window and a pennant | Tinta's home base and the tour's start |
 | 01 | Minoscreto | Cut gem (faceted icosahedron) | Bank vault door with a spinning wheel | Privacy: a locked crystal |
 | 02 | Ingresos App | Smooth green world wrapped in a receipt-paper ribbon | Bank with columns and a coin stack | Bookkeeping, receipts, money |
-| 03 | Data science | Big blue cratered world (radius 11, others 6–7.5) | Hub: live bar chart with a trend arrow; then mailbox (A/B email), wind turbine (grid demand), street clock (311 delays) | One group, four stops, so it is bigger |
-| 04 | Formato Médico | Two-tone capsule pill (coral and white), tilted | Clinic with a red cross | Medical paperwork |
-| 05 | Whisker Gacha | Gacha capsule (pink top, white bottom, seam band) | Cat-eared capsule machine | His cat gacha game |
+| 03 | Formato Médico | Two-tone capsule pill (coral and white), tilted | Clinic with a red cross | Medical paperwork |
+| 04 | Data science | Big blue cratered world (radius 11, others 6–7.5) | Hub: live bar chart with a trend arrow; then mailbox (A/B email), wind turbine (grid demand), street clock (311 delays) | One group, four stops, so it is bigger |
+| 05 | Whisker Gacha (bonus) | Gacha capsule (pink top, white bottom, seam band) | Cat-eared capsule machine | His cat gacha game; an earlier build on the 2D site, kept as a bonus planet |
 | 06 | Contact | Yellow moon | Radio beacon with a dish and a speech bubble | "Say hi" |
 
 ## 6. Space backdrop

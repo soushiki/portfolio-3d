@@ -238,10 +238,20 @@ function hullGeometry(geo) {
 // `scale` thickens (1.6) or thins (0.6) the line for hero vs background pieces.
 // Options: `bias` pushes hulls back so inner crossings vanish (multi-part characters);
 // meshes with userData.outline === 0 get no hull, and userData.outline = k scales its width.
-export function addOutlines(root, scale = 1, { bias = 0 } = {}) {
+export function addOutlines(root, scale = 1, { bias = 0, minSize = 0 } = {}) {
+  // minSize: skip hulls on parts smaller than this (world units, bounding radius), so tiny details
+  // such as clock ticks, windows and buttons don't each draw their own ring of ink.
+  root.updateWorldMatrix(true, true);
   const meshes = [];
+  const ws = new THREE.Vector3();
   root.traverse((o) => {
-    if (o.isMesh && !o.userData.isOutline && !o.material.userData?.noOutline && o.userData.outline !== 0) meshes.push(o);
+    if (!o.isMesh || o.userData.isOutline || o.material.userData?.noOutline || o.userData.outline === 0) return;
+    if (minSize > 0) {
+      if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+      o.getWorldScale(ws);
+      if (o.geometry.boundingSphere.radius * Math.max(ws.x, ws.y, ws.z) < minSize) return;
+    }
+    meshes.push(o);
   });
   for (const mesh of meshes) {
     const k = mesh.userData.outline ?? 1;
