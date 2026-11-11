@@ -3,10 +3,10 @@ import { localize, withLang, pick } from './i18n.js';
 // Content shown on the in-world signs and overlay cards.
 export const SIMPLE_PORTFOLIO = 'https://sebherr.netlify.app';
 
-// Resume: the HTML resume on the main portfolio (it has its own download/print button).
+// Resume: one-page PDFs served by this site (copies of the developer resumes in job-applications).
 export const RESUME = {
-  en: `${SIMPLE_PORTFOLIO}/public/html/english.html`,
-  es: `${SIMPLE_PORTFOLIO}/public/html/spanish.html`,
+  en: '/resume/Sebastian-Herrera-resume-en.pdf',
+  es: '/resume/Sebastian-Herrera-resume-es.pdf',
 };
 
 export const CONTACT = {
