@@ -6,9 +6,9 @@ For: Sebastian, aiming at junior QA, data and developer roles (written, async wo
 
 | # | What | Why | Effort |
 | --- | --- | --- | --- |
-| 1 | **Ingresos App: remove the real restaurant figures** from `README.md` (it names a real receipt number and amount) and from the `probar_*.py` scripts; replace them with synthetic numbers. | The `ingresos-app` repo is **public** on GitHub *(checked)*; it shows a client's sales data. If the figures are already pushed, they stay in the git history: ask before rewriting it. | 20 min, plus history clean-up if needed |
+| 1 | ~~Ingresos App: real restaurant figures in a public repo~~ **Done by Sebastian (2026-11-10): `ingresos-app` is now private.** Still replace the figures with synthetic ones before it is ever made public again. | The README named a real receipt number and amount. | 20 min, only before making it public |
 | 2 | **Minoscreto: CI, LICENSE and a README top section** (screenshot, live link, "115 tests", how to run). | It has about 115 tests in 10 files but no CI, no LICENSE and a 25-line README *(checked: no `.github`, no LICENSE)*. A green test badge is the 30-second QA signal. | 1.5 h |
-| 3 | **Main portfolio skills match real projects.** Angular, Java/Spring Boot, MySQL and Docker are listed *(checked)*; link the public `ClassRoomAPIV2` repo (and any Docker use) as proof, or drop what has none. | Recruiters and interviewers ask about every listed skill; tutorial-level claims hurt. | 15–30 min |
+| 3 | **Main portfolio skills match real projects.** Angular, Java/Spring Boot, MySQL and Docker are listed *(checked)*; link the public `stockroom` repo (Spring Boot, JPA, PostgreSQL, Angular, Docker Compose) as proof. MySQL has no project (Stockroom uses PostgreSQL): change it to PostgreSQL or drop it. | Recruiters and interviewers ask about every listed skill; tutorial-level claims hurt. | 15–30 min |
 | 4 | **Main portfolio README** (it is 2 lines) and focus/reduced-motion styles. | Engineering reviewers open GitHub first. | 15 min + 1–2 h |
 | 5 | **Whisker Gacha in its own repo** with a README and screenshot; keep the two WhatsApp photos in `ref/` out of it. Later, move the pity/50-50 logic into a module with tests. | Its "Code" link now points into the portfolio repo. Tested probability logic is a strong QA/dev talking point. | 1 h, then 2–3 h |
 | 6 | **Formato Médico: 3 Vitest tests** (PDF field positions, CIE-10 search) and a screenshot in the README. Its Android CI already exists. | The repo is private, so recruiters only see the case study; tests still matter for interviews. | 2.5 h |
@@ -32,6 +32,10 @@ Sources agree: a few finished, deployed projects that match the target role, eac
 - Accessibility testing in CI (axe-core inside Playwright) plus a short manual screen-reader note (NVDA): the clearest "accessibility-first" signal.
 - Honest evaluation write-ups (what lost, what baseline won), as his data science READMEs already do: keep that voice everywhere.
 - Not found in this pass: Colombia-specific recruiter preferences, LLM-evaluation and data-storytelling examples. Research them before choosing a third project.
+
+## 3b. GitHub profile
+
+Redesigned 2026-11-10: `D:\Claude\github-profile\` (new README, bio and fields, pins; old README backed up there).
 
 ## 4. What this means for Planets of Code
 
