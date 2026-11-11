@@ -163,6 +163,14 @@ export function createUI({ featured, earlier, planets }) {
     toastTimer = setTimeout(() => (el.hidden = true), 2600);
   };
 
+  let lastCats = [];
+  $('cats-reset').addEventListener('click', () => {
+    try {
+      localStorage.removeItem('p3d-cats');
+    } catch {}
+    location.reload();
+  });
+
   let navNext = null;
   return {
     progress(fraction, message) {
@@ -258,6 +266,24 @@ export function createUI({ featured, earlier, planets }) {
         el.dataset.dir = String(dir);
         el.textContent = t(dir > 0 ? 'launchHint' : 'launchHintBack');
       }
+    },
+
+    // Fills the "Secret cats" section: cats = [{ id, name }] in CATS order, foundIds = found ids.
+    setCats(foundIds, cats = lastCats) {
+      lastCats = cats;
+      if (!cats.length) return;
+      $('cats-section').hidden = false;
+      const found = new Set(foundIds);
+      $('cats-count').textContent = t('catsCount', { n: cats.filter((c) => found.has(c.id)).length, total: cats.length });
+      $('cats-list').replaceChildren(
+        ...cats.map((c) => {
+          const li = document.createElement('li');
+          const on = found.has(c.id);
+          li.textContent = on ? `${c.name} ✓` : '???';
+          if (on) li.className = 'is-found';
+          return li;
+        }),
+      );
     },
 
     foundCat(name, n, total) {

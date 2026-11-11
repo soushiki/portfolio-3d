@@ -487,6 +487,12 @@ a {
   font-size: 0.85rem;
   font-weight: 600;
 }
+.tags li.is-found {
+  background: #8edb5a;
+}
+.cats-list {
+  margin: 0 0 10px;
+}
 .card-links {
   display: flex;
   flex-wrap: wrap;
