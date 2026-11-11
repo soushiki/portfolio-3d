@@ -172,7 +172,7 @@ footer a { color: var(--yellow); }
 <div class="wrap">
 
 <header class="cover">
-  <span class="badge">Fable 5.2 review · pass 1.1 · 2026-11-10</span>
+  <span class="badge">Fable 5.2 review · pass 2 · 2026-11-11</span>
   <h1>Planets of Code</h1>
   <p class="lede">Sebastian's 3D portfolio, redesigned as a guided comic tour: a cat courier walks around small planets in space, one per project, and the visitor turns the page with Next. The list, resume and contact are one click away from the first screen.</p>
 </header>
@@ -184,7 +184,7 @@ footer a { color: var(--yellow); }
       <h3><span class="pill done">Built and checked</span></h3>
       <ul class="status-list">
         <li>Comic shading: two bands, halftone, ink outlines</li>
-        <li>Hero Tinta, 14 sleeping cats, 7 planets, 10 landmarks</li>
+        <li>Hero Tinta, 13 secret cats from his own cats, 7 planets, 10 landmarks</li>
         <li>Guided walk, jump, hop arcs, Next / Back, planet strip</li>
         <li>Cover with skip paths, list dialog and no-WebGL fallback</li>
         <li>Phone, phone landscape, tablet and desktop layouts</li>
@@ -194,9 +194,8 @@ footer a { color: var(--yellow); }
     <div>
       <h3><span class="pill next">Next</span></h3>
       <ul class="status-list">
-        <li>Remove the old driving files and Rapier</li>
-        <li>Sound (off by default) and haptics</li>
-        <li>Hidden-cat reactions and a counter (12 cats)</li>
+                <li>Sound (off by default) and haptics</li>
+        <li>Cat list in the project dialog and saved progress (in progress)</li>
         <li>Landmark recolour, tap-to-walk, smoke tests, axe audit</li>
         <li>Fable: hero polish, data planet layout, phone perf pass</li>
       </ul>
@@ -213,13 +212,46 @@ footer a { color: var(--yellow); }
   </div>
 </section>
 
+<section class="panel" aria-labelledby="pass2">
+  <h2 id="pass2">Pass 2: his cats, hops both ways, phone fixes</h2>
+  <figure><img src="shots/cats-lineup.jpg" alt="Model sheet: Tinta and the 13 secret cats on plinths, idle poses on the top rows and found poses marked with a check below" loading="lazy"><figcaption>The 13 secret cats, modelled on Sebastian's own cats: idle pose above, found pose (✓) below. Tinta top left for scale.</figcaption></figure>
+  <div class="grid" style="margin-top:16px">
+    <div>
+      <h3>Secret cats</h3>
+      <ul class="status-list">
+        <li>Likeness from coat, patches, stripes, blaze, eye colour and size</li>
+        <li>Each has its own idle pose, a 1.2 s collect animation and a found pose</li>
+        <li>Toast names the cat: "Oreo found! 4 of 13 cats"</li>
+        <li>Reduced motion: a calm slow blink instead</li>
+        <li>His photos stay private: never copied or published</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Controls</h3>
+      <ul class="status-list">
+        <li>Two stars per planet: right hops forward, left hops back</li>
+        <li>Hold Space or Jump 0.6 s on a star; let go early to cancel</li>
+        <li>B, P, Backspace or Shift+Enter go back a stop</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Fixes</h3>
+      <ul class="status-list">
+        <li>Touch Jump no longer fails when pointer capture throws</li>
+        <li>Phones with "remove animations" see a small hop, not nothing</li>
+        <li>Bottom-right 240 × 72 px kept free for Netlify's badge (standing rule)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 <section class="panel" aria-labelledby="hero">
   <h2 id="hero">Hero and world</h2>
   <div class="grid">
     <div>
       <h3>Tinta, the courier cat</h3>
       <p>An original tuxedo cat with chibi proportions (head about 40% of the height), big comic eyes, a yellow scarf and a red jet pack that fires while airborne. Ears, tail curl and pack read as a silhouette at 60 px. It stops just left of each landmark and faces it.</p>
-      <p>The other 12 cats of Sebastian's household sleep on the planet undersides as easter eggs that never block the route.</p>
+      <p>Sebastian's 13 real cats hide on the planet undersides as easter eggs that never block the route.</p>
     </div>
     <figure><img src="shots/gacha-desktop.jpg" alt="Tinta standing beside the capsule machine on the pink Whisker Gacha planet, with its card open on the right" loading="lazy"><figcaption>Planet 05, Whisker Gacha: Tinta beside the capsule machine.</figcaption></figure>
   </div>
