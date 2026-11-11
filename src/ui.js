@@ -260,8 +260,8 @@ export function createUI({ featured, earlier, planets }) {
       }
     },
 
-    foundCat(n, total) {
-      toast(t('catFound', { n, total }));
+    foundCat(name, n, total) {
+      toast(t('catFound', { x: name, n, total }));
     },
 
     // Reduced motion: a quick comic "panel" wipe instead of flying.

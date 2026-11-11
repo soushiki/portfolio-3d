@@ -1,10 +1,9 @@
 import * as THREE from 'three';
 import { comicMaterial as M, addOutlines, bannerSprite } from './comic.js';
 import { makeLandmark } from '../landmarks.js';
-import { makeCat } from './hero.js';
+import { CATS, makeSecretCat } from './cats.js';
 
 const DEG = Math.PI / 180;
-const HIDDEN_COATS = ['orange', 'grey', 'calico', 'black', 'cream', 'tuxedo'];
 
 // Point on a planet's rim (z = 0 plane) at `deg` degrees, `lift` above the surface.
 export function rimPoint(planet, deg, lift = 0, out = new THREE.Vector3()) {
@@ -156,19 +155,18 @@ export function buildPlanets({ scene, route, low }) {
     banner.position.set(p.x, p.y + p.radius + tallest + 1.8, -2);
     root.add(banner);
 
-    // Two hidden cats sleeping on the underside: easter eggs, never on the route.
+    // Secret cats on the underside: easter eggs, never on the route.
     const hidden = [];
-    for (const [k, deg] of [[0, 245], [1, 300]]) {
-      const cat = makeCat({ coat: HIDDEN_COATS[(p.index * 2 + k) % HIDDEN_COATS.length], gear: false, outline: 1.1 });
-      cat.group.scale.setScalar(0.85);
-      cat.group.scale.y = 0.6; // curled up
+    for (const { id, angle } of p.cats ?? []) {
+      const cat = makeSecretCat(CATS.find((c) => c.id === id));
+      cat.root.rotation.y = -0.5; // three-quarter view toward the camera
+      cat.root.scale.setScalar(1.1);
       const holder = new THREE.Group();
-      holder.add(cat.group);
-      standOnRim(holder, p, deg, 0.05);
+      holder.add(cat.root);
+      standOnRim(holder, p, angle, 0.05);
       root.add(holder);
-      hidden.push({ angle: deg, holder, cat, found: false });
+      hidden.push({ angle, holder, cat, found: false });
     }
-
     scene.add(root);
     planets.push({ ...p, root, body, pad, backPad, banner, hidden });
   }

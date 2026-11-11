@@ -54,6 +54,13 @@ async function loadFonts() {
 }
 
 async function boot() {
+  // ?lineup=cats: the cat model sheet (design and review tool, no tour).
+  if (new URLSearchParams(location.search).get('lineup') === 'cats' && hasWebGL()) {
+    document.getElementById('loader').hidden = true;
+    const { startLineup } = await import('./space/lineup.js');
+    startLineup(document.getElementById('scene'));
+    return;
+  }
   if (!hasWebGL()) {
     ui.showFallback(t('noWebgl'));
     return;
