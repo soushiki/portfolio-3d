@@ -1,5 +1,7 @@
 # Portfolio 3D: Planets of Code
 
+[![CI](https://github.com/soushiki/portfolio-3d/actions/workflows/ci.yml/badge.svg)](https://github.com/soushiki/portfolio-3d/actions/workflows/ci.yml)
+
 A guided comic tour of my portfolio. Tinta, a tuxedo cat courier, walks between planets that sit in one line in space. Press Next to go from stop to stop; each planet opens a card with a short description, tags and links to the project. The list, Resume and Contact are always one click away on the cover and in the HUD, so the 3D tour is never the only way in.
 
 The main portfolio stays at [sebherr.netlify.app](https://sebherr.netlify.app). This one links back to it from the cover.
@@ -12,6 +14,21 @@ npm run dev
 ```
 
 `npm run build` writes a static site to `dist/` (works on Netlify as-is).
+
+## How this site is tested
+
+Every push and pull request runs `npm ci`, `npm run build` and `npm test` on GitHub Actions (`.github/workflows/ci.yml`). The tests use Playwright (Chromium, software WebGL) against the Vite dev server on port 5071:
+
+- **Smoke tests** (`tests/tour.spec.js`): the cover shows Start, the list button, Resume, Contact and this testing link; the guided tour opens each card in tour order; `?webgl=0` shows the plain list (tour items and earlier builds); `?lang=es` shows the Spanish labels.
+- **Accessibility** (`tests/a11y.spec.js`): axe-core checks the cover, the plain list and the tour HUD with an open card, and fails on serious or critical violations.
+
+Run them locally:
+
+```bash
+npm install
+npx playwright install chromium
+npm test
+```
 
 ## Controls
 

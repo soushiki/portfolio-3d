@@ -136,7 +136,7 @@ export function createUI({ featured, earlier, planets }) {
     b.className = 'strip-dot';
     b.style.setProperty('--planet', p.color);
     b.textContent = String(p.index);
-    b.setAttribute('aria-label', `${p.number} ${p.stops[0].item.title}`);
+    b.setAttribute('aria-label', `${p.index} ${p.stops[0].item.title}`);
     b.title = p.stops[0].item.title;
     b.addEventListener('click', () => onGoTo?.(p.stops[0].item.id));
     strip.append(b);
