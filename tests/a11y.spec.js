@@ -27,6 +27,7 @@ test('?webgl=0 list has no serious or critical axe violations', async ({ page })
 test('tour HUD with an open card has no serious or critical axe violations', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Start the tour' }).click({ timeout: 30_000 });
+  await expect(page.locator('#loader')).toBeHidden({ timeout: 10_000 });
   await expect
     .poll(async () => {
       await page.evaluate(() => window.__game.advance(1));
