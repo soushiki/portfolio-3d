@@ -302,6 +302,10 @@ export function createUI({ featured, earlier, planets }) {
       toast(t('catFound', { x: name, n, total }));
     },
 
+    helloCat(name, n, total) {
+      toast(t('catHello', { x: name, n, total }));
+    },
+
     // Reduced motion: a quick comic "panel" wipe instead of flying.
     panelCut() {
       const c = $('cut');

@@ -3,7 +3,7 @@ import { setPixelRatio } from './comic.js';
 import { createBackdrop } from './backdrop.js';
 import { buildPlanets, rimPoint } from './planets.js';
 import { makeCat } from './hero.js';
-import { CATS, collect, setPose, updateCat } from './cats.js';
+import { CATS, collect, greetAgain, setPose, updateCat } from './cats.js';
 import { ROUTE, STOPS } from './route.js';
 import { createInput } from './input.js';
 
@@ -242,8 +242,12 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
         if (state.dismissed !== s) ui.openCard(s.item, s.planet);
       }
     }
-    for (const h of p.hidden) {
-      if (!h.found && Math.abs(angDiff(state.angle, h.angle)) < HIDDEN_RANGE) {
+    for (const q of planets) for (const h of q.hidden) {
+      const d = Math.abs(angDiff(state.angle, h.angle));
+      const inside = q === p && d < HIDDEN_RANGE;
+      if (q !== p || d > HIDDEN_RANGE + 4) h.near = false;
+      if (inside && !h.found) {
+        h.near = true;
         h.found = true;
         state.found++;
         collect(h.cat, { reducedMotion });
@@ -253,6 +257,11 @@ export async function startGame({ canvas, quality, isTouch, ui, reducedMotion })
         } catch {}
         ui.setCats(foundIds, catInfo);
         ui.foundCat(h.cat.spec.name, state.found, planets.reduce((n, q) => n + q.hidden.length, 0));
+      } else if (inside && !h.near) {
+        h.near = true;
+        if (greetAgain(h.cat, { reducedMotion })) {
+          ui.helloCat(h.cat.spec.name, state.found, planets.reduce((n, q) => n + q.hidden.length, 0));
+        }
       }
     }
     // Next/Back labels follow the hero.
