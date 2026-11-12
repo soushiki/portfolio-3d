@@ -38,6 +38,8 @@ Owner: Fable 5.2 (since 2026-11-10; Sebastian: "the portfolio is its own", Fable
 
 - 2026-11-11, sync with the 2D site and landmark audit: tour order now Hello → Minoscreto → Ingresos → Formato Médico → Data science (4 stops) → Whisker Gacha (bonus) → Contact (checked by stepping Next through all stops); list "On the tour" = the featured set, Whisker Gacha under Earlier builds; intro and Minoscreto card carry the 160-tests proof; Contact card and list link to the 2D services page. Landmarks: `npm run check:models` found no duplicate meshes; the "copies inside itself" look on the clock (and the vault, turbine, clinic) was one outline hull per tiny part with no depth push. Fixed with `LANDMARK_OUTLINE`; all 10 landmarks checked on `?lineup=landmarks` in Chrome. Hop selftest PASS at 375 × 812 (full and reduced).
 
+- 2026-11-12, PLAN tasks 10, 11, 14 (branch `qa-tests`): Playwright smoke tests (`tests/tour.spec.js`) + axe checks (`tests/a11y.spec.js`), `npm test` 7/7 passed three times locally; headless WebGL works with swiftshader flags; CI workflow `.github/workflows/ci.yml` not run on GitHub yet (needs a push); cover link "How this site is tested"; axe fix in `src/ui.js` (strip labels). Report: `a11y-2026-11.md`.
+
 ## Tried and failed (and why)
 
 - **Testing in the hidden browser pane with real time:** `requestAnimationFrame` barely runs while the pane is hidden, so waits showed stale frames. Fixed for testing with the dev-only `__game.advance(seconds)`, which steps the simulation and renders. Screenshots can still show the frame before the last render; take a second screenshot.
