@@ -1,6 +1,7 @@
 // Phone-sized screenshot through Chrome's DevTools protocol (real device emulation; headless
 // --window-size can't go below ~500 px). Node 22+ (built-in WebSocket), no dependencies.
 // Usage: node tools/phone-shot.mjs <url> <out.png> [width=360] [height=740] [waitMs=4000]
+// Env: RM=1 emulates prefers-reduced-motion: reduce; NOJS=1 disables JavaScript; EVAL='<expr>' prints its value.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -44,10 +45,16 @@ const send = (method, params = {}) => new Promise((r) => {
 
 await send('Emulation.setDeviceMetricsOverride', { width: +w, height: +h, deviceScaleFactor: 2, mobile: true });
 await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+if (process.env.RM === '1') await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+if (process.env.NOJS === '1') await send('Emulation.setScriptExecutionDisabled', { value: true });
 await send('Page.enable');
 await send('Page.navigate', { url });
 await sleep(+wait);
 const iw = await send('Runtime.evaluate', { expression: 'innerWidth', returnByValue: true });
+if (process.env.EVAL) {
+  const r = await send('Runtime.evaluate', { expression: process.env.EVAL, returnByValue: true });
+  console.log('eval:', JSON.stringify(r.result.result.value));
+}
 const shot = await send('Page.captureScreenshot', { format: 'png' });
 writeFileSync(out, Buffer.from(shot.result.data, 'base64'));
 console.log(`saved ${out} (innerWidth ${iw.result.result.value})`);
