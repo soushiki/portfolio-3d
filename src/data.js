@@ -15,6 +15,9 @@ export const SERVICES_URL = `${SIMPLE_PORTFOLIO}/services.html`;
 export const CONTACT = {
   github: 'https://github.com/soushiki',
   linkedin: 'https://www.linkedin.com/in/sebastian-herrera-claro-23a0af/',
+  whatsapp: 'https://wa.me/573188022279?text=Hi%20Sebastian%21%20I%27m%20interested%20in%20discussing%20a%20digital%20project%20for%20my%20business.',
+  whatsapp_es: 'https://wa.me/573188022279?text=Hola%2C%20Sebasti%C3%A1n.%20Me%20interesa%20conversar%20sobre%20un%20proyecto%20digital%20para%20mi%20negocio.',
+  email: 'mailto:sebastianherrerajr@gmail.com',
 };
 
 const RAW_PROJECTS = [
@@ -23,10 +26,10 @@ const RAW_PROJECTS = [
     landmark: 'vault',
     title: 'Minoscreto',
     description:
-      'Anonymizes Word documents before you paste them into an AI, then restores the real names in the answer. Everything runs in the browser, so nothing leaves your computer. 160 automated tests.',
+      "Pasting a document into an AI chat exposes the real names in it. Minoscreto swaps them for placeholders in your browser and puts them back in the AI's answer, so the names never leave your computer. 160 automated tests.",
     tags: ['React', 'Vite', 'Vitest', '.docx'],
     description_es:
-      "Anonimiza documentos de Word antes de pegarlos en una IA y luego restaura los nombres reales en la respuesta. Todo se ejecuta en el navegador, así que nada sale de tu computador. 160 pruebas automáticas.",
+      "Pegar un documento en un chat de IA expone los nombres reales que contiene. Minoscreto los cambia por marcadores en tu navegador y los devuelve en la respuesta de la IA, así los nombres nunca salen de tu computador. 160 pruebas automatizadas.",
     live: 'https://minoscreto.netlify.app/',
     caseStudy: `${SIMPLE_PORTFOLIO}/public/html/minoscreto.html`,
     code: 'https://github.com/soushiki/minoscreto',
@@ -49,10 +52,10 @@ const RAW_PROJECTS = [
     landmark: 'bank',
     title: 'Ingresos App',
     description:
-      "Bookkeeping template for restaurants: reads photos and PDFs of receipts and POS cash-closing reports with OCR and a local vision model, then builds the day's accounting ledger and exports it to Excel.",
+      'Built for a restaurant that typed its receipts and POS cash-closing reports into the books by hand. It reads photos and PDFs with OCR and a local vision model and turns the month\'s papers into a ledger ready for the accountant, with the cash closing checked against the receipts.',
     tags: ['Python', 'OCR', 'Ollama', 'Excel'],
     description_es:
-      "Plantilla de contabilidad para restaurantes: lee fotos y PDFs de recibos y de cierres de caja del POS con OCR y un modelo de visión local, luego arma el libro contable del día y lo exporta a Excel.",
+      "Hecha para un restaurante que pasaba a mano sus recibos y cierres de caja del POS a la contabilidad. Lee fotos y PDF con OCR y un modelo de visión local y deja los papeles del mes como un libro listo para el contador, con el cierre de caja cuadrado contra los recibos.",
     caseStudy: `${SIMPLE_PORTFOLIO}/public/html/ingresos.html`,
     code: 'https://github.com/soushiki/ingresos-app',
   },
@@ -61,10 +64,10 @@ const RAW_PROJECTS = [
     landmark: 'hospital',
     title: 'Formato Médico',
     description:
-      "Fills a physician's lab orders, prescriptions and certificates as PDFs that match the printed form, with an offline ICD-10 search. One React codebase for web and Android.",
+      "Built for a doctor whose lab orders, prescriptions and certificates have to match his printed form exactly. It fills them as identical PDFs, with an offline ICD-10 search, so each document comes out ready to print or send from the phone. Web and Android.",
     tags: ['React', 'jsPDF', 'Capacitor', 'Android'],
     description_es:
-      "Llena órdenes de laboratorio, fórmulas médicas y certificados como PDFs idénticos al formato impreso, con búsqueda CIE-10 sin conexión. Un solo código en React para web y Android.",
+      "Hecha para un médico cuyas órdenes de laboratorio, recetas y certificados deben coincidir exactamente con su formato impreso. Los llena como PDF idénticos, con buscador CIE-10 sin internet, y cada documento sale listo para imprimir o enviar desde el celular. Web y Android.",
     caseStudy: `${SIMPLE_PORTFOLIO}/public/html/formato-medico.html`,
   },
   {
@@ -156,9 +159,9 @@ const RAW_HUB = {
   id: 'ds-hub',
   title: 'Data Science Portfolio',
   description:
-    'End-to-end data science on real public data: live API pipelines, honest out-of-time evaluation and interactive dashboards. Walk around the planet to see each project.',
+    'Three projects on real public data, each ending in what won, what lost and against which baseline, so a decision can rest on it. Walk around the planet to see each project.',
   description_es:
-    'Ciencia de datos de punta a punta con datos públicos reales: pipelines con APIs en vivo, evaluación fuera de tiempo sin trampa y dashboards interactivos. Camina alrededor del planeta para ver cada proyecto.',
+    'Tres proyectos con datos públicos reales; cada uno termina en qué ganó, qué perdió y contra qué línea base, para poder decidir con eso. Camina alrededor del planeta para ver cada proyecto.',
   tags: ['Data science', 'Python', 'scikit-learn'],
   tags_es: ['Ciencia de datos', 'Python', 'scikit-learn'],
   title_es: 'Portafolio de ciencia de datos',
@@ -219,11 +222,13 @@ const RAW_CONTACT = {
   id: 'contact',
   title: 'Say hi',
   title_es: 'Saluda',
-  description: 'Open to junior QA, data and developer roles. The quickest way to reach me is LinkedIn.',
-  description_es: 'Busco roles junior de QA, datos y desarrollo. La forma más rápida de contactarme es LinkedIn.',
+  description: 'For a project: WhatsApp or email. For a job: LinkedIn or my resume.',
+  description_es: 'Para un proyecto: WhatsApp o correo. Para un empleo: LinkedIn o mi hoja de vida.',
   tags: ['Contact'],
   tags_es: ['Contacto'],
   links: [
+    { label: "Let's discuss your project", label_es: 'Hablemos de tu proyecto', href: CONTACT.whatsapp, href_es: CONTACT.whatsapp_es },
+    { label: 'Email', label_es: 'Correo', href: CONTACT.email },
     { label: 'LinkedIn', href: CONTACT.linkedin },
     { label: 'Resume', label_es: 'Hoja de vida', href: RESUME.en, href_es: RESUME.es },
     { label: 'GitHub', href: CONTACT.github },
@@ -237,9 +242,9 @@ const RAW_INTRO = {
   title: "Hi, I'm Sebastian",
   title_es: 'Hola, soy Sebastian',
   description:
-    'Open to junior QA, data and developer roles. I build tested tools for real problems: 160 automated tests in Minoscreto, 3 data science projects, a web + Android app. Press Next to fly to the first planet.',
+    'I build websites and practical tools that help businesses work smarter. Open to junior QA, data and developer roles, and available for freelance projects. 160 automated tests in Minoscreto, 3 data science projects, a web + Android app. Press Next to fly to the first planet.',
   description_es:
-    'Busco roles junior de QA, datos y desarrollo. Construyo herramientas probadas para problemas reales: 160 pruebas automáticas en Minoscreto, 3 proyectos de ciencia de datos y una app web y Android. Pulsa Siguiente para volar al primer planeta.',
+    'Construyo páginas web y herramientas prácticas que ayudan a los negocios a trabajar mejor. Busco roles junior de QA, datos y desarrollo y estoy disponible para proyectos freelance. 160 pruebas automatizadas en Minoscreto, 3 proyectos de ciencia de datos y una app web y Android. Pulsa Siguiente para volar al primer planeta.',
   tags: ['Web', 'Data', 'QA'],
   tags_es: ['Web', 'Datos', 'QA'],
   links: [

@@ -151,7 +151,7 @@ export const pick = (item, field) => (LANG === 'es' && item[`${field}_es`]) || i
 export const withLang = (href) => {
   if (LANG !== 'es' || !href || !/^https?:/.test(href)) return href; // own files (e.g. the resume PDF) stay as they are
   const u = new URL(href);
-  if (u.hostname === 'github.com') return href;
+  if (u.hostname === 'github.com' || u.hostname === 'wa.me') return href;
   u.searchParams.set('lang', 'es');
   return u.toString();
 };
