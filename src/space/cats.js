@@ -638,6 +638,14 @@ export function collect(cat, { reducedMotion = false } = {}) {
   nextStep(cat);
 }
 
+// A found cat says hello again when the hero walks past it.
+export function greetAgain(cat, { reducedMotion = false } = {}) {
+  if (!cat.found || cat.anim) return false;
+  cat.anim = { steps: reducedMotion ? ['slowBlink'] : ['greet', 'headBump'], i: -1, t: 0 };
+  nextStep(cat);
+  return true;
+}
+
 function nextStep(cat) {
   const a = cat.anim;
   STEPS[a.steps[a.i]]?.exit?.(cat);
