@@ -67,7 +67,3 @@ Pinned exact versions: Vite 8.3.4, Three.js 0.186.1. All geometry is procedural;
 | `src/i18n.js` | English and Spanish strings. |
 | `src/data.js` | Project and contact content. Edit this to add or change projects. |
 | `src/main.js` | WebGL check, quality settings, loading cover, lazy-loads the tour. |
-
-## More
-
-The design notes, art bible and build plan are in [docs/fable/](docs/fable/).

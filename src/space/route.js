@@ -4,7 +4,6 @@ import { PROJECTS, DATA_SCIENCE, DATA_SCIENCE_HUB, CONTACT_ZONE, INTRO_ZONE } fr
 // the 2D site (sebherr.netlify.app): Minoscreto, Ingresos, Formato Médico, Data science. Whisker Gacha
 // is an earlier build there; here it stays as a bonus planet (it carries two secret cats). Each planet has stops along its
 // upper arc; the hero walks clockwise over the top (left = 150°, top = 90°, right = 30°).
-// See docs/fable/PLAN.md "Project selection" for why these projects and this order.
 
 const byId = (list, id) => list.find((p) => p.id === id);
 

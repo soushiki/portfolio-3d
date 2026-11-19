@@ -13,7 +13,7 @@ const noLine = (mesh) => ((mesh.userData.outline = 0), mesh);
 // shapes stay simple and comic). His photos give only the looks; the motion follows real cat body
 // language: idle hiding pose -> caught (freeze or startle hop) -> greeting (tail up, quivering tip)
 // -> the cat's own happy end pose. Chaotic cats add zoomies or a dazed wobble.
-// See docs/fable/ART-BIBLE.md §2b. The cat faces +x, +y is up, about 1 unit tall sitting.
+// The cat faces +x, +y is up, about 1 unit tall sitting.
 
 const DEG = Math.PI / 180;
 
@@ -518,7 +518,7 @@ export function setPose(cat, name) {
 // --- Found reactions ---------------------------------------------------------------------------
 // Each step: { duration (s), enter(c) once, run(c, u) with u in 0..1, exit(c) }. Timings follow real
 // cat motion: a startle freeze is a fraction of a second, a greeting trot about a second, a zoomies
-// burst one to two seconds (docs/fable/cats-and-feedback-2026-11-11.md, "Timings used").
+// burst one to two seconds.
 const STEPS = {
   // "You caught me!": a short freeze, eyes wide, ears forward, head up.
   freeze: {

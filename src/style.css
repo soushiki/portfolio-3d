@@ -1,5 +1,5 @@
-/* Planets of Code: comic-panel UI over a space scene. Palette checked with palette-check
-   (WCAG 2.1 AA, docs/fable/palette-preview.html). Rule: planet colours are fills under
+/* Planets of Code: comic-panel UI over a space scene. Palette checked against
+   WCAG 2.1 AA. Rule: planet colours are fills under
    ink text, never text on paper. */
 :root {
   --ink: #16122e;

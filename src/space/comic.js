@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 
-// Comic shading for everything in the space world (see docs/fable/ART-BIBLE.md).
+// Comic shading for everything in the space world.
 // - Two flat colour bands (lit / shadow), the shadow hue-shifted toward violet.
 // - Screen-space halftone dots inside the shadow band: the always-on signature.
 // - A thin lit highlight band and no smooth gradients.

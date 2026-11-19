@@ -3,3 +3,9 @@ dist
 .DS_Store
 playwright-report
 test-results
+
+# Local working notes (kept in a private repo, never committed here)
+/CLAUDE.md
+/.claude
+/docs/fable
+/docs/copy-sync-2026-11-12.md
